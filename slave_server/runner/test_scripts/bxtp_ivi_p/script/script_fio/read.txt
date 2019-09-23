@@ -1,0 +1,5 @@
+cd /data
+chmod a+x fio_rand_read-sh
+./fio_rand_read-sh
+exit
+

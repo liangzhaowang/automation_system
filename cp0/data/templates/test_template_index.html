@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+
+{% block content %}
+<div class="row">
+    {% for g in templates %}
+        {% for template in g %}
+        <div class="col-lg-6">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>{{ template.template_name|default:'Not set' }}</h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="stream-small">
+                        <span class="label label-primary"> PROJECT</span>
+                        <span class="text-muted"> {{ template.serialize.project_name }}</span>
+                    </div>
+                    <div class="stream-small">
+                        <span class="label label-primary"> BUILDER</span>
+                        <span class="text-muted"> {{ template.serialize.build_type }}</span>
+                    </div>
+                    <div class="stream-small">
+                        <span class="label label-primary"> ARTIFACTORY</span>
+                        <span class="text-muted"> <a title="{{ template.serialize.build_url }}" href="{{ template.serialize.build_url }}">{{ template.serialize.build_url|slice:":40" }}...</a></span>
+                    </div>
+                    <div class="stream-small">
+                        <span class="label label-primary"> TARGET</span>
+                        <span class="text-muted"> {{ template.serialize.test_target }}</span>
+                    </div>
+                    
+                    {% if template.serialize.case_info %}
+                        {% for case in template.serialize.case_info %}
+                        <div class="stream-small">
+                            <span class="label label-primary"> CASE {{ forloop.counter }}</span>
+                            <span class="text-muted"> {{ case.case_name }} x {{ case.case_loop }}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="stream-small">
+                            <span class="label label-primary"> NO CASE DEFINED</span>
+                            <span class="text-muted"> {{ name }}
+                        </div>
+                    {% endif %}
+
+                    <div class="stream-small">
+                        <span class="label label-primary"> SLAVE</span>
+                        <span class="text-muted"> {{ template.serialize.slave_info }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    
+    {% endfor %}
+     
+</div>
+{% endblock %}

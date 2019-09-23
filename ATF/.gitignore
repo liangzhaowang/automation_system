@@ -1,0 +1,8 @@
+*.pyc
+*.egg
+build/
+ATF.egg-info
+.vscode/
+dist/
+.idea/
+debug.py

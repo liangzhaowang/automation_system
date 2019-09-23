@@ -1,0 +1,6 @@
+Input                                               |ReportStatuts  |Attribute  |Output
+CPU0 Launch first Guest                             |S              |pre_kernel        |VMM start
+VMM: Launch Android                                 |R              |pre_kernel            |Lk/trusty  ready
+Initializing cgroup subsys cpuset                   |S              |kernel     |Console ready
+init: init started!                                 |R              |kernel     |Root mounted
+init: Starting service 'rvc'...						|S				|RVC		|rvc Start     

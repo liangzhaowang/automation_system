@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% load chart %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-content">
+                <form class="form-horizontal">
+                    <input type="hidden" id="prev_mq" value="{{ prev_mq }}">
+                    <input type="hidden" id="current_mq" value="{{ current_mq }}">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Test Cases</label>
+                        <div class="col-sm-5">
+                            {% for case in cases %}
+                            <div class="input-group m-b">
+                                <span class="input-group-addon" style="width: 400px" id="n{{ forloop.counter0 }}" aria-id="{{ forloop.counter0 }}" name="caseName">{{ case }}</span>
+                                <input type="num" value="1" name="caseLoop" id="l{{ forloop.counter0 }}" aria-id="{{ forloop.counter0 }}" class="form-control">
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Test Slave</label>
+                        <div class="col-sm-2">
+                            <select class="form-control m-b" name="slave" id="slave_selector">
+                                {% for slave in slaves %}
+                                <option value="{{ slave.id }}">{{ slave.ip }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="m-b-lg">
+                        <span class="text-muted small pull-right">Daily builds: {{ prev_build }} to {{ current_build }}</span>
+                        <h2>Merge requests</h2>
+
+                        <div class="m-t-md">
+                            <div class="pull-right">
+                                <a type="button" class="btn btn-sm btn-white">
+                                    Buildbot
+                                </a>
+                                <a type="button" class="btn btn-sm btn-white">
+                                    JF images
+                                </a>
+                                <a type="button" class="btn btn-sm btn-white">
+                                    SH images
+                                </a>
+                            </div>
+                    
+                            <strong>Found {{ filtered_mq_list|length }} merge requests.</strong>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="tb_merge_request" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Merge request</th>
+                                    <th>Repo</th>
+                                    <th>Image</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody_merge_request">
+                                {% for merge_request in filtered_mq_list %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <span class="label label-success">{{ merge_request.0 }}</span></td>
+                                    <td>{{ merge_request.1 }}</td>
+                                    <td>
+                                        <a href="{{ merge_request.2 }}" class="text-muted">{{ merge_request.2 }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="" class="btn btn-xs btn-success"><i class="fa fa-link"></i> buildbot</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4">
+                                <button class="btn btn-primary" type="button" onclick="create()">Launch tests</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/cp0/daily.js' %}"></script>
+<script>
+    function create() {
+        var case_inputs = $("input[name=\"caseLoop\"]");
+        var arrayCaseName = [];
+        var arrayCaseLoop = [];
+        for (var i=0; i < case_inputs.length; i++)
+        {
+            arrayCaseName.push($("#n" + i.toString()).html());
+            arrayCaseLoop.push($("#l" + i.toString()).val());
+        }
+        
+        var postData = {
+            'case_name': arrayCaseName,
+            'case_loop': arrayCaseLoop,
+            'prev_mq': $("#prev_mq").val(),
+            'current_mq': $("#current_mq").val(),
+            'slave': $("#slave_selector option:selected").val(),
+        };
+
+
+        $.post('./create/', postData, function(data) {
+            if (data.status_code == '200') {
+                window.location.href = '/';
+            }
+        });
+    };
+</script>
+{% endblock js %}

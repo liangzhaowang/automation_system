@@ -1,0 +1,56 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block content %}
+
+<div class="raw">
+        <div class="ibox">
+            <div class="ibox-content">
+                <table class="table table-strip">
+                    <tr>
+                        <td></td>
+                        {% for case_name in caseresult.items.0.1.keys %}
+                        <td>{{ case_name }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% for build, bv in caseresult.items %}
+                    <tr>
+                        <td><a href="{{ mq_url }}{{ build }}" target="_blank">{{ build }}</a></td>
+                        {% for case, cv in bv.items %}
+                        
+                        <td>
+                            {% for test in cv.tests %}
+                            <a href="/raw/{{ project }}/{{ build }}/{{ test.test_id }}/">{{ test.result }}</a> 
+                            {% endfor %}
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+    
+{% endblock content %}
+
+
+{% block js %}
+<script>
+$("table").each(function() {
+    var $this = $(this);
+    var newrows = [];
+    $this.find("tr").each(function(){
+        var i = 0;
+        $(this).find("td").each(function(){
+            i++;
+            if(newrows[i] === undefined) { newrows[i] = $("<tr></tr>"); }
+            newrows[i].append($(this));
+        });
+    });
+    $this.find("tr").remove();
+    $.each(newrows, function(){
+        $this.append(this);
+    });
+});
+</script>
+{% endblock js %}

@@ -1,0 +1,60 @@
+<div style="height:400px">
+<table class="table issue-tracker no-margins" task_count={{ myfavorites.paginator.count }}>
+    <thead>
+        <th>STATUS</th>
+        <th>CREATED</th>
+        <th>USER</th>
+        <th>BUILD</th>
+        <th>PROJECT</th>
+        <th>SLAVE</th>
+        <th>CONFIG</th>
+        <th>RESULT</th>
+        <th></th>
+    </thead>
+
+    <tbody>
+        {% for logger in myfavorites %}
+        <tr>
+            <td><span class="label label-{{ logger.label_class }}"> {{ logger.event }}</span></td>
+            <td class="issue-time"> <a>{{ logger.create_time }}</a><small>{{ logger.time_interval }}</small></td>
+            <td class="issue-user">
+            <a class="pull-left" href="#"><img class="img-circle" width="28px" src="/static/img/avatars/{{ logger.user.usercpz.avatar|default:'avatarDefault.png' }}">                                                {{ logger.user.last_name }}, {{ logger.user.first_name }}</a>
+            </td>
+            <td class="issue-build"><a name="build" href="{{ logger.build_link.2 }} " target="_blank">{{ logger.build_link.0 }}</a><small>{{ logger.build_link.1 }}</small></td>
+            <td><a name="project" project_id={{ logger.project.id }}>{{ logger.project }}</a></td>
+            <td><a name="slave" slave_id="{{ logger.slave.id }}">{{ logger.slave.num }}</a></td>
+            <td><span class="text-muted"><a name="config" onclick="show_config('{{ logger.test_config }}')">{{ logger.test_config }}</a></span></td>
+            {% if logger.result_link == '#' %}
+            <td><span class="text-muted">Cancel</span></td>
+            {% else %}
+            <td><span class="text-muted"><a href="/{{ logger.result_link }} " target="_blank">View result</a></span></td>
+            {% endif %}
+            <td><div class="btn-group">
+            <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false">
+            <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu">
+            <li><a onclick="retest(this)" target="_blank">Re-test</a></li>
+            <li><a href="/new/{{ logger.test_config }}">Copy-test</a></li>
+            <li><a onclick="unfavorite(this, {{ logger.task.id }})">Unfavorite</a></li>
+            </ul>
+            </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+<div class="row">
+    <div class="btn-group pull-right", style="margin-right: 40px">
+        <button class="btn btn-white" onclick="getMyfavorites({{ myfavorites.paginator.page_range.0 }})" aria-label="First">&laquo;</button>
+        {% if myfavorites.has_previous %}
+        <button class="btn btn-white" onclick="getMyfavorites({{ myfavorites.previous_page_number }})" aria-label="Previous">‹</button>
+        {% endif %}
+        {{ page_html |safe }}
+        {% if myfavorites.has_next %}
+            <button class="btn btn-white" onclick="getMyfavorites({{ myfavorites.next_page_number }})" aria-label="Next">›</button>
+        {% endif %}
+            <button class="btn btn-white" onclick="getMyfavorites({{ myfavorites.paginator.num_pages }})" aria-label="Last">&raquo;</button>
+    </div>
+</div>

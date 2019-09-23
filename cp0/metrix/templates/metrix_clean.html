@@ -1,0 +1,47 @@
+{% extends "base_clean.html" %}
+{% load staticfiles %}
+{% block css %}
+<style>
+    .table > tbody > tr > td {
+        padding: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<table class="table table-bordered table-hover table-striped">
+    <thead>
+        <tr>
+            <!--<td>Session ID</td>-->
+            <td style="width: 500px">Indicator Name</td>
+            <td style="width: 120px">Target</td>
+            <td style="width: 150px">{{ data.0.build }}</td>
+            <td style="width: 150px">{{ data.0.prev_build }}</td>
+            <td>A vs B</td>
+            <td>A vs Alpha</td>
+            <td>A vs Beta</td>
+            <td>A vs PV</td>
+            <td style="width: 150px">Remark</td>
+        </tr>
+    </thead>
+    <tbody>
+        {% for i in data %}
+        <tr>
+            <!--<td>{{ i.0 }}</td>-->
+            <td>{{ i.case }}</td>
+            <td>{{ i.target_display }}</td>
+            <td class="{{ i.cur_bg }}">{{ i.cur_result }} ({{ i.cur_rsd }}) <br>{% ifnotequal i.cur_bug None %} <small class="text-muted">{{ i.cur_bug }}</small>{% endifnotequal %}</td>
+            <td class="{{ i.prev_bg }}">{{ i.prev_result }} ({{ i.prev_rsd }}) <br>{% ifnotequal i.cur_bug None %} <small class="text-muted">{{ i.prev_bug }}</small>{% endifnotequal %}</td>
+            <td>{{ i.vs }}</td>
+            <td>{{ i.vstarget }}</td>
+            <td>{{ i.vstarget }}</td>
+            <td>{{ i.vstarget }}</td>
+            <td id="{{i.indicator_id }}" name='remark' aria-name="{{ i.case }}">{{ i.remark }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block js %}
+{% endblock %}

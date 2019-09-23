@@ -1,0 +1,167 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% block css %}
+<link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox ">
+            <div class="ibox-title">
+                <h5>Test Script Management </h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content ibox-heading">
+                <h4>Shared from others
+                    <div class="stat-percent text-navy">11 <i class="fa fa-level-up"></i></div>
+                </h4>
+            </div>
+            <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Script</th>
+                                <th>Case Name</th>
+                                <th>Last update</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/boot_analyze_2_0/boot_analyze_2_0.py</td>
+                                <td>full_boot</td>
+
+                                <td>Jul 14, 2018</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/Acrn_boot_analyze_2_0/Acrn_BTM.py</td>
+                                <td>Acrn_boot_time</td>
+                                <td>Jul 16, 2018</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/boot_time/boottime.py</td>
+                                <td>boot_simple</td>
+                                <td>Jul 18, 2018</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/quick_boot/bootanalyze.py</td>
+                                <td>quick_boot</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/boot_file_cp0/boot_file_cp0.py</td>
+                                <td>boot_file_cp0 patch list 601001, 615293</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/cold_boot_audio/boot_analyze_2_0.py</td>
+                                <td>cold_boot_to_audio</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/benchmark/adb_rlbench.py</td>
+                                <td>Rlbench</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/benchmark/adb_gfx_gl4.py</td>
+                                <td>GFX5_openGL_high</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/benchmark/adb_gfx_gl4.py</td>
+                                <td>GFX5_openGL_high_off</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/benchmark/adb_gfx_gl4.py</td>
+                                <td>GFX5_openGL_normal</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/benchmark/adb_gfx_gl4.py</td>
+                                <td>GFX5_openGL_normal_off</td>
+                                <td>Feb 23, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ibox-content ibox-heading">
+                <h4>Private
+                    <div class="stat-percent text-navy">1 <i class="fa fa-level-up"></i></div>
+                </h4>
+                <div><a href="#">Add a new script</a></div>
+            </div>
+            <div class="ibox-content">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Script</th>
+                                <th>Case Name</th>
+                                <th>Last update</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="checkbox" checked class="i-checks" name="input[]"></td>
+                                <td>script/cpu_usage/cpu_usage.py</td>
+                                <td>full_boot</td>
+
+                                <td>Mar 17, 2019</td>
+                                <td><a href="#">Edit</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ibox-footer">
+                <button class="btn btn-primary btn-sm" type="submit">Save changes</button>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    {% block js %}
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.i-checks').iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green',
+            });
+        });
+    </script>
+    {% endblock %}

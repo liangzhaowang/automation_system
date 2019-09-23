@@ -1,0 +1,239 @@
+
+<style>
+    .text-cotented{
+        color:#0071c5;
+    }
+
+    .hideme{
+        display:none;
+    }
+
+    .font_gray_color{
+        color:rgb(103, 106, 108);
+    }
+</style>
+
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row">
+            <div class="col-lg-12">
+                <table id="table" class="table table-bordered table-hover table-striped" aria-cur="{{ cur_bug_count }}" aria-name="{{ outdir }}" style="table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <td style="width: 30%;overflow:hide">Indicator Name</td>
+                            <td style="width: 9%;overflow:hide">
+                                <div class="w3-dropdown-hover w3-background-opacity-full font_gray_color font_gray_color" style="background:rgb(245, 245, 246)">
+                                    <button class="w3-button w3-padding-0 w3-background-opacity-full mtx-hover-blue font_gray_color"><span>Priority </span><i class="fa fa-caret-down"></i></button>
+                                    <div class="w3-dropdown-content w3-bar-block w3-border dt-hd-opts font_gray_color" id="prior-flt-opts" style="max-height: 528.6px; overflow: auto">
+                                      <a class="w3-bar-item w3-button w3-padding-tiny dt-hd-opt prior-flt-opt">All</a>
+                                      <a class="w3-bar-item w3-button w3-padding-tiny dt-hd-opt prior-flt-opt">P1</a>
+                                      <a class="w3-bar-item w3-button w3-padding-tiny dt-hd-opt prior-flt-opt">P2</a>
+                                    </div>
+                                    <div class="mtx-tbl-highlight mtx-txt-blue font_gray_color" id="prior-pked" style="text-align:center">All</div>
+                                </div>
+                            </td>
+                            <td style="width: 10%;overflow:hide">Target</td>
+                            <td style="width: 10%;overflow:hide">{{ data.0.build }}</td>
+                            <td style="width: 10%;overflow:hide">{{ data.0.prev_build }}</td>
+                            <td style="width: 9%;overflow:hide">A vs B</td>
+                            <td style="width: 9%;overflow:hide">A vs Target</td>
+                            <td style="width: 8%;overflow:hide">QA JIRA</td>
+                            <td style="width: 5%;overflow:hide">JIRA TREE</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for i in data %}
+                        <tr id="{{i.cur_bug }}" class='indi-all' name='indicator' aria-id='{{i.indicator_id }}'>
+                            <td name="pnpbug" aria-bug="{{ i.bug }}" aria-id="{{ i.indicator_id }}">{{ i.case }}
+                                <!--{% ifnotequal i.bug None %}-->
+                                <!--<p class="text-success">{{ i.bug }}</p>-->
+                                <!--{% endifnotequal %}-->
+                            </td>
+                            <td id="{{ i.indicator_id }}_priority">{{ i.priority }}</td>
+                            <td>{{ i.target_display }}</td>
+                            <td class="{{ i.cur_bg }}">
+                                {% ifnotequal i.cur_result 'N/A' %}
+                                {{ i.cur_result }} ({{ i.cur_rsd }}) <br>
+                                {% else %}
+                                {{ i.cur_result }}<br>
+                                {% endifnotequal %}
+                            </td>
+                            <td class="{{ i.prev_bg }}">
+                                {% ifnotequal i.prev_result 'N/A' %}
+                                {{ i.prev_result }} ({{ i.prev_rsd }}) <br>
+                                {% else %}
+                                {{ i.prev_result }}<br>
+                                {% endifnotequal %}
+                            </td>
+                            <td>{{ i.vs }}</td>
+                            <td>{{ i.vstarget }}</td>
+                            <td id="{{ i.indicator_id }}" name='remark' aria-name="{{ i.cur_bug_params }}:{{i.prev_bug_params}}" ar>
+                                <p class="text-cotented">
+                                {% ifnotequal i.cur_result 'N/A' %}
+                                    {% for item in i.cur_bug %}
+                                        <a href="https://jira.devtools.intel.com/browse/{{ item }}" target="_blank">{{ item }}</a><br>
+                                    {% endfor %}
+                                {%else%}
+                                    {% for item in i.prev_bug %}
+                                        <a href="https://jira.devtools.intel.com/browse/{{ item }}" target="_blank">{{ item }}</a><br>
+                                    {% endfor %}
+                                {% endifnotequal%}
+
+                                </p></td>
+                            <td id="tree_{{ i.indicator_id }}" name="treetd" aria-name="{{ i.cur_bug }}">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="myModal"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" style="height: 650px; width: 950px; color:black; overflow:auto">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h5 class="modal-title" id="myModalLabel1"></h5>
+            </div>
+            <div class="tree_view_cl">
+
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+
+
+<script>
+$(document).ready(function(){
+    $.each($("td[name=\"remark\"]"), function(k, v){
+        var id_data = v.getAttribute("aria-name");
+        var id_ar = new Array();
+
+        var text = $(this).children('.text-cotented').text();
+        text = text.replace(/\s/g, "")
+        id_ar = id_data.split(':');
+        <!--console.log(id_ar);-->
+        var id;
+        if(id_ar[0] != 'None'){
+          id = id_ar[0];
+        }else{
+          id = id_ar[1]
+        }
+        <!--console.log(id);-->
+        <!--console.log(text);-->
+        <!--console.log(text != '')-->
+        if (id != "" && text != '')
+        {
+            $("#tree_" + v.getAttribute("id")).append("<button type=\"button\" class=\"btn btn-primary\" name=\'treebt\' style=\"width:50px\" id=\"tree_btn" + id + "\">tree</button>");
+
+        }
+    });
+    <!--$.get('/metrix/outexamps/',function(){-->
+
+    <!--})-->
+
+});
+$(".dt-hd-opt").on("click", function(){
+    do_datatable_filter(this);
+});
+$("td[name='treetd']").on('click','button',function(){
+    var bug_id = $(this).attr("id").substr(8);
+    var dir = $("#table").attr("aria-name");
+
+
+        var selector = $(this)
+
+        $.ajax({
+        url: '/metrix/jira_raw_data/'+bug_id+':'+dir+'/',
+        type: "get",
+        beforeSend: function(XMLHttpRequest){
+            <!--console.log('beforeSend');-->
+            selector.attr({"disabled":"disabled"});
+        },
+        success: function(data) {
+            <!--console.log('success');-->
+        },
+        complete: function(XMLHttpRequest, textStatus){
+                <!--console.log('complete');-->
+                $.ajax({
+                url: '/metrix/examp/'+bug_id+':'+dir+'/',
+                type: "get",
+                success: function(data) {
+                    var openstr = '/metrix/examp_templates/examps'+bug_id+'_'+dir+'.html'
+                    openWins(openstr)
+                    //openWin(data);
+                    },
+                complete: function(XMLHttpRequest, textStatus){
+                    selector.removeAttr("disabled");
+                    },
+                error: function(jqXHR, textStatus, errorThrown){
+                    selector.removeAttr("disabled");
+                    }
+                });
+            },
+        error: function(jqXHR, textStatus, errorThrown){
+            selector.removeAttr("disabled");
+        }
+
+        });
+
+});
+
+//<!--$("button[name='treebt']").trigger('click');-->
+function openWins(openurl) {
+           var name='add';
+           var iWidth=950;
+           var iHeight=600;
+           var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
+           var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
+           window.open(openurl, name, 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + '');
+
+       }
+
+function do_datatable_filter( elem ){
+	//console.log( "do_datatable_filter" );
+	var filter = elem.innerHTML;
+	console.log( "filter:" + filter );
+	$(elem).parent().parent().next().html( filter );
+
+	if( "All" == filter )
+		$(elem).parent().prev().children("i").removeClass("w3-text-amber");
+	else
+		$(elem).parent().prev().children("i").addClass("w3-text-amber");
+
+	var filters = [];
+
+	console.log( "filter:" + filter );
+	if( "All" != filter )
+	    filters.push( filter );
+    $('#prior-pked').html(filter);
+	console.log( filters );
+	$(".indi-all").each(function(){
+
+		var show = false;
+		var priority_id = $(this).attr('aria-id')+'_priority';
+		//console.log($("#"+priority_id).html());
+		//console.log($('tr > td:eq(1)').val())
+		for( var i = 0, cnt = filters.length; i < cnt; i++ ) {
+			if( $("#"+priority_id).html() == filters[i] ) {
+				show = true;
+			} else {
+				show = false;
+				break;
+			}
+		}
+		if( 0 == filters.length ) {
+			$(this).removeClass("hideme");
+		}else if( show ) {
+			$(this).removeClass("hideme");
+		} else {
+			$(this).addClass("hideme");
+		}
+	});
+}
+</script>
+

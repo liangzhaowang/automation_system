@@ -1,0 +1,5 @@
+./prepare.sh ####device_id####
+
+./main.sh ####html_folder####
+
+./dump_launchtime_pagenumber.py ####page_folder####

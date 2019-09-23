@@ -1,0 +1,351 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="tabs-container">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="active" name="cpu_info"><a class="nav-link active" data-toggle="tab" href="#tab-1"> CPU Usage</a></li>
+                    <li name="memo_info"><a class="nav-link" data-toggle="tab" href="#tab-2">Memory Usage</a></li>
+                    <li name="fps_info"><a class="nav-link" data-toggle="tab" href="#tab-3">FPS trends</a></li>
+                    <button class="btn btn-success dim btn-xl btn-outline" name="cpu_inifo" id="plus" style="left: 600px; width: 70px">-</button>
+                    <button class="btn btn-success dim btn-xl btn-outline" name="cpu_inifo" id="minus" style="left: 795px; width: 70px">+</button>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" id="tab-1" class="tab-pane active">
+                        <div class="panel-body">
+                            <canvas id="canvas_cpu" height="120"></canvas>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="tab-2" class="tab-pane">
+                        <div class="panel-body">
+                            <canvas id="canvas_mem" height="120"></canvas>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="tab-3" class="tab-pane">
+                        <div class="panel-body">
+                            <canvas id="canvas_fps" height="120"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+	<script src="{% static 'js/Chart.js' %}"></script>
+	    <script>
+        var data_count = 100;
+        var full_lable = [];
+        var full_cpu = [];
+        var full_instance = [];
+        var full_memo = [];
+        var full_fps = [];
+        var time = [];
+        var config_cpu = {
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: [{
+                    label: 'usage',
+					backgroundColor: "",
+					borderColor: "rgb(54, 162, 235)",
+					data: [],
+					fill: false,
+                }]
+            },
+            options: {
+				animation: {
+					duration: 0
+				},
+				responsive: true,
+				title: {
+					display: true,
+					text: 'CPU'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Time(s)'
+						}
+					}],
+					yAxes: [{
+						id: 'y-axis-1',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Usage percentage',
+							position: 'left'
+                        }
+					},{
+						id: 'y-axis-2',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Instance num',
+                        },
+						position: 'right',
+						gridLines: {
+							drawOnChartArea: false, // only want the grid lines for one axis to show up
+						},
+					}]
+				}
+			}
+        }
+		var config_fps = {
+			animation: {
+				duration: 0
+			},
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: [{
+                    label: 'usage',
+					backgroundColor: "",
+					borderColor: "rgb(54, 162, 235)",
+					data: [],
+					fill: false,
+                }]
+            },
+            options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'FPS'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Time(s)'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'FPS'
+						}
+					},{
+						id: 'y-axis-2',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Instance num',
+                        },
+						position: 'right',
+						gridLines: {
+							drawOnChartArea: false, // only want the grid lines for one axis to show up
+						},
+					}]
+				}
+			}
+        }
+		var config_mem = {
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: []
+            },
+            options: {
+				animation: {
+					duration: 0
+				},
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Memory'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Time(s)'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Memory'
+						}
+					},{
+						id: 'y-axis-2',
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Instance num',
+                        },
+						position: 'right',
+						gridLines: {
+							drawOnChartArea: false, // only want the grid lines for one axis to show up
+						},
+					}]
+				}
+			}
+        }
+        window.onload = function() {
+			$.get('/{{ api }}', function(data) {
+				config_mem.data.datasets = data.datasets.mem_dataset;
+				config_cpu.data.datasets = data.datasets.cpu_dataset;
+				config_fps.data.datasets = data.datasets.fps_dataset;
+				config_mem.data.labels = deepClone(data.datasets.instances);
+				config_cpu.data.labels = deepClone(data.datasets.instances);
+				config_fps.data.labels = deepClone(data.datasets.instances);
+
+                for(var i in data.datasets.instances){
+                    full_lable.push(data.datasets.instances[i])
+                }
+                for(var j in config_cpu.data.datasets[0]['data']){
+                    full_cpu.push(config_cpu.data.datasets[0]['data'][j])
+                }
+                for(var k in config_cpu.data.datasets[1]['data']){
+                    full_instance.push(config_cpu.data.datasets[1]['data'][k])
+                }
+                for(var l in config_mem.data.datasets[0]['data']){
+                    full_memo.push(config_mem.data.datasets[0]['data'][l])
+                }
+                for(var m in config_fps.data.datasets[0]['data']){
+                    full_fps.push(config_fps.data.datasets[0]['data'][m])
+                }
+
+				var ctx_mem = document.getElementById('canvas_mem').getContext('2d');
+				window.myLine_mem = new Chart(ctx_mem, config_mem);
+
+				var ctx_fps = document.getElementById('canvas_fps').getContext('2d');
+				window.myLine_fps = new Chart(ctx_fps, config_fps);
+
+				var ctx_cpu = document.getElementById('canvas_cpu').getContext('2d');
+				window.myLine_cpu = new Chart(ctx_cpu, config_cpu);
+                document.getElementById('minus').addEventListener('click', function () {
+                    var active_page = $("li[class='active']").attr('name');
+                    if(active_page=='cpu_info'){
+                        if( config_cpu.data.labels.length>=data_count){
+                            config_cpu.data.labels.splice(0, data_count);
+                            for(var i=1; i<=data_count; i++){
+                                config_cpu.data.datasets.forEach(function (dataset) {
+                                    dataset.data.shift();
+                                })
+                            }
+
+                        }
+                        window.myLine_cpu.update();
+                    }
+                    if(active_page=='memo_info'){
+                        if( config_mem.data.labels.length>=data_count){
+                            config_mem.data.labels.splice(0, data_count);
+                            for(var i=1; i<=data_count; i++){
+                                config_mem.data.datasets.forEach(function (dataset) {
+                                    data_tmps = dataset.data.shift();
+                                })
+                            }
+                        }
+                        window.myLine_mem.update()
+                    }
+                    if(active_page=='fps_info'){
+                        if( config_fps.data.labels.length>=data_count){
+                            console.log();
+                            config_fps.data.labels.splice(0, data_count);
+                            for(var i=1; i<=data_count; i++){
+                                config_fps.data.datasets.forEach(function (dataset) {
+                                    dataset.data.shift();
+                                })
+                            }
+
+                        }
+                        window.myLine_fps.update()
+                    }
+                });
+                document.getElementById('plus').addEventListener('click', function () {
+                    var active_pages = $("li[class='active']").attr('name');
+                    if(active_pages=='cpu_info'){
+                        var data_lenth = config_cpu.data.labels.length;
+                        //console.log('=====:'+data_lenth);
+                        if( data_lenth<full_lable.length){
+                            for (i=full_lable.length-data_lenth-1; full_lable.length-data_lenth-data_count<=i; i--){
+                                //console.log(i);
+                                config_cpu.data.labels.unshift(full_lable[i]);
+                                config_cpu.data.datasets[0]["data"].unshift(full_cpu[i]);
+                                config_cpu.data.datasets[1]["data"].unshift(full_instance[i]);
+                            }
+                        }
+                        window.myLine_cpu.update();
+                        console.log('----');
+                    }
+                    if(active_pages=='memo_info'){
+                        var data_lenth = config_mem.data.labels.length;
+                        if( data_lenth<full_lable.length){
+                            for (i=full_lable.length-data_lenth-1; full_lable.length-data_lenth-data_count<=i; i--){
+                                config_mem.data.labels.unshift(full_lable[i]);
+                                config_mem.data.datasets[0]["data"].unshift(full_memo[i]);
+                                config_mem.data.datasets[1]["data"].unshift(full_instance[i]);
+                            }
+                        }
+                        window.myLine_mem.update();
+                    }
+                    if(active_pages=='fps_info'){
+                        var data_lenth = config_fps.data.labels.length;
+                        if( data_lenth<full_lable.length){
+                            for (i=full_lable.length-data_lenth-1; full_lable.length-data_lenth-data_count<=i; i--){
+                                config_fps.data.labels.unshift(full_lable[i]);
+                                config_fps.data.datasets[0]["data"].unshift(full_fps[i]);
+                                config_fps.data.datasets[1]["data"].unshift(full_instance[i]);
+                            }
+                        }
+                        window.myLine_fps.update();
+                    }
+                });
+
+			});
+		};
+        function deepClone(obj) {
+            var _tmp, result;
+            _tmp = JSON.stringify(obj);
+            result = JSON.parse(_tmp);
+            return result;
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while(n--){
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+
+            return new File([u8arr], filename, {type:mime});
+        }
+
+    </script>
+{% endblock %}

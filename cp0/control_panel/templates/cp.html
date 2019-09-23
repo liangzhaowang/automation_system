@@ -1,0 +1,136 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        Server
+                    </h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table">
+                        <thead>
+                        <th>File system</th>
+                        <th>Size</th>
+                        <th>Used</th>
+                        <th>Available</th>
+                        <th>Mounted on</th>
+                        <th></th>
+                        </thead>
+                        <hbody>
+                            {% for fs in fss %}
+                                <tr>
+                                    <td>{{ fs.0 }}</td>
+                                    <td>{{ fs.1 }}</td>
+                                    <td>{{ fs.2 }}</td>
+                                    <td>{{ fs.3 }}</td>
+                                    <td>{{ fs.5 }}</td>
+                                    <td width="30%">
+                                        <div class="progress progress no-margins">
+                                            <div class="progress-bar" style="width: {{ fs.4 }};"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                        </hbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        Buildbot
+                        <small>https://buildbot.sh.intel.com/</small>
+                    </h5>
+                </div>
+                <div class="ibox-content">
+                    <form method="post" class="form-horizontal">
+                        <div class="form-group"><label class="col-sm-2 control-label">Branch Config URL</label>
+                            <div class="col-sm-10"><input class="form-control" type="text" value="{{ branch_url }}">
+                            </div>
+                        </div>
+                        <div class="form-group"><label class="col-sm-2 control-label">Product Node</label>
+                            <div class="col-sm-10"><input class="form-control" type="text" value="{{ branch_nodes }}">
+                            </div>
+                        </div>
+                        <div class="form-group"><label class="col-sm-2 control-label"></label>
+                            <div class="col-sm-3">
+                                <button class="btn btn btn-primary" type="button" id="btn_test">Update</button>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                    </form>
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        Redis
+                        <small>localhost:6379</small>
+                    </h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-hover">
+                        <htead>
+                            <th>Key</th>
+                            <th>Value</th>
+                        </htead>
+                        <tbody>
+                        {% for k, v in redis_dict.items %}
+                            <tr>
+                                <td>{{ k }}</td>
+                                <td>{{ v }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        MongoDB
+                        <small>localhost:6379</small>
+                    </h5>
+                </div>
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            {% ifnotequal mongo_st.0 0 %}
+                                <dl class="dl-horizontal">
+                                    <dt>Status:</dt>
+                                    <dd><span class="label label-primary">Active</span></dd>
+                                </dl>
+                                <dl class="dl-horizontal">
+                                    <dt>Databases:</dt>
+                                    <dd>{{ mongo_st }}</dd>
+                                </dl>
+                            {% else %}
+                                <dl class="dl-horizontal">
+                                    <dt>Status:</dt>
+                                    <dd><a class="label label-danger">Fail: {{ mongo_st }}</a></dd>
+                                </dl>
+                            {% endifnotequal %}
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $("#btn_test").click(function () {
+            $.post('/control_panel/update_branch', {}, function () {
+
+            })
+        })
+    </script>
+{% endblock %}

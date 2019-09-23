@@ -1,0 +1,4 @@
+ip: 10.239.93.155
+server: 10.239.93.159:8000
+config: blank_gr_mrb_b1
+target: gordon_peak

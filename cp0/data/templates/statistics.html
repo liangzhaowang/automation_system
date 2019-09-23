@@ -1,0 +1,222 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+
+{% endblock css %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Tasks</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" id="task_count"></h1>
+                <small>Total tasks</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Projects</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" id="project_count"></h1>
+                <small>Total projects</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Slaves</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" id="slave_count"></h1>
+                <small>Total slaves</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Users</h5>
+            </div>
+            <div class="ibox-content">
+                <h1 class="no-margins" id="user_count"></h1>
+                <small>Total users</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Slave usage</h5>
+                <div class="pull-right">
+                    <div class="btn-group">
+                        <button name="dur" type="button" aria-days="7" class="btn btn-xs btn-white">7 days</button>
+                        <button name="dur" type="button" aria-days="30" class="btn btn-xs btn-white">30 days</button>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="alert alert-success alert-dismissable">
+                    <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+                    CP0 has tested <strong id="period_task_count"></strong> task in recent <strong id="period"></strong> days, totally saved <strong id="hour_count"></strong> hours.
+                </div>
+                <div class="row">
+                    <canvas id="barStack" height="80"></canvas>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <canvas id="barChart" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Tasks</h5>
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <canvas id="barChart2" height="80"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+</pre>
+{% endblock content %}
+
+{% block js %}
+<script src="{% static 'js/plugins/chartJs/Chart.min.js' %}"></script>
+<script>
+    $("button[name='dur']").on('click', function(obj) {
+        update_slave_usage($(this).attr("aria-days"));
+    });
+
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF'.split('');
+        var color = '#';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+    var ctx2 = document.getElementById("barChart").getContext("2d");
+    var ctx3 = document.getElementById("barStack").getContext("2d");
+    var chart2 = new Chart(ctx2, {
+        type: 'bar', 
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: "Total(mins)",
+                    backgroundColor: 'rgba(26, 179, 148, 0.5)',
+                    pointBorderColor: "#fff",
+                    data: []
+                }
+            ]
+        }, 
+        options: {
+            title: {
+                display: true,
+                text: ''
+            },
+            responsive: true
+        }
+    });
+    var chart3 = new Chart(ctx3, {
+        type: 'bar', 
+        data: {
+            datasets: [],
+            labels: []
+        }, 
+        options: {
+            title: {
+                display: true,
+                text: ''
+            },
+            tooltips: {
+                mode: 'index',
+                intersect: false
+            },
+            responsive: true,
+            scales: {
+                xAxes: [{
+                    stacked: true,
+                }],
+                yAxes: [{
+                    stacked: true
+                }]
+            }
+        }
+    });
+
+    function update_slave_usage(period) {
+        $.get('/statistics/get/' + period, function(data){
+            chart2.data.labels = [];
+            chart2.data.datasets[0].data = [];
+            for (var d in data) {
+                if (d == "total") {
+                    $("#hour_count").html(data[d]['hours']);
+                    $("#period_task_count").html(data[d]['tasks']);
+                    $("#period").html(period);
+                }
+                else {
+                    chart2.data.labels.push('#' + data[d]['slave_info']['number'])
+                    chart2.data.datasets[0].data.push(Number((data[d]['sum'] / 60).toFixed(1)));
+                }
+                
+            }
+            chart2.options.title.text = 'Slaves total execution(' + period + ' days)';
+            chart2.update();
+        })
+        
+        $.get('/statistics/get/weekly/' + period, function(data){
+            chart3.data.labels = data.labels;
+            chart3.data.datasets = data.datasets;
+            chart3.options.title.text = 'Slaves usage('+ period + ' days)';
+            chart3.update();
+        })
+        
+    }
+
+    $.get('/statistics/get/summary/', function(data){
+        $("#task_count").html(data['task_count']);
+        $("#project_count").html(data['project_count']);
+        $("#slave_count").html(data['slave_count']);
+        $("#user_count").html(data['user_count']);
+
+        var ctx2 = document.getElementById("barChart2").getContext("2d");
+        var barOptions = {
+            responsive: true
+        };
+        var barData2 = {
+            labels: data['month_list'],
+            datasets: [
+                {
+                    label: "Count",
+                    backgroundColor: 'rgba(26, 179, 148, 0.5)',
+                    pointBorderColor: "#fff",
+                    data: data['task_count_list']
+                }
+            ]
+        };
+
+        window.chart = new Chart(ctx2, {type: 'line', data: barData2, options:barOptions});
+    });
+
+    update_slave_usage(7);
+</script>
+{% endblock js %}

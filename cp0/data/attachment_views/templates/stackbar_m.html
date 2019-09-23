@@ -1,0 +1,378 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <div class="ibox">
+            <div class="ibox-content">
+                <div id="container" style="height: 600px">
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div id="container2" style="height: 900px">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/code/highcharts.js' %}"></script>
+    <script>
+        $.getJSON('/chart_data/stack_bar/{{ link }}', function (data) {
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'bar'
+                },
+                exporting: {
+                    chartOptions: {
+                        plotOptions: {
+                            series: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'To Kernel Complete'
+                },
+                xAxis: {
+                    categories: ['Phases'].concat(data.kernel.categories)
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Time'
+                    },
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        pointPadding: 0.1,
+                        groupPadding: 0,
+                        stacking: 'normal'
+                    }
+                },tooltip: 
+                {
+                    borderWidth: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    borderRadius: 15,
+                    shadow: false,
+                    style: {
+                        color: '#fff',
+                        font: 'Open Sans'
+                    },
+                    animation: false,
+                    formatter: function () {
+                        return '<b>' + this.y + ': ' + this.x + '</b>';
+                    }
+                },
+                series: [
+                    {
+                        name: 'RVC',
+                        data: [data.kernel.phases[8]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Kernel_RVC',
+                        data: [data.kernel.phases[7]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Kernel',
+                        data: [data.kernel.phases[6]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Pkernel->kernel',
+                        data: [data.kernel.phases[5]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Pre-kernel',
+                        data: [data.kernel.phases[4]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'ABL-Prekernel',
+                        data: [data.kernel.phases[3]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'ABL',
+                        data: [data.kernel.phases[2]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'CSE',
+                        data: [data.kernel.phases[1]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Pre-CSE',
+                        data: [data.kernel.phases[0]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'duration',
+                        color: 'rgb(0, 113, 197)',
+                        dataLabels: {
+                            enabled: true,
+                            align: 'right',
+                            color: 'white',
+                            boarderColor: 'gray',
+                            x: -10,
+                            y: -1,
+                        },
+                        data: data.kernel.durations
+                    }, {
+                        name: 'start from',
+                        color: '#F0F8FF',
+                        data: data.kernel.starts
+                    },
+                ]
+            });
+
+            Highcharts.chart('container2', {
+                chart: {
+                    type: 'bar'
+                },
+                exporting: {
+                    chartOptions: {
+                        plotOptions: {
+                            series: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: 'To Android Complete'
+                },
+                xAxis: {
+                    categories: ['Phases'].concat(data.android.categories)
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Time'
+                    },
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        pointPadding: 0.1,
+                        groupPadding: 0,
+                        stacking: 'normal'
+                    }
+                },tooltip: 
+                {
+                    borderWidth: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    borderRadius: 15,
+                    shadow: false,
+                    style: {
+                        color: '#fff',
+                        font: 'Open Sans'
+                    },
+                    animation: false,
+                    formatter: function () {
+                        return '<b>' + this.y + ': ' + this.x + '</b>';
+                    }
+                },
+                series: [
+                   {
+                        name: 'android->boot finished',
+                        data: [data.android.phases[9]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                   {
+                        name: 'init2->android',
+                        data: [data.android.phases[8]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'init1->2',
+                        data: [data.android.phases[7]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'kernel',
+                        data: [data.android.phases[6]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Pkernel->kernel',
+                        data: [data.android.phases[5]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'pre-kernel',
+                        data: [data.android.phases[4]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'ABL-prekernel',
+                        data: [data.android.phases[3]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'ABL',
+                        data: [data.android.phases[2]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'CSE',
+                        data: [data.android.phases[1]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Pre_CSE',
+                        data: [data.android.phases[0]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'duration',
+                        color: 'rgb(0, 113, 197)',
+                        dataLabels: {
+                            enabled: true,
+                            align: 'right',
+                            color: 'white',
+                            boarderColor: 'gray',
+                            x: -10,
+                            y: -1,
+                        },
+                        data: data.android.durations
+                    }, {
+                        name: 'start from',
+                        color: '#F0F8FF',
+                        data: data.android.starts
+                    }
+
+                ]
+            });
+        });
+    </script>
+{% endblock %}

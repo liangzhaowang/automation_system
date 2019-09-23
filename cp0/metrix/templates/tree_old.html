@@ -1,0 +1,95 @@
+{% block content %}
+
+<div class="tree_view">
+</div>
+
+
+<div style="display: none;">
+    <div class="tree">
+        <ul id="tree_ul_id">
+            <li id="li_contain"></li>
+        </ul>
+    </div>
+</div>
+
+<div style="display: none;">
+    <div class="my_span">
+    <span id="span_id" ><i class="icon-calendar"></i></span><br>
+    <p></p>
+    </div>
+</div>
+<div style="display: none;">
+    <div  class="my_sub_data_ul">
+        <ul>
+        </ul>
+    </div>
+</div>
+<div style="display: none;" >
+    <div class="my_sub_data">
+        <li>
+            <span class="badge badge-success" id="main_id"><i class="icon-minus-sign"></i></span><br>
+            <p id="sum_id"></p>
+        </li>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+$(document).ready(function(){
+    console.log("+++++++++++++++++++++++");
+    var mid = {{main_id|safe}};
+    for (x in {{main_id|safe}})
+    {
+        console.log(x)
+        console.log(mid[x])
+        var m_id = mid[x]
+        $.get('/total_result/', function(data) {
+        $.each(data,function(i,v){
+          if(m_id == i){
+              console.log(i)
+              console.log(v)
+          }
+        })
+
+       <!--$(".tree_view_cl").html(data);-->
+       <!--$.each(data,function(i,v){-->
+       <!--console.log(i)-->
+       <!--console.log(v)-->
+       <!--});-->
+        });
+    }
+
+    <!--console.log(main_id);-->
+    <!--var id_data =-->
+    <!--console.log(id_len);-->
+    <!--console.log(id_data);-->
+    <!--console.log("{{main_id_1}}");-->
+    console.log("-----------------------");
+    <!--$.map(main_id,function(ind){-->
+    <!--console.log(ind);-->
+    <!--});-->
+    <!--console.log(cont_data.length);-->
+    <!--console.log(main_id);-->
+    $("#span_id").text("content");
+    $(".my_span p").text(" p");
+    $("#main_id").text(" main");
+    $("#sum_id").text(" sub");
+
+    $(".my_sub_data_ul ul").append($(".my_sub_data").html());
+    <!--console.log($(".my_sub_data").html());-->
+    <!--console.log($(".my_sub_data_ul").html());-->
+    $("#li_contain").append(
+        $(".my_span").html()
+    );
+    <!--console.log($("#li_contain").html());-->
+    $("#li_contain").append(
+        $(".my_sub_data_ul").html()
+    );
+    <!--console.log($("#li_contain").html());-->
+    $(".tree_view").append(
+        $(".tree").html()
+    );
+});
+
+</script>
+{% endblock %}

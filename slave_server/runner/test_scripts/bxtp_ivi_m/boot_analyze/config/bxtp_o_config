@@ -1,0 +1,4 @@
+Input                                               |ReportStatuts  |Attribute  |Output
+Initializing cgroup subsys cpuset                   |S              |kernel     |Console ready
+init: init first stage started!                                 |R              |kernel     |Root mounted
+init: Starting service 'rvc'...						|S				|RVC		|rvc Start     

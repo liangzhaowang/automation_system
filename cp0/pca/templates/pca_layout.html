@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/plugins/w3/w3.css" rel="stylesheet" type="text/css">
+<!-- CSS goes in the document HEAD or added to your external stylesheet -->
+<style type="text/css">
+    table.hovertable {
+        font-family: verdana,arial,sans-serif;
+        font-size:11px;
+        color:#333333;
+        border-width: 1px;
+        border-color: #999999;
+        border-collapse: collapse;
+        overflow:auto;
+    }
+    table.hovertable th {
+        background-color:#c3dde0;
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+        <!--overflow:auto;-->
+    }
+    table.hovertable tr {
+        background-color:#d4e3e5;
+        <!--overflow:auto;-->
+    }
+    table.hovertable td {
+        border-width: 1px;
+        padding: 8px;
+        border-style: solid;
+        border-color: #a9c6c9;
+        <!--overflow:auto;-->
+    }
+
+</style>
+{% endblock %}
+{% block content %}
+<div class="ibox" style="margin-bottom:0">
+    <ul id="pca_nav" class="nav nav-tabs" style="background:#fff;border-bottom: 1px solid #fff;">
+      <li><a href="/pca/">PCA analyze</a></li>
+      <li><a href="/pca/charts/">Charts</a></li>
+    </ul>
+    <div>
+        {% block sub_content %}
+        {% endblock %}
+    </div>
+
+</div>
+
+{% endblock %}
+

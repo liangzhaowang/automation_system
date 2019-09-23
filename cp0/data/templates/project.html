@@ -1,0 +1,73 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% load chart %}
+{% load hometag %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="history-sidebar">
+                <ul class="nav metismenu history-sidebar" id="side-menu">
+                    <li class="active">
+                        <a href="/project/{{ project.name }}"><span class="nav-label">Overview </span></a>
+                    </li>
+                    <li>
+                        <a href="/daily/{{ project.name }}"><span class="nav-label">Daily tests </span></a>
+                    </li>
+                    <li>
+                        <a href="/bkc/{{ project.name }}"><span class="nav-label">BKC/Weekly tests </span></a>
+                    </li>
+                    <li>
+                        <a href="/history/{{ project.name }}"><span class="nav-label">All tests </span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="row">
+                        <div class="col-lg-5">
+                            <dl class="dl-horizontal">
+                                <dt>Slaves:</dt>
+                                <dd>3</dd>
+                                <dt>Build name:</dt>
+                                <dd>{{ project.builder_name }}</dd>
+                                <dt>Services:</dt>
+                                <dd></dd>
+                            </dl>
+                        </div>
+                        <div class="col-lg-7" id="cluster_info">
+                            <dl class="dl-horizontal">
+                                <dt>Database space</dt>
+                                <dd>{{ db_info.dataSize|filesize }}</dd>
+                                <dt>Results</dt>
+                                <dd>{{ db_info.objects }}</dd>
+                                <dt>Collections</dt>
+                                <dd>{{ db_info.collections }}</dd>
+                                <dt>Builds</dt>
+                                <dd>{{ db_info.builds }}</dd>
+                            </dl>
+                        </div>
+                        <div class="col-lg-12">
+                            <dl class="dl-horizontal">
+                                <dt>Products:</dt>
+                                <dd>{{ products }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="ibox">
+        <div class="ibox-content">
+            <div id="container" style="height:{{ height }};"></div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/code/highcharts.js' %}"></script>
+    <script>
+        var mydata = {{ alldata|safe }};
+        var title_names = "{{ title_name }}";
+        if (mydata["text"] == "Eavb stage"){
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'bar'
+                },
+                exporting: {
+                    chartOptions: {
+                        plotOptions: {
+                            series: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: title_names
+                },
+                xAxis: {
+                    categories: [mydata["text"]].concat(mydata["name"])
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Time'
+                    }
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        pointPadding: 0.1,
+                        groupPadding: 0,
+                        stacking: 'normal'
+                    }
+                },tooltip:
+                {
+                    borderWidth: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    borderRadius: 15,
+                    shadow: false,
+                    style: {
+                        color: '#fff',
+                        font: 'Open Sans'
+                    },
+                    animation: false,
+                    formatter: function () {
+                        return '<b>' + this.y + 's' +': ' + this.x + '</b>';
+                    }
+                },
+                series: [
+                    {
+                        name: 'earlyavbaudio start->earlyavbaudio exit',
+                        data: [mydata["audio"][7]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'avbstreamhandler ready->earlyavbaudio start',
+                        data: [mydata["audio"][6]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'avbstreamhandler start->avbstreamhandler ready',
+                        data: [mydata["audio"][5]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Ethernet Link Up->avbstreamhandler start',
+                        data: [mydata["audio"][4]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },  {
+                        name: 'GPTP start->Ethernet Link Up',
+                        data: [mydata["audio"][3]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Ethernet Driver init->GPTP start',
+                        data: [mydata["audio"][2]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'AlSA init->Ethernet Driver init',
+                        data: [mydata["audio"][1]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },{
+                        name: 'Power->AlSA init',
+                        data: [mydata["audio"][0]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                        }
+                    },{
+                        name: 'duration',
+                        color: 'rgb(0, 113, 197)',
+                        dataLabels: {
+                            enabled: true,
+                            align: 'right',
+                            color: 'white',
+                            boarderColor: 'gray',
+                            x: -10,
+                            y: -1,
+                        },
+                        data: mydata["data"]
+                    }, {
+                        name: 'start from',
+                        color: '#F0F8FF',
+                        data: mydata["start"]
+                    }
+                ]
+            });
+        };
+        if (mydata["text"] == "Audio stage"){
+            Highcharts.chart('container', {
+                chart: {
+                    type: 'bar'
+                },
+                exporting: {
+                    chartOptions: {
+                        plotOptions: {
+                            series: {
+                                dataLabels: {
+                                    enabled: true
+                                }
+                            }
+                        }
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: title_names
+                },
+                xAxis: {
+                    categories: [mydata["text"]].concat(mydata["name"])
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Time'
+                    }
+                },
+                legend: {
+                    reversed: true
+                },
+                plotOptions: {
+                    series: {
+                        pointPadding: 0.1,
+                        groupPadding: 0,
+                        stacking: 'normal'
+                    }
+                },tooltip:
+                {
+                    borderWidth: 0,
+                    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+                    borderRadius: 15,
+                    shadow: false,
+                    style: {
+                        color: '#fff',
+                        font: 'Open Sans'
+                    },
+                    animation: false,
+                    formatter: function () {
+                        return '<b>' + this.y + 's' +': ' + this.x + '</b>';
+                    }
+                },
+                series: [
+                    {
+                        name: 'Snd_soc_skl->End earlyaudio',
+                        data: [mydata["audio"][3]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Start earlyaudio->Snd_soc_skl',
+                        data: [mydata["audio"][2]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },
+                    {
+                        name: 'Advanced Linux->Start earlyaudio',
+                        data: [mydata["audio"][1]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    }, {
+                        name: 'Power->Advanced Linux',
+                        data: [mydata["audio"][0]],
+                        dataLabels: {
+                            enabled: true,
+                            formatter: function () {
+                                return this.series.name
+                            },
+                            y: 0
+                        }
+                    },{
+                        name: 'duration',
+                        color: 'rgb(0, 113, 197)',
+                        dataLabels: {
+                            enabled: true,
+                            align: 'right',
+                            color: 'white',
+                            boarderColor: 'gray',
+                            x: -10,
+                            y: -1,
+                        },
+                        data: mydata["data"]
+                    }, {
+                        name: 'start from',
+                        color: '#F0F8FF',
+                        data: mydata["start"]
+                    }
+                ]
+            });
+        }
+    </script>
+{% endblock %}

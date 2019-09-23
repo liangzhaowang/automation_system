@@ -1,0 +1,12 @@
+This script is developed for cp0, which can automatically profile system-boot-reading files.
+
+ This script must be used with 2 patch, which enable trace when booting.
+
+ # 2017-09-19 # Enable atrace for systrace boot timing.
+ https://android.intel.com:443/#/c/601001 
+
+ # 2018-01-16 # Enable trace when booting, close it after boot completed.
+ https://android.intel.com:443/#/c/615293 
+
+
+

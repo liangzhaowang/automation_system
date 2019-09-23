@@ -1,0 +1,172 @@
+<div class="ibox" id="case_{{ result.case_name }}">
+    <div class="ibox-title">
+        <h5>{{ current_build }}</h5>
+        <div class="ibox-tools">
+            <a class="collapse-link">
+                <i class="fa fa-chevron-up"></i>
+            </a>
+        </div>
+    </div>
+    {% for result in data %}
+    <div class="ibox-content">
+        <div class="detail-table">
+            <table aria-build="{{ result.raw.0.build }}" aria-test="{{ result.raw.0.test_id }}" class="footable table table-stripped toggle-arrow-tiny no-margins detail hide-if-no-paging"
+                   id="table_detail_{{ result.case_name }}" name="table_detail">
+                <thead class="dark">
+                <tr>
+                    <th data-sorting="true">#</th>
+                    <th data-sorting="true">Test Case</th>
+                    <th data-sorting="true">Result</th>
+                    <th data-sort-ignore="true">View in Charts</th>
+                    <th data-sort-ignore="true">Attachments</th>
+                    <th data-sort-ignore="true"></th>
+                    <th data-sort-ignore="true">Compare</th>
+                    <th data-hide="phone,tablet"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for l in result.raw reversed %}
+                    <tr>
+                        <td>{{ l.loop|add:1 }}</td>
+                        <td>{{ l.case_name }}</td>
+                        <td>{{ l.result }} {{ l.unit }}</td>
+                        <td>
+                            <div class="form-group-sm">
+                                {% for name, info in result.vic.items %}
+                                <a href="/chart/{{ name }}/{{ project_name }}/{{ data.0.raw.0.build }}/{{ l.test_id }}/{{ l.case_name }}/{{ info.0 }}_{{ l.loop }}.{{ info.1 }}/" target="_blank"
+                                   class="btn btn-sm btn-success"><i
+                                        class="fa fa-rotate-90 fa-bar-chart"></i> {{ name }}</a>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group-sm">
+                                <select class="form-control" id="c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}"
+                                        name="attachment">
+                                    {% for attachment in l.attachments %}
+                                        <option value="attachment/{{ project_name }}/{{ data.0.raw.0.build }}/{{ l.test_id }}/{{ l.case_name }}/{{ attachment }}">{{ attachment }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <a onclick="dl_attachment('c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}')"
+                               class="btn btn-sm btn-white"><i
+                                    class="fa fa-download"></i></a>
+                            <a onclick="view_attachment('c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}')"
+                               class="btn btn-sm btn-white"><i
+                                    class="fa fa-eye"></i></a>
+                        </td>
+                        <td>
+                            <a aria-data="{{ project_name }}/{{ current_build }}/{{ l.test_id }}/{{ l.case_name }}/{{ l.loop }}"
+                               name="add_cmp" class="btn btn-sm btn-white"><i
+                                    class="fa fa-exchange-alt"></i></a>
+                        </td>
+                        <td>
+                            <table class="table table-bordered no-margins">
+                                <tbody>
+                                {% for ss in l.sub_score %}
+                                    <tr>
+                                        <td width="200px">{{ ss.0 }}</td>
+                                        <td width="60px">{{ ss.1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+<div class="ibox" id="case_{{ result.case_name }}">
+    <div class="ibox-title">
+        <h5>{{ prev_build }}</h5>
+        <div class="ibox-tools">
+            <a class="collapse-link">
+                <i class="fa fa-chevron-up"></i>
+            </a>
+        </div>
+    </div>
+    {% for result in prev_data %}
+    <div class="ibox-content">
+        <div class="detail-table">
+            <table aria-build="{{ result.raw.0.build }}" aria-test="{{ result.raw.0.test_id }}" class="footable table table-stripped toggle-arrow-tiny no-margins detail hide-if-no-paging"
+                   id="table_detail_{{ result.case_name }}" name="table_detail">
+                <thead class="dark">
+                <tr>
+                    <th data-sorting="true">#</th>
+                    <th data-sorting="true">Test Case</th>
+                    <th data-sorting="true">Result</th>
+                    <th data-sort-ignore="true">View in Charts</th>
+                    <th data-sort-ignore="true">Attachments</th>
+                    <th data-sort-ignore="true"></th>
+                    <th data-sort-ignore="true">Compare</th>
+                    <th data-hide="phone,tablet"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for l in result.raw reversed %}
+                    <tr>
+                        <td>{{ l.loop|add:1 }}</td>
+                        <td>{{ l.case_name }}</td>
+                        <td>{{ l.result }} {{ l.unit }}</td>
+                        <td>
+                            <div class="form-group-sm">
+                                {% for name, info in result.vic.items %}
+                                <a href="/chart/{{ name }}/{{ project_name }}/{{ prev_data.0.raw.0.build }}/{{ l.test_id }}/{{ l.case_name }}/{{ info.0 }}_{{ l.loop }}.{{ info.1 }}/" target="_blank"
+                                   class="btn btn-sm btn-success"><i
+                                        class="fa fa-rotate-90 fa-bar-chart"></i> {{ name }}</a>
+                                {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="form-group-sm">
+                                <select class="form-control" id="c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}"
+                                        name="attachment">
+                                    {% for attachment in l.attachments %}
+                                        <option value="attachment/{{ project_name }}/{{ prev_data.0.raw.0.build }}/{{ l.test_id }}/{{ l.case_name }}/{{ attachment }}">{{ attachment }}</option>
+                                    {% endfor %}
+
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <a onclick="dl_attachment('c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}')"
+                               class="btn btn-sm btn-white"><i
+                                    class="fa fa-download"></i></a>
+                            <a onclick="view_attachment('c{{ forloop.parentloop.counter0 }}l{{ forloop.counter0 }}')"
+                               class="btn btn-sm btn-white"><i
+                                    class="fa fa-eye"></i></a>
+                        </td>
+                        <td>
+                            <a aria-data="{{ project_name }}/{{ prev_build }}/{{ l.test_id }}/{{ l.case_name }}/{{ l.loop }}"
+                               name="add_cmp" class="btn btn-sm btn-white"><i
+                                    class="fa fa-exchange-alt"></i></a>
+                        </td>
+                        <td>
+                            <table class="table table-bordered no-margins">
+                                <tbody>
+                                {% for ss in l.sub_score %}
+                                    <tr>
+                                        <td width="200px">{{ ss.0 }}</td>
+                                        <td width="60px">{{ ss.1 }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+</div>

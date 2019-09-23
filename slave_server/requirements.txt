@@ -1,0 +1,6 @@
+django<2
+pyyaml
+redis
+django-cors-headers
+pyserial
+requests

@@ -1,0 +1,405 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% block css %}
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/prettify.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet" type="text/css">
+    <style>
+        .setbutton{
+            width: 82px;
+            height: 40px;
+            font-size: 8pt;
+        }
+        .setbuttonlite{
+            width: 100px;
+            height: 50px;
+            font-size: 8pt;
+
+        }
+        .onoffswitch-inner-custom {
+            content: "ON";
+            text-align: left !important;
+            padding-left: 10px !important;
+            background-color: #0071C5;
+            color: #FFFFFF;
+        }
+        .flow{
+            list-style-type: none;
+            background-color: gainsboro;
+            text-align: center;
+            margin-top:20px;
+            width:100px;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: inset 0 0 0 #1872ab, 0 5px 0 0 #1872ab, 0 10px 5px #999999;
+        }
+    </style>
+{% endblock %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Case</title>
+</head>
+</html>
+<link rel="stylesheet" href="/static/plugins/bootstrap-3.3.7/css/bootstrap.min.css">
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="profile-image">
+            <img src="/static/img/avatars/{{ user.usercpz.avatar | default:'avatarDefault.png' }}" class="img-circle circle-border m-b-md" alt="profile">
+        </div>
+        <div class="profile-info">
+            <div class="">
+                <div>
+                    <h2 class="no-margins">
+                        {{ user.last_name }} {{ user.first_name }}
+                    </h2>
+                    <h4>{{ user.email }}</h4>
+                    <small>
+                        Last login: {{ user.last_login }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4" style="background-color: #FFFFFF; width:330px; height: 830px;">
+        <div class="ibox" style="padding: 20px;">
+            <h3>
+                <i class="fa fa-sitemap"></i>&nbsp Select Items
+            </h3>
+            <div class="hr-line-dashed"></div>
+            <label>DUT Configration</label><br><br>
+            <div class="row">
+                <div class="col-lg-1" style="text-align:right; padding-right: 0px;">
+                    wifi
+                </div>
+                <div class="col-lg-4 switch">
+                    <div class="onoffswitch">
+                        <input type="checkbox" checked class="onoffswitch-checkbox" name='setting' id="wifi">
+                        <label class="onoffswitch-label" for="wifi">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-2" style="text-align:left; padding-left: 10px;">
+                    airplane
+                </div>
+                <div class="col-lg-5 switch">
+                    <div class="onoffswitch">
+                        <input type="checkbox" checked class="onoffswitch-checkbox" name='setting' id="airplane">
+                        <label class="onoffswitch-label" for="airplane">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-1" style="text-align:right; padding-right: 0px;">
+                    gps
+                </div>
+                <div class="col-lg-4 switch">
+                    <div class="onoffswitch">
+                        <input type="checkbox" checked class="onoffswitch-checkbox" name='setting' id="gps">
+                        <label class="onoffswitch-label" for="gps">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-lg-2" style="text-align:left; padding-left: 0px;">
+                    bluetooth
+                </div>
+                <div class="col-lg-5 switch">
+                    <div class="onoffswitch">
+                        <input type="checkbox" checked class="onoffswitch-checkbox" name='setting' id="bluetooth">
+                        <label class="onoffswitch-label" for="bluetooth">
+                            <span class="onoffswitch-inner"></span>
+                            <span class="onoffswitch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hr-line-dashed"></div>
+            <label>APP</label><br><br>
+            <div class="row">
+                <button id="btn_app_install" class="btn btn-outline btn-outline btn-success dim setbutton" name="app_info">App<br/>install</button>
+                <button id="btn_app_uninstall" class="btn btn-outline btn-success dim setbutton" name="app_info">App<br/>uninstall</button>
+                <button id="btn_app_launch" class="btn btn-outline btn-success dim setbutton" name="app_info">App<br/>launch</button>
+                <button id="btn_app_kill" class="btn btn-outline btn-success dim setbutton" name="app_info">App<br/>kill</button>
+                <button id="btn_app_dataclear" class="btn btn-outline btn-success dim setbutton" name="app_info">App<br/>data clear</button>
+                <button id="btn_app_getpageinfo" class="btn btn-outline btn-success dim setbutton" name="app_info">get<br/>page info</button>
+            </div><br>
+            <label>Android UI operation</label><br><br>
+            <div class="row">
+                <button id="btn_ui_click_text" class="btn btn-outline btn-success dim setbutton" name="ui_operation">click<br/>text</button>
+                <button id="btn_ui_click_coord" class="btn btn-outline btn-success dim setbutton" style="width: 90px" name="ui_operation">click<br/>coordinate</button>
+                <button id="btn_ui_wait_text" class="btn btn-outline btn-success dim setbutton" name="ui_operation">wait<br/>text</button>
+                <button id="btn_ui_wait_rid" class="btn btn-outline btn-success dim setbutton" name="ui_operation">wait<br/>resourceId</button>
+            </div><br>
+            <div class="hr-line-dashed"></div>
+            <label>Log capture</label><br><br>
+            <div class="row">
+                <button id="btn_log_screenshot" class="btn btn-outline btn-success dim setbutton" style="width: 90px" name="log_capture">screenshot</button>
+                <button id="btn_log_logcat" class="btn btn-outline btn-success dim setbutton" name="log_capture">get<br/>logcat</button>
+                <button id="btn_log_ttylog" draggable="true" ondragstart="drag(event)" class="btn btn-outline btn-success dim setbutton" name="log_capture">get<br/>ttylog</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-1" style="background-color: #FFFFFF; width:170px; height: 830px; margin-left:5px; margin-right:5px;">
+    <ul id="code_flow" style="margin-left: -18px;">
+    </ul>
+    </div>
+    <div class="col-lg-7" style="background-color: #FFFFFF; width:660px;">
+        <div class="ibox" style="padding: 20px">
+            <div class="form-horizontal">
+                <h3>
+                    <i class="fa fa-history"></i>&nbsp Project Code
+                </h3>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <pre id='case_code' draggable="false" class="prettyprint linenums" style="height: 640px" contenteditable>
+#!/usr/bin/env python
+# coding=utf-8
+<div id="import_str">&nbsp;</div>
+defﾠrun_test():
+    app = apptest()
+</pre>
+            <br>
+            <div class="row">
+                <div class="col-lg-6">
+                    <button id="generatecode" class="btn btn-success" style="width: 100px; margin-left:150px;">Generate</button>
+                </div>
+                <div class="col-lg-6">
+                    <button id="savecode" class="btn btn-success" data-toggle="modal" data-target="#case_setting" style="width: 100px;margin-left: 100px;">Save Code</button>
+                    <div class="modal fade" id="case_setting" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                    <h4 class="modal-title" id="myModalLabel">
+                                        Please Set Case Info
+                                    </h4>
+                                </div>
+                                <div class="modal-body" style="padding: 20px 20px 20px 20px">
+                                    <input class="form-control" type="text" id="case_name" value="please input case name" onfocus="if (value != ''){value='';this.style.color='#555'}" onblur="if (value==''){value=defaultValue;this.style.color='#999'}" style="color: #999"><br>
+                                    <select id="project" class="form-control " >
+                                    </select>
+                                    <br/>
+                                    <select id="slave" class="form-control " >
+                                    </select>
+                                </div>
+                                <div id="sbmit_case" class="modal-footer">
+                                    <button type="button" onclick="Savecode()" class="btn btn-primary">submit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'js/prettify.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.min.js' %}"></script>
+        <script>
+        var import_list = [];
+        var main = "<li>    app.save()</li><li></li><li></li><li>ifﾠ__name__ ==ﾠ\"__main__\":</li>" +
+            "<li>ﾠﾠﾠﾠforﾠiﾠinﾠrange(3):</li>" +
+            "<li>ﾠﾠﾠﾠﾠﾠﾠﾠifﾠrun_test():</li>" +
+            "<li>ﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠbreak</li>" +
+            "<li>ﾠﾠﾠﾠﾠﾠﾠﾠui_operation.soft_reboot()</li>" +
+            "<li>ﾠﾠﾠﾠexit(0ﾠifﾠi <ﾠ2ﾠelseﾠ1)</li>";
+        var indent = "    ";
+        var apk_path = "";
+        prettyPrint();
+          $(function() {
+        $( "#code_flow" ).sortable({
+            revert: true,
+            stop: function(event){
+                if($(event.originalEvent.target).prev().length != 0) {
+                    $("#"+$(event.originalEvent.target).prev().attr("id").substr(8)).after($("#"+$(event.originalEvent.target).attr("id").substr(8)))
+                }
+                else if($(event.originalEvent.target).next().length != 0) {
+                    $("#"+$(event.originalEvent.target).next().attr("id").substr(8)).before($("#"+$(event.originalEvent.target).attr("id").substr(8)))
+                }
+            }
+        });
+      });
+        $("#case_code ol").append(PR.prettyPrintOne("<li id='setting_wifi'>    app.system.operation.turn_wifi('1')</li>"));
+        $("#case_code ol").append(PR.prettyPrintOne("<li id='setting_airplane'>    app.system.operation.turn_airplane('1')</li>"));
+        $("#case_code ol").append(PR.prettyPrintOne("<li id='setting_gps'>    app.system.operation.turn_gps('1')</li>"));
+        $("#case_code ol").append(PR.prettyPrintOne("<li id='setting_bluetooth'>    app.system.operation.turn_bluetooth('1')</li>"));
+
+        $("input[name='setting']").click(function () {
+           var setting_status = $(this).prop('checked') ? '1':'0';
+           var setting_name = $(this).prop('id');
+           $("#setting_"+setting_name).html(PR.prettyPrintOne("    app.system.operation.turn_"+ setting_name+"('"+setting_status+"')"))
+        });
+
+        $("button[name='app_info']").click(function () {
+            var appinfo = $(this).html();
+            apk_path = get_apk_path();
+            if (apk_path) {
+                add_to_flow(appinfo, $(this).attr("id"));
+                if (appinfo == 'App<br>install'){
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_install'>"+indent+"app.install('"+apk_path+"')"+"</li>"));
+                } else if (appinfo == 'App<br>uninstall') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_uninstall'>"+indent+"app.uninstall('"+apk_path+"')"+"</li>"));
+                } else if (appinfo == 'App<br>launch') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_launch'>"+indent+"app.launch('"+apk_path+"')"+"</li>"));
+                } else if (appinfo == 'App<br>kill') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_kill'>"+indent+"app.kill_app('"+apk_path+"')"+"</li>"));
+                } else if (appinfo == 'App<br>data clear') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_dataclear'>"+indent+"app.data_clear('"+apk_path+"')"+"</li>"));
+                } else if (appinfo == 'get<br>page info') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='app_getpageinfo'>"+indent+"app.get_page_info()"+"</li>"));
+                }
+            }
+        });
+        function get_apk_path() {
+            if (apk_path == "") {
+                var tmp_path = prompt('please input apk location:');
+                if (tmp_path) {
+                    if (import_list.indexOf("fromﾠrunner.operation_lib.apptestﾠimportﾠapptest") < 0) {
+                        import_list.push("fromﾠrunner.operation_lib.apptestﾠimportﾠapptest");
+                        $("<li>"+PR.prettyPrintOne(import_list[import_list.length-1])+"</li>").insertBefore($("#import_str").parent());
+                    }
+                    return tmp_path;
+                } else {
+                    return ""
+                }
+            } else {
+                return apk_path;
+            }
+        };
+
+        $("button[name='ui_operation']").click(function () {
+            var ui_info = $(this).html();
+            var input_text = get_input_text(ui_info);
+            if (input_text) {
+                add_import("runner.operation_lib.ui_operation");
+                add_to_flow(ui_info, $(this).attr("id"));
+                if (ui_info == 'click<br>text') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='ui_click_text'>"+indent+"ui_operation.click_ui_button_by_text('"+input_text+"')"+"</li>"));
+                } else if (ui_info == 'click<br>coordinate') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='ui_click_coord'>"+indent+"ui_operation.click_ui_click('"+input_text+"')"+"</li>"));
+                } else if (ui_info == 'wait<br>text') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='ui_wait_text'>"+indent+"if ui_operation.wait_for_complete_by_text('"+input_text+"'):"+"</li>"));
+                    indent += "    ";
+                } else if (ui_info == 'wait<br>resourceId') {
+                    $("#case_code ol").append(PR.prettyPrintOne("<li id='ui_wait_rid'>"+indent+"if ui_operation.wait_for_complete_by_resourceId('"+input_text+"'):"+"</li>"));
+                    indent += "    ";
+                }
+            }
+        });
+        function get_input_text(input_type) {
+            var notice_text = "";
+            if(input_type  == 'click<br>text') {
+                notice_text = "please input text";
+            } else if (input_type == 'click<br>coordinate') {
+                notice_text = "please input coordinate as:'800 600'";
+            } else if (input_type == 'wait<br>text') {
+                notice_text = "please input the text what you want wait for";
+            } else if (input_type == 'wait<br>resourceId') {
+                notice_text = "please input resourceId"
+            }
+            var input_text = prompt(notice_text);
+            if(input_text) {
+                return input_text
+            } else {
+                return ""
+            }
+        }
+        function add_import(str_import) {
+            if (import_list.indexOf("import " + str_import) < 0) {
+                import_list.push("import " + str_import);
+                $("<li>"+PR.prettyPrintOne(import_list[import_list.length-1])+"</li>").insertBefore($("#import_str").parent());
+            }
+        }
+
+        $("button[name='log_capture']").click(function () {
+            var log_info = $(this).html();
+            add_import("runner.log_management");
+            add_to_flow(log_info, $(this).attr("id"));
+            if (log_info == 'screenshot'){
+                $("#case_code ol").append(PR.prettyPrintOne("<li id='log_screenshot'>"+indent+"log_management.screenshot()"+"</li>"));
+            }
+            if (log_info == 'get<br>logcat'){
+                $("#case_code ol").append(PR.prettyPrintOne("<li id='log_logcat'>"+indent+"log_management.get_logcat()"+"</li>"));
+            }
+            if (log_info == 'get<br>ttylog'){
+                $("#case_code ol").append(PR.prettyPrintOne("<li id='log_ttylog'>"+indent+"log_management.get_ttyLog()"+"</li>"));
+            }
+        });
+
+         $("#generatecode").click(function () {
+            $("#case_code ol").append(PR.prettyPrintOne(main));
+        });
+
+        $("#savecode").click(function () {
+            $.get('/accounts/slave_info/', function (ret) {
+                $("#slave").empty();
+                $("#project").empty();
+                $("#slave").html(ret['slave_info']);
+                $("#project").html(ret['projectall']);
+            })
+        });
+        $("#case_code").keydown(function(key){
+            if(key.keyCode == 32) {
+                var tmp = $("#case_code ol li:last").text();
+                $("#case_code ol li:last").remove();
+                $("#case_code ol").append("<li>"+PR.prettyPrintOne(tmp)+"</li>");
+                $("#case_code ol li:last").focusEnd();
+            }
+        });
+
+        function add_to_flow(text, r_id){
+            $("#code_flow").append("<li id='div_"+r_id+"' name='action'  ondblclick='remove_action(this)' class='ui-state-default flow btn dim'>"+text+"</li>");
+        }
+        function remove_action(obj){
+            if($(obj).attr("id") == "div_btn_ui_wait_text" || $(obj).attr("id") == "div_btn_ui_wait_rid" ) {
+                indent = indent.substr(4);
+            }
+            $("#"+($(obj).attr("id")).replace("div_btn_", "")).remove();
+            $(obj).remove();
+        }
+        function Savecode() {
+            var case_name = $("#case_name").val();
+            var slave_ip = $("#slave").val();
+
+            var case_code = "";
+            $("#case_code ol li").each(function(){
+                case_code += $(this).text() + "\n";
+            });
+            console.log(case_code);
+            var project = $("#project").val();
+
+            if (case_name != 'please input case name' && case_code){
+                $.post("/accounts/save_case/", {"case_name":case_name, "case_info":case_code, "project":project, "slave_ip":slave_ip}, function (ret) {
+                    window.location.reload()
+                })
+            } else {
+                if (case_name == 'please input case name'){
+                    alert("please input right case name")
+                }
+                else {
+                    alert("please input right case info")
+                }
+            }
+        }
+        </script>
+{% endblock %}

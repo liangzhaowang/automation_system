@@ -1,0 +1,191 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<script src="/static/js/jquery-3.1.1.min.js"></script>
+
+<div class="row">
+    <div class="ibox-content forum-container">
+        <div class="tab-content">
+            <div id="all">
+                {% for project in filtered_projects %}
+                <div class="forum-item active list-project ALL {{ project.OS_version }} {{ project.build_label }} {{ project.board_type }} {% if project.active  %} Active {% endif %}" style="margin: 0px 0px">
+                    <div class="col-lg-12 ">
+                        <div class="col-lg-4" style="text-align:left;text-transform:uppercase;">
+                            <a href="#"  class="forum-item-title" style="margin:10px 0px 10px 0px !important;"><font size="2">{{ project.name }}</font></a>
+                        </div>
+                        <div class="col-lg-4" style="text-align:left;text-transform:uppercase;">
+                            <div class="forum-title" >builder: {{ project.builder_name }}</div>
+                        </div>
+                        <div class="col-lg-1 forum-info" >
+                            <a href="/daily/{{ project.name }}" class="btn btn-xs btn-primary" style="margin-top: 13px">Daily</a>
+                        </div>
+                        <div class="col-lg-1 forum-info" >
+                            <a href="/bkc/{{ project.name }}" class="btn btn-xs btn-primary" style="margin-top: 13px">Weekly</a>
+                        </div>
+                        <div class="col-lg-1 forum-info" >
+                            <a href="/history/{{ project.name }}" class="btn btn-xs btn-primary" style="margin-top: 13px">History</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>  
+<script>
+    $(document).ready(function(){
+        $(".select-no").hide()
+        $(".list-project").hide().filter(".Queen.8G").show()
+        $(".select-result dl").append($("#select1  dd.selected").clone().attr("id", "selectA"));
+        $(".select-result dl").append($("#select2  dd.selected").clone().attr("id", "selectB"));
+
+                
+        $("#select1 dd").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+            if ($(this).hasClass("select-all")) {
+                $("#selectA").remove();
+            } else {
+                var copyThisA = $(this).clone();
+                if ($("#selectA").length > 0) {
+                    $("#selectA a").html($(this).text());
+                } else {
+                    $(".select-result dl").append(copyThisA.attr("id", "selectA"));
+                }
+            }
+            if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text());  
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter("."+$(this).text()).show()
+                }
+        });
+
+        $("#select2 dd").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+            if ($(this).hasClass("select-all")) {
+                $("#selectB").remove();
+            } else {
+                var copyThisB = $(this).clone();
+                if ($("#selectB").length > 0) {
+                    $("#selectB a").html($(this).text());
+                } else {
+                    $(".select-result dl").append(copyThisB.attr("id", "selectB"));
+                }
+            }
+            if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text()); 
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter("."+$(this).text()).show()
+                }
+        });
+
+        $("#select3 dd").click(function () {
+                $(this).addClass("selected").siblings().removeClass("selected");
+                if ($(this).hasClass("select-all")) {
+                    $("#selectC").remove();
+                } else {
+                    var copyThisB = $(this).clone();
+                    if ($("#selectC").length > 0) {
+                        $("#selectC a").html($(this).text());
+                    } else {
+                        $(".select-result dl").append(copyThisB.attr("id", "selectC"));
+                    }
+                }
+                if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text());
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter("."+$(this).text()).show()
+                }
+        });
+
+        $(document).on("click", "#selectA",function () {
+            $(this).remove();
+            $("#select1 .select-all").addClass("selected").siblings().removeClass("selected");
+            // alert($(".ALL").text())
+            if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text());
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter(".ALL").show()
+                }
+        });
+
+        $(document).on("click","#selectB", function () {
+            $(this).remove();
+            $("#select2 .select-all").addClass("selected").siblings().removeClass("selected");
+            if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text());
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter(".ALL").show()
+                }
+        });
+
+        $(document).on("click", "#selectC",function () {
+            $(this).remove();
+            $("#select3 .select-all").addClass("selected").siblings().removeClass("selected");
+            if ($(".select-result dd").length > 1) {
+                var Mutifilter="";
+                $(".select-result a").each(function(){
+                    Mutifilter+=("."+$(this).text());
+                })
+                $(".list-project").hide().filter($(Mutifilter)).show()
+            } else {
+                $(".list-project").hide().filter(".ALL").show()
+                }
+        });
+
+        $(document).on("click", "ul.select",function () {
+            if ($(".select-result dd").length > 1) {
+                $(".select-no").hide();
+            } else {
+                $(".select-no").show();
+            }
+        });
+    });
+</script>
+<style>
+
+    *{margin:0;padding:0;list-style-type:none;}
+    a,img{border:0;}
+    /* body{font:12px/180% Arial, Helvetica, sans-serif, "ÐÂËÎÌå";} */
+    /* select */
+    .select{padding:5px 20px;border:#ddd 1px solid;border-radius:10px;width:100%;margin:1% auto;font-size:11px}
+    .select li{list-style:none;padding:10px 0 5px 100px}
+    .select .select-list{border-bottom:#eee 1px dashed}
+    .select dl{zoom:1;position:relative;line-height:50px;margin-top:0px;margin-bottom:-15px;margin-top: -10px}
+    .select dl:after{content:" ";display:block;clear:both;height:0;overflow:hidden;margin-top:10px;margin-bottom:10px}
+    .select dt{width:100px;margin-bottom:0px;position:absolute;top:0;left:-100px;text-align:left;color:#666;height:24px;line-height:24px}
+    .select dd{float:left;display:inline;margin:0 0 5px 5px;}
+    .select a{display:inline-block;white-space:nowrap;height:24px;padding:0 10px;text-decoration:none;color:black;border-radius:2px;padding-top:3px}
+    .select a:hover{color:#f60;background-color:#f3edc2}
+    .select .selected a{color:#fff;background-color:#0071C5}
+    .select-result dt{font-weight:bold}
+    .select-no{color:#999;margin-top: 3px !important}
+    .select .select-result a{padding-right:20px;background:#0071C5 url("{% static 'img/close.gif' %}") right 9px no-repeat}
+    .select .select-result a:hover{background-position:right -15px}
+    .forum-item {-moz-column-count:2;-webkit-column-count:2;column-count:1;}
+    .tab-content {border:#ddd 1px solid;border-radius:10px;}
+    .forum-container {padding:20px 20px 20px 20px !important}
+</style>
+
+{% endblock %}

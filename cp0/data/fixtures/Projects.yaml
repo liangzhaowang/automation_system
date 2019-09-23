@@ -1,0 +1,9 @@
+- model: data.project
+  pk: 1
+  fields:
+    name: bxtp_ivi_m
+
+- model: data.project
+  pk: 2
+  fields:
+    name: bxtp_ivi_o

@@ -1,0 +1,176 @@
+<html>
+    <head>
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="/static/title32.ico" />
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style1.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/animate.css" rel="stylesheet" type="text/css">
+    <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/plugins/chosen/bootstrap-chosen.css" rel="stylesheet" type="text/css">
+
+    <link href="/static/css/github-markdown.css" rel="stylesheet" type="text/css">
+   <script src="/static/js/jquery-3.1.1.min.js"></script>
+   <script src="/static/js/bootstrap.min.js"></script>
+    <script>
+    function changeEdit(id)
+    {
+    var Patch=document.getElementById(id);
+    var text=Patch.innerHTML;
+    Patch.innerHTML='<input value='+text+'></input>';
+    }
+    </script>
+    <title>CP0|FULLPATCH</title>       
+    </head>
+<body class="top-navigation fixed-nav" style="background: url('/static/img/shattered.png')">
+    <div id="wrapper">
+        <div id="page-wrapper">
+            <div class="row border-bottom white-bg">
+                <nav class="navbar navbar-fixed-top" role="navigation">
+                    <div class="navbar-header">
+                        <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse" class="navbar-toggle collapsed"
+                            type="button">
+                            <i class="fa fa-reorder"></i>
+                            </button>
+                            <a href="/" class="navbar-brand">CUBE P ZERO</a>
+                    </div>
+                    <div class="navbar-collapse collapse" id="navbar">
+                        <ul class="nav navbar-nav">
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-home"></span>&nbsp;BXTP_M
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="divider"></li>
+                                    <li><a href="/">BXTP_M_PATCH</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="/fullpatch_m/">BXTP_M_FULLPATCH</a></li>
+                                </ul>
+                            </li>
+                            <li class="dropdown">
+                                <a class="dropdown-toggle" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-unchecked"></span>&nbsp;BXTP_O
+                                    <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li class="divider"></li>
+                                    <li><a href="/index_o/">BXTP_O_PATCH</a></li>
+                                    <li class="divider"></li>
+                                    <li><a href="/fullpatch_o/">BXTP_O_FULLPATCH</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="http://10.239.93.159" target="_blank"><span class=" glyphicon glyphicon-new-window"></span>&nbsp;CP0_HOME</a></li>
+                        </ul>
+                        <p class="navbar-text navbar-right"><span class=" glyphicon glyphicon-user"></span>&nbsp;{{users}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </div>
+                </nav>
+            </div>
+            <div class="wrapper wrapper-content">
+                <div class="container patch-selector">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                    <h5>ALL PATCH LIST OF BXTP_O <span class="badge">{{counts}}</span></h5>
+                </div>
+            <div class="ibox-content">
+                <table class="table table-hover table-bordered" >
+                    <thead>       
+                <tr>
+                    <th  width="10%" style="text-align:center;">
+                        Time
+                    </th>
+                    <th  width="8%" style="text-align:center;">
+                        Patch
+                    </th>
+                    <th  width="10%" style="text-align:center;">
+                        Owner
+                    </th>
+                    <th  width="20%" style="text-align:center;">
+                        Subject
+                    </th>
+                    <th  width="8%" style="text-align:center;">
+                        Status
+                    </th>
+                    <th  width="8%" style="text-align:center;">
+                        Tracked_id
+                    </th>
+                    <th  width="6%" style="text-align:center;">
+                        Category
+                    </th>                                                 
+                </tr>
+                    </thead>
+                {% for i in All %}
+                <tr>
+                    <!--<td width="8%" class="text-center no-padding" style="font-size: 15px;vertical-align: middle"> 
+                    {{ i.name }}
+                    </td>-->
+                    <td width="10%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                    {{i.fomartted_date}}
+                    </td> 
+                    <td width="10%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                        <!--<style>.readonly input{border:none}</style>-->
+                        <div id={{i.id}} class="readonly">
+                            <a href={{i.patch}} target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.patch}}</a><br>
+                        </div>
+                    </td>
+                    <td width="8%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                        {{i.owner}}
+                    </td>
+                    <td width="8%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                        {{i.subject}}
+                    </td>                    
+                    <td width="8%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                        {{i.status}}
+                    </td>
+                    <td width="8%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {% ifequal  i.track 'None' %}
+                                {{i.track}}
+                            {% else %}
+                                <a href={{i.track}} target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.data}}</a><br>
+                            {% endifequal %}                       
+                    </td> 
+                    <td width="5%" class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                        {{i.category}}
+                    </td>  
+                    <!--<td width="15%" class="text-center">
+                    <div class="col-lg-6">
+                        <input id="button{{i.id}}" type="button" value="Edit" onclick="btnClick({{i.id}})" class="btn btn-primary block  m-b" style="height:35px;width:70px;"/>
+                    </div>
+                    <div class="col-lg-6">
+                        <input type="button" align="center" value="Delete" onclick="window.location.href='/delete/{{i.id}}/'" class="btn btn-primary" style="height:35px;width:70px;"/>
+                    </div>
+                    </td>-->  
+                </tr>
+                {% endfor %}
+            </table>
+            <script type="text/javascript" src="/static/js/jquery-3.1.1.min.js"></script>
+            <script>
+                $.ajaxSetup({
+                    data: {csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });           
+                function btnClick(id) {
+                    var toEdit =$('#button'+id)== 'Edit';
+                    var input = $('#'+id+' input').val()
+                    if ($('#button'+id).val()=="Save") {
+                        $.post('/save/',{'id':id,'patch':input},function(ret){
+                            if (ret=='success'){
+                                $('#button'+id).val("Edit");
+                                $("#"+id+" input").attr("readonly","readonly");
+                            }
+                        })
+                    }
+
+                    if($('#button'+id).val() == "Edit")
+                    {
+                        $("#"+id+" input").removeAttr('readonly');
+                    }
+                    else
+                    {
+                        $("#"+id+" input").attr("readonly","readonly");
+                    }
+                    $('#button'+id).val("Save");       
+                }
+            </script>
+        </center>   
+    </body>
+</html>

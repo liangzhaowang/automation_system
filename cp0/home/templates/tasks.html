@@ -1,0 +1,465 @@
+{% extends 'layout.html' %} 
+{% load staticfiles %} 
+{% block css %} 
+{% endblock %} 
+{% block content %}
+
+
+<div class="row">
+    <div class="col-lg-5">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Testing Tasks</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            {% if testing|length == 0 %}
+            <div class="ibox-content">
+                Empty
+            </div>
+            {% else %} 
+            {% for testin in testing %}
+            <div id="{{ testin.id }}" name="slave" aria-id={{ testin.id }} aria-ip={{ testin.ip }} class="ibox-content">
+                <h4>{{ testin.task.project }} Build <a href="{{ testin.build_link.2 }} " target="_blank">{{ testin.build_link.0 }}</a>
+                {{ testin.build_link.1 }}
+                    <div class="stat-percent text-navy" id="progress_show_{{ testin.id }}"></div>
+                </h4>
+                <div class="progress progress-small progress-striped no-margins active">
+                    <div id="progress_{{ testin.id }}" class="progress-bar progress-bar-success"></div>
+                </div>
+                <small id="current_{{ testin.id }}"></small>
+                <div class="text-right pull-right">
+                    <small>{{ testin.task.submitter.last_name }} {{ testin.task.submitter.first_name }}</small>
+                </div>
+                <hr class="hr-line-dashed-sm">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <h5>Start time</h5>
+                        <p>{{ testin.task.start_time }}</p>
+                    </div>
+                    <div class="col-lg-6">
+                        <h5>Est time</h5>
+                        <p id="est_tb_{{ testin.id }}"></p>
+                        <span id="sp_total_est_{{ slave.id }}" class="pull-right" style="color:#676a6c;width:80px; overflow:hidden;height:20px; text-align:right" title="{{ est.result }}">{{ est.result }}</span>
+                    </div>
+                    <div class="col-lg-12">
+                        <h5>Comment</h5>
+                        <p>{{ testin.task.comment|default:"No comments" }}</p>
+                    </div>
+                    <div class="col-lg-12 text-right pull-right">
+                        <a class="btn btn-xs btn-white">slave {{ testin.task.slave.num }}</a>
+                        <a name="config" aria-config="{{ testin.task.test_config }}" class="btn btn-xs btn-white">config</a>                        
+                        {% if testin.config.tag.0 == 'daily' %}
+                        <a class="btn btn-xs btn-white" href="/daily/{{ testin.task.project }}/{{ testin.config.build }}/">View Daily {{ testin.config.build }} </a>
+                        {% endif %} 
+                        {%if testin.test_id != 'null' %}
+                        <a class="btn btn-xs btn-white" href="/raw/{{ testin.task.project }}/{{ testin.config.build }}/{{ testin.test_id }}/">View {{ testin.test_id }} </a>
+                        {% endif %}
+                        <button class="btn btn-xs btn-danger" aria-id="{{ testin.task.id }}" name="testing_cancel">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %} 
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Queue Tasks</h5>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-hover no-margins">
+                        <thead>
+                            <tr>
+                                <th>ID </th>
+                                <th>BUILD </th>
+                                <th>OWNER </th>
+                                <th>SLAVE </th>
+                                <th>CONFIG</th>
+                                <th>CANCEL</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in queue %}
+                            <tr id="q{{ task.id }}" >
+                                <td style="vertical-align:middle;"><span>{{ task.id }}</span></td>
+                                <td style="vertical-align:middle;"><span>{{ task.build }}</span></td>
+                                <td style="vertical-align:middle;"><a class="pull-left"><img class="img-circle" width="28px" src="/static/img/avatars/{{ task.submitter.usercpz.get_avatar }}"> {{ task.submitter.last_name }},{{ task.submitter.first_name }}</a></td>
+                                <td style="vertical-align:middle;"><a>
+                                    {% if task.test_tag == 'mt' %}
+                                    <i class="fas fa-user"></i>
+                                    {% else %}
+                                    {{ task.slave.num }}
+                                    {% endif %}</a></td>
+                                <td style="vertical-align:middle;"><span><a name="config" aria-config="{{ task.test_config }}">{{ task.test_config }}</a></span></td>
+                                <td style="vertical-align:middle;"><a style="cursor: pointer" class="label label-danger" aria-id="{{ task.id }}" name="queue_cancel">Cancel</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>Activity Records</h5>
+            </div>
+            <div class="ibox-content">
+                <table class="table issue-tracker no-margins">
+                    <thead>
+                        <tr>
+                            <th>STATUS</th>
+                            <th>CREATED</th>
+                            <th>USER</th>
+                            <th>BUILD</th>
+                            <th>PROJECT</th>
+                            <th>SLAVE</th>
+                            <th>CONFIG</th>
+                            <th>RESULT</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for logger in loggers %}
+                        <tr>
+                            <td><span class="label label-{{ logger.label_class }}"> {{ logger.event }}</span></td>
+                            <td class="issue-time"> <a>{{ logger.create_time|date:"P" }}</a><small>{{ logger.time_interval }}</small></td>
+                            <td class="issue-user"><a class="pull-left"><img class="img-circle" width="28px" src="/static/img/avatars/{{ logger.user.usercpz.get_avatar }}"> {{ logger.user.last_name }}, {{ logger.user.first_name }}</a></td>
+                            <td class="issue-build"><a name="build" href="{{ logger.build_link.2 }} " target="_blank">{{ logger.build_link.0 }}</a><small>{{ logger.build_link.1 }}</small></td>
+                            <td><a name="project" project_id={{ logger.project.id }}>{{ logger.project }}</a></td>
+                            <td><a name="slave" slave_id="{{ logger.slave.id }}">
+                                {% if logger.task.test_tag == 'mt' %}
+                                <i class="fas fa-user"></i>
+                                {% else %}
+                                {{ logger.slave.num }}
+                                {% endif %}</a></td>
+                            <td><span class="text-muted"><a name="config" aria-config="{{ logger.test_config }}">{{ logger.test_config }}</a></span></td>
+                            {% if logger.result_link == '#' %}
+                                <td><span class="text-muted">Cancel</span></td>
+                            {% else %}
+                                <td><span class="text-muted"><a href="/{{ logger.result_link }} " target="_blank">View result</a></span></td>
+                            {% endif %}
+                            <td>
+                                <div class="btn-group">
+                                    <button data-toggle="dropdown" class="btn btn-default dropdown-toggle" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a onclick="retest(this)" target="_blank">Re-test</a></li>
+                                        <li><a href="/new/{{ logger.test_config }}">Copy-test</a></li>
+                                        <li><a onclick="favorite(this, '{{ logger.task.id }}')" target="_blank">Favorite</a></li>
+                                        {% if user == logger.user and logger.description == 'mt' %}
+                                        <li><a onclick="open_upload_modal('{{ logger.project }}', '{{ logger.build_link.0 }}', '{{ logger.display_build }}', '{{ logger.tag }}', '{{ logger.task.id }}', '{{ logger.task.test_id }}', '{{ logger.test_config }}')" target="_blank">Upload Result</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal" id="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="config_title" name="test_config"></h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <td style="width:100px;">Project</td>
+                            <td id="project_name"></td>
+                        </tr>
+                        <tr>
+                            <td>Skip Flash</td>
+                            <td id="skip_flash"></td>
+                        </tr>
+                        <tr>
+                            <td>Tag</td>
+                            <td id="tag"></td>
+                        </tr>
+                        <tr>
+                            <td>Method</td>
+                            <td id="patch_method"></td>
+                        </tr>
+                        <tr>
+                            <td>Case</td>
+                            <td id="case_name"></td>
+                        </tr>
+                        <tr>
+                            <td>Based on</td>
+                            <td id="based_on"></td>
+                        </tr>
+                        <tr>
+                            <td>Patch</td>
+                            <td id="patch"></td>
+                        </tr>
+                        <tr>
+                            <td>Comment</td>
+                            <td id="test_comment"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal inmodal" id="upload_result" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn" style="width:850px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Upload Result</h4>
+                <small class="font-bold"></small>
+            </div>
+            <form class="form-horizontal">
+                <div class="modal-body" style="background-color: antiquewhite; padding-bottom: 10px; text-align: center;">
+                    <div id="task_cfg" class="form-group"></div>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input id="hid_project" type="hidden" value="">
+                        <input id="hid_build" type="hidden" value="">
+                        <input id="hid_display_build" type="hidden" value="">
+                        <input id="hid_tag" type="hidden" value="">
+                        <input id="hid_task_id" type="hidden" value="">
+                        <input id="hid_test_id" type="hidden" value="">
+                        <input id="hid_config_name" type="hidden" value="">
+                        <div id="hid_template_case" style="display:none">
+                            <div class="form-group">
+                                <div class="col-sm-4 control-label"></div>
+                                <div class="col-sm-2"><input name="loop0" title="loop0" class="form-control"></div>
+                                <div class="col-sm-2"><input name="loop1" title="loop1" class="form-control"></div>
+                                <div class="col-sm-2"><input name="loop2" title="loop2" class="form-control"></div>
+                                <div class="col-sm-2"><select title="unit" class="form-control"><option>sec</option><option>ms</option><option>fps</option><option>score</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spiner-example" style="display: none" id="upload_spinner">
+                        <div class="sk-spinner sk-spinner-wave">
+                            <div class="sk-rect1"></div>
+                            <div class="sk-rect2"></div>
+                            <div class="sk-rect3"></div>
+                            <div class="sk-rect4"></div>
+                            <div class="sk-rect5"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 control-label">Case Name</div>
+                        <div class="col-sm-2 control-label">Loop0</div>
+                        <div class="col-sm-2 control-label">Loop1</div>
+                        <div class="col-sm-2 control-label">Loop2</div>
+                        <div class="col-sm-2 control-label">Unit</div>
+                    </div>
+                    <div id="upload_tables"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                    <button id="btn_mt_up_result" type="button" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    $("a[name='queue_cancel']").on("click", function () {
+        if (confirm('Are you sure to cancel it?')) {
+            $.get('/api/cancel/' + $(this).attr('aria-id'), function (data) {
+                toastr.success('cancelled');
+            });
+            $("#q" + $(this).attr('aria-id')).remove();
+            return true;
+        }
+        return false;
+    });
+
+    $("button[name='testing_cancel']").click(function () {
+        if (confirm('Are you sure to cancel it?')) {
+            $.get('/api/cancel/' + $(this).attr('aria-id'), function (data) {
+                toastr.success('cancelled');
+            });
+            $("#q" + $(this).attr('aria-id')).remove();
+            return true;
+        }
+        return false;
+    });
+
+    $("a[name='config']").on("click", function () {
+        $.get("/api/show_config/" + $(this).attr("aria-config"), function (data) {
+            $("p[name='test_config']").empty();
+            $("#patch").empty();
+            $("#based_on").empty();
+            $("#config_title").html(data.build);
+            $("#project_name").html(data.project_name);
+            $("#skip_flash").html(String(data.skip_flash));
+            $("#tag").html(data.tag);
+            $("#patch_method").html(data.patch_method);
+            $("#case_name").html(data.case_names);
+            $("#based_on").html(data.based_link);
+            $("#patch").html(data.patches);
+            try {
+                var comment_obj = JSON.parse(data.test_comment);
+                var comment_str = "<b>From:&nbsp;&nbsp;</b>" + comment_obj["From"][0];
+
+                for(var k in comment_obj) {
+                    if(k == "From") { continue }
+                    if(k == "Cases") {
+                        comment_str += "<br/><b>Cases:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;";
+                        comment_str += comment_obj[k].join("<br/>&nbsp;&nbsp;&nbsp;&nbsp;");
+                    } else if(k == "Comment") {
+                        comment_str += "<br/><b>Comment:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;";
+                        comment_str += comment_obj[k].replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
+                    } else {
+                        comment_str += "<br/><b>"+k+":&nbsp;&nbsp;</b>" + comment_obj[k];
+                    }
+                }
+                $("#test_comment").html(comment_str);
+            } catch(e) {
+                $("#test_comment").html(data.test_comment);
+            }
+        });
+        $("#modal").modal()
+    });
+    function retest(obj) {
+        var row = $(obj).parents("tr");
+        var config_name = $(row).find("td a[name='config']").text();
+        var project_id = $(row).find("td a[name='project']").attr("project_id");
+        var slave_id = $(row).find("td a[name='slave']").attr("slave_id");
+        var build = $(row).find("td a[name='build']").text();
+        $.post("/api/retest/", { config_name: config_name, project_id: project_id, slave_id: slave_id, build: build }, function(ret){
+            if (ret.success == true)
+            {
+                toastr.success("start task success ~ ");
+                window.location.href='/tasks/';
+            }
+            else
+            {
+                toastr.error(ret.msg);
+                $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+            }
+        })
+    }
+    function favorite(obj, task_id) {
+        $.post("/api/favorite/", { task_id: task_id }, function(ret){
+            if (ret.success == true)
+            {
+                toastr.success("favorite success!");
+            }
+            else
+            {
+                toastr.error(ret.msg);
+                $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+            }
+        })
+    }
+    function update_progress() {
+        $("div[name='slave']").each(function (i, k) {
+            var url = '/api/progress/' + k.id
+            console.log(url);
+            $.get(url, function (data) {
+                if (data.atf_task_id == 'None') {
+                    location.reload(true);
+                }
+                else {
+                    $("#progress_" + k.id).width(data.atf_progress + "%");
+                    $("#progress_show_" + k.id).html(data.atf_progress + "%");
+                    $("#current_" + k.id).html('testing: ' + data.atf_current);
+                }
+            });
+        })
+    }
+
+    function open_upload_modal(project, build, display_build, tag, task_id, test_id, config_name) {
+        $("#hid_project").val(project);
+        $("#hid_build").val(build);
+        $("#hid_display_build").val(display_build);
+        $("#hid_tag").val(tag);
+        $("#hid_task_id").val(task_id);
+        $("#hid_test_id").val(test_id);
+        $("#hid_config_name").val(config_name);
+        $("#upload_tables").empty();
+        $("#upload_result").modal();
+        $.getJSON("/api/config/"+$("#hid_config_name").val()+"/", function (ret) {
+            var comment_obj = JSON.parse(ret['test_comment']);
+            $("#task_cfg").html(comment_obj["From"][0] + " | " + project + " / " + build + " / " + comment_obj["Image"] + " | " + comment_obj["Board"]+ " | " + comment_obj["Display"] + " | " + comment_obj["Keybox"].replace(';', '') + " Keybox | " +  comment_obj["OSC"].replace(';', '') + " OSC | " + comment_obj["Log"]);
+            for(var casename in comment_obj["Cases"]) {
+                var row = $("#hid_template_case").find("div.form-group").clone();
+                $(row).find("div.control-label").html(comment_obj["Cases"][casename]);
+                $("#upload_tables").append(row);
+            }
+            $("#btn_mt_up_result").on("click", function(){
+                $("#upload_spinner").show();
+                $("#upload_tables div.form-group").each(function(){
+                    for(var i=0; i<3; i++) {
+                        var result = $(this).find("input[name='loop"+i.toString()+"']").val();
+                        if(result == "") { continue }
+                        var row_data = {
+                            'project': $("#hid_project").val(),
+                            'build': $("#hid_build").val(),
+                            'display_build': ret["display_build"],
+                            'tag': ret["tag"],
+                            'test_id': $("#hid_test_id").val(),
+                            'task_id': $("#hid_task_id").val(),
+                            'config_name': $("#hid_config_name").val(),
+                            'case_name': $(this).find("div.control-label").html(),
+                            'result': result,
+                            'unit': $(this).find("select").val(),
+                            'test_tag': 'mt',
+                            'loop': i,
+                            'sub_score_names': [],
+                            'sub_score_scores': []
+                        };
+                        $.post('/api/test_result', { "data":JSON.stringify(row_data) }, function(ret) {
+                            $("#upload_spinner").hide();
+                            $("#upload_result").modal('hide');
+                            window.location.reload();
+                        });
+                    }
+                });
+                $.post('/api/broadcast/', data={"task_id": $("#hid_task_id").val(), 'test_id': $("#hid_test_id").val(), 'test_config': $("#hid_config_name").val(), 'from': '{{ user.email }}', 'recipient':comment_obj["From"][1],'cc':ret['owner'], 'msg': 'success'})
+            });
+        });
+    }
+
+    $(document).ready(function () {
+        update_progress();
+        setInterval(update_progress, 10000);
+    });
+    $("div[name='slave']").each(function(i, item){
+        $.ajax({
+            url: '/api/slave/' + $(item).attr('aria-id') + '/' + $(item).attr('aria-ip').replace(':9001',''),
+            type: 'get',
+            async: true,
+            success: function(data) {
+                if (data['status_code'] == 200) {
+                    var tb_str = "";
+                    console.log(data)
+                    var min_str = Math.floor(data['testing_tasks'][0]['est'] / 60) != 0 ? Math.floor(data['testing_tasks'][0]['est'] / 60) + " m " : "";
+                    var sec_str = data['testing_tasks'][0]['est'] % 60 != 0 ? data['testing_tasks'][0]['est'] % 60 + " s" : "";
+                    $("#est_tb_" + $(item).attr('aria-id')).html(min_str + sec_str);
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}

@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title> Custom colored example </title>
+    <link rel="stylesheet" href="/static/css/Treant.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="/static/css/custom-colored.css" rel="stylesheet" type="text/css">
+
+</head>
+<body>
+    <div class="chart" id="custom-colored"> --@-- </div>
+    <script src="{% static 'js/raphael.js' %}"></script>
+    <script src="{% static 'js/Treant.js' %}"></script>
+
+    <script >
+        var config = {
+        container: "#custom-colored",
+
+        nodeAlign: "BOTTOM",
+
+        connectors: {
+            type: 'step'
+        },
+        node: {
+            HTMLclass: 'nodeExample1'
+        }
+    }
+    var OAM_00000={
+        HTMLclass:"green",
+        text :{
+            name: "OAM-00000",
+            contact: "assignee:Shu, QinshengX",
+            desc: "[BXT-P][M] KPI “Performance_Cold_boot_to_Android_UI“ doesn’t meet target",
+        },
+    }
+    var OAM_38692={
+        parent: OAM_00000,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-38692",
+            contact: "assignee:Shu, QinshengX",
+            desc: "[BXT-P][M] KPI “Performance_Cold_boot_to_Android_UI“ doesn’t meet target",
+        },
+    }
+    var OAM_41343={
+        parent: OAM_00000,
+        HTMLclass:"blue-gray",
+        text :{
+            name: "OAM-41343",
+            contact: "assignee:Cai, Jialiang",
+            desc: "[M][BXT-P IVI][KPIMETA]“ST_PERF_H.264_MPEG4_AVC_1080p60“ need to meet to target 60fps",
+        },
+    }
+    var OAM_41222={
+        parent: OAM_00000,
+        HTMLclass:"blue-gray",
+        text :{
+            name: "OAM-41222",
+            contact: "assignee:Cai, Jialiang",
+            desc: "[M][BXT-P IVI][KPIMETA]“ ST_PERF_Cold_boot_to_RVC“ need to meet to target 2s",
+        },
+    }
+    var OAM_41345={
+        parent: OAM_00000,
+        HTMLclass:"blue-gray",
+        text :{
+            name: "OAM-41345",
+            contact: "assignee:Cai, Jialiang",
+            desc: "[M][BXT-P IVI][KPIMETA]“ST_PERF_H.265_HEVC_1080p60_playback“ need to meet to target 60fps",
+        },
+    }
+
+    var OAM_49041={
+        parent: OAM_41345,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-49041",
+            contact: "assignee:Zhang, FengX",
+            desc: "[BXT-P] [M] KPI “ST_PERF_H.265_HEVC_1080p60_playback” doesn’t meet target",
+        },
+    }
+    var OAM_49043={
+        parent: OAM_41343,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-49043",
+            contact: "assignee:Zhang, FengX",
+            desc: "[BXT-P] [M] KPI “ST_PERF_H.264_MPEG4_AVC_1080p60” doesn’t meet target",
+        },
+    }
+    var OAM_49037={
+        parent: OAM_41343,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-49037",
+            contact: "assignee:Zhang, FengX",
+            desc: "[BXT-P] [M] KPI “ST_PERF_VP9_1080p30_playback” doesn’t meet target",
+        },
+    }
+    var OAM_42027={
+        parent: OAM_38692,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42027",
+            contact: "assignee:Li, Ting",
+            desc: "[BXTP_IVI_M-BXTP-ABL_MRB]The WIFI driver load consume ~2s and slow down the “Cold boot up“ time",
+        },
+    }
+    var OAM_41146={
+        parent: OAM_38692,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41146",
+            contact: "assignee:Shan, ShanX",
+            desc: "[BXT-P][M] Android GUI costs too long time to boot up.",
+        },
+    }
+    var OAM_40542={
+        parent: OAM_38692,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40542",
+            contact: "assignee:Wang, Kai Z",
+            desc: "[BXT-P][M] eMMC/SD init in ABL cost more than 6 secs during boot up",
+        },
+    }
+    var OAM_41866={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41866",
+            desc: "rvc refactor: move camera logic to a dedicated thread",
+        },
+    }
+    var OAM_40899={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40899",
+            desc: "[BXTP_IVI_M] ui freeze at the last camera frame when stop rvc",
+        },
+    }
+    var OAM_42823={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42823",
+            desc: "[BXTP IVI][M] check camera modules loading status before start rvc application",
+        },
+    }
+    var OAM_41560={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41560",
+            desc: "[M][BXTP_IVI] rvc refactor: move boot time rvc to early_rvc directory",
+        },
+    }
+    var OAM_40762={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40762",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_42962={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42962",
+            desc: "[M][BXT-P]DUT hang at “Intel“ interface during boot up and turn on RVC camera again",
+        },
+    }
+    var OAM_40832={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40832",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_42821={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42821",
+            desc: "[BXT-P] [M][REG] with HDMI pass through, DUT show white screen when Start the device by short press the “ignition” button.",
+        },
+    }
+    var OAM_40974={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40974",
+            desc: "rvc camera and splash on kernel 4.4 can't display properly ",
+        },
+    }
+    var OAM_40774={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40774",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_40742={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40742",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_40834={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40834",
+            desc: "[BXTP_IVI_M] ui flickering in rvc",
+        },
+    }
+    var OAM_40776={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40776",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_40741={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40741",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_41477={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41477",
+            desc: "[M][BXT-P IVI] add runtime rvc app support",
+        },
+    }
+    var OAM_39769={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-39769",
+            desc: "[BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_42441={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42441",
+            desc: "[BXT-P] [M]lack workaround for KPI “ST_PERF_ACPI_S3_resume_to_Rear_View_Camera“  measurement.",
+        },
+    }
+    var OAM_42043={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42043",
+            contact: "assignee:Shu, QinshengX",
+            desc: "[BXT-P] [M] KPI “ST_PERF_Cold_boot_to_RVC” doesn’t meet target",
+        },
+    }
+    var OAM_40761={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40761",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_41790={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41790",
+            desc: "wait for drm/camera devices ready before access",
+        },
+    }
+    var OAM_43809={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-43809",
+            desc: "[BXTP_IVI_M] rvc code submit",
+        },
+    }
+    var OAM_40753={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40753",
+            desc: "CLONE - [BXTP-IVI-M]Back port rvc from N to M",
+        },
+    }
+    var OAM_40737={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40737",
+            desc: "CLONE - make rvc start as quick as possible.",
+        },
+    }
+    var OAM_41815={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41815",
+            desc: "allow print log to dmesg on userdebug or eng build for debug",
+        },
+    }
+    var OAM_40110={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40110",
+            desc: "[BXTP-IVI-M] Camera takes more than 1s to capture first frame in bxtp_ivi_m",
+        },
+    }
+    var OAM_41576={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41576",
+            desc: "[M][BXTP_IVI] rvc cannot work on user image",
+        },
+    }
+    var OAM_40284={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-40284",
+            desc: "[BXTP-IVI-M] for rvc porting to M from N",
+        },
+    }
+    var OAM_43600={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-43600",
+            desc: "[BXTP_IVI_M][RVC] fix some kw check issues",
+        },
+    }
+    var OAM_43758={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-43758",
+            desc: "[BXTP_IVI_M]The boot animation diaplay some tearing strip when boot up.",
+        },
+    }
+    var OAM_41458={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-41458",
+            desc: "[M][BXT-P] RVC can't be launch via cold boot devices when set GPIO switch on on user image. ",
+        },
+    }
+    var OAM_42030={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-42030",
+            desc: "[bxtp][ivi_m] disable android boot animation",
+        },
+    }
+    var OAM_43708={
+        parent: OAM_41222,
+        HTMLclass:"green",
+        text :{
+            name: "OAM-43708",
+            desc: "[BXTP_IVI_M] revert rvc commits for leafhill platform",
+        },
+    }
+var chart_config = [
+        config,OAM_00000,
+		OAM_38692,OAM_41343,OAM_41222,OAM_41345,OAM_49041,OAM_49043,OAM_49037,OAM_42027,OAM_41146,OAM_40542,
+		OAM_41866,OAM_40899,OAM_42823,OAM_41560,OAM_40762,OAM_42962,OAM_40832,OAM_42821,OAM_40974,OAM_40774,
+		OAM_40742,OAM_40834,OAM_40776,OAM_40741,OAM_41477,OAM_39769,OAM_42441,OAM_42043,OAM_40761,OAM_41790,
+		OAM_43809,OAM_40753,OAM_40737,OAM_41815,OAM_40110,OAM_41576,OAM_40284,OAM_43600,OAM_43758,OAM_41458,
+		OAM_42030,OAM_43708];
+    </script>
+    <script>
+
+        new Treant( chart_config );
+    </script>
+</body>
+</html>

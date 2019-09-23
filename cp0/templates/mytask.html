@@ -1,0 +1,353 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+    </head>
+</html>
+<link rel="stylesheet" href="/static/plugins/bootstrap-3.3.7/css/bootstrap.min.css">
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="profile-image">
+            <img src="/static/img/avatars/{{ user.usercpz.avatar | default:'avatarDefault.png' }}" class="img-circle circle-border m-b-md" alt="profile">
+        </div>
+        <div class="profile-info">
+            <div class="">
+                <div>
+                    <h2 class="no-margins">
+                        {{ user.last_name }} {{ user.first_name }}
+                    </h2>
+                    <h4>{{ user.email }}</h4>
+                    <small>
+                        Last login: {{ user.last_login }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <small>My tasks</small>
+        <h2 id="mytask_count" class="no-margins"></h2>
+    </div>
+    <div class="col-md-2">
+        <small>My favorites</small>
+        <h2 id="myfavo_count" class="no-margins"></h2>
+    </div>
+    <div class="col-md-2">
+        <small>My manual test</small>
+        <h2 id="mymanual_count" class="no-margins"></h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="tabs-container">
+            <ul class="nav nav-tabs">
+                <li class="active"><a id="mytask_count" data-toggle="tab" href="#tab-1" aria-expanded="true">My Tasks</a></li>
+                <li class=""><a id="myfavo_count" data-toggle="tab" href="#tab-2" aria-expanded="false">My Favorite Tasks</a></li>
+                <li class=""><a id="mymanualtasks_count" data-toggle="tab" href="#tab-3" aria-expanded="false">My Manual Tasks</a></li>
+             </ul>
+        </div> 
+            <div class="tab-content">
+                <div id="tab-1" class="tab-pane active">
+                    <div class="panel-body">
+                        <div id="div_mytasks" class="ibox-content">
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-2" class="tab-pane">
+                    <div class="panel-body">
+                        <div id="div_myfavorites" class="ibox-content">
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-3" class="tab-pane">
+                    <div class="panel-body">
+                        <div id="div_mymanualtasks" class="ibox-content">
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+     
+<div class="modal inmodal" id="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="config_title" name="test_config"></h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                        <tr>
+                            <td style="width:100px;">Project</td>
+                            <td id="project_name"></td>
+                        </tr>
+                        <tr>
+                            <td>Skip Flash</td>
+                            <td id="skip_flash"></td>
+                        </tr>
+                        <tr>
+                            <td>Tag</td>
+                            <td id="tag"></td>
+                        </tr>
+                        <tr>
+                            <td>Method</td>
+                            <td id="patch_method"></td>
+                        </tr>
+                        <tr>
+                            <td>Case</td>
+                            <td id="case_name"></td>
+                        </tr>
+                        <tr>
+                            <td>Based on</td>
+                            <td id="based_on"></td>
+                        </tr>
+                        <tr>
+                            <td>Patch</td>
+                            <td id="patch"></td>
+                        </tr>
+                        <tr>
+                            <td>Comment</td>
+                            <td id="test_comment"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal" id="upload_result" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content animated fadeIn" style="width:850px">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Upload Result</h4>
+                <small class="font-bold"></small>
+            </div>
+            <form class="form-horizontal">
+                <div class="modal-body" style="background-color: antiquewhite; padding-bottom: 10px; text-align: center;">
+                    <div id="task_cfg" class="form-group">
+                            kong, peng | bxtp_ivi_p/daily/20181102_2350/UserDebug | 8G | HDMI | No keybox | NO OSC | logcat
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input id="hid_project" type="hidden" value="">
+                        <input id="hid_build" type="hidden" value="">
+                        <input id="hid_display_build" type="hidden" value="">
+                        <input id="hid_tag" type="hidden" value="">
+                        <input id="hid_task_id" type="hidden" value="">
+                        <input id="hid_test_id" type="hidden" value="">
+                        <input id="hid_config_name" type="hidden" value="">
+                        <div id="hid_template_case" style="display:none">
+                            <div class="form-group">
+                                <div class="col-sm-4 control-label"></div>
+                                <div class="col-sm-2"><input name="loop0" title="loop0" class="form-control"></div>
+                                <div class="col-sm-2"><input name="loop1" title="loop1" class="form-control"></div>
+                                <div class="col-sm-2"><input name="loop2" title="loop2" class="form-control"></div>
+                                <div class="col-sm-2"><select title="unit" class="form-control"><option>sec</option><option>ms</option><option>fps</option><option>score</option></select></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spiner-example" style="display: none" id="upload_spinner">
+                        <div class="sk-spinner sk-spinner-wave">
+                            <div class="sk-rect1"></div>
+                            <div class="sk-rect2"></div>
+                            <div class="sk-rect3"></div>
+                            <div class="sk-rect4"></div>
+                            <div class="sk-rect5"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 control-label">Case Name</div>
+                        <div class="col-sm-2 control-label">Loop0</div>
+                        <div class="col-sm-2 control-label">Loop1</div>
+                        <div class="col-sm-2 control-label">Loop2</div>
+                        <div class="col-sm-2 control-label">Unit</div>
+                    </div>
+                    <div id="upload_tables"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                    <button id="btn_mt_up_result" type="button" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    function show_config(config) {
+        $.get("/api/show_config/" + config, function (data) {
+            $("p[name='test_config']").empty();
+            $("#patch").empty();
+            $("#based_on").empty();
+            $("#config_title").html(data.build);
+            $("#project_name").html(data.project_name);
+            $("#skip_flash").html(String(data.skip_flash));
+            $("#tag").html(data.tag);
+            $("#patch_method").html(data.patch_method);
+            $("#case_name").html(data.case_names);
+            $("#based_on").html(data.based_link);
+            $("#patch").html(data.patches);
+            try {
+                var comment_obj = JSON.parse(data.test_comment);
+                var comment_str = "<b>From:&nbsp;&nbsp;</b>" + comment_obj["From"][0];
+
+                for(var k in comment_obj) {
+                    if(k == "From") { continue }
+                    if(k == "Cases") {
+                        comment_str += "<br/><b>Cases:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;";
+                        comment_str += comment_obj[k].join("<br/>&nbsp;&nbsp;&nbsp;&nbsp;");
+                    } else if(k == "Comment") {
+                        comment_str += "<br/><b>Comment:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;";
+                        comment_str += comment_obj[k].replace(/\n/g, "<br/>").replace(/ /g, "&nbsp;");
+                    } else {
+                        comment_str += "<br/><b>"+k+":&nbsp;&nbsp;</b>" + comment_obj[k];
+                    }
+                }
+                $("#test_comment").html(comment_str);
+            } catch(e) {
+                $("#test_comment").html(data.test_comment);
+            }
+        });
+        $("#modal").modal()
+    }
+
+    function retest(obj) {
+        row = $(obj).parents("tr");
+        config_name = $(row).find("td a[name='config']").text();
+        project_id = $(row).find("td a[name='project']").attr("project_id");
+        slave_id = $(row).find("td a[name='slave']").attr("slave_id");
+        build = $(row).find("td a[name='build']").text();
+        $.post("/api/retest/", { config_name: config_name, project_id: project_id, slave_id: slave_id, build: build }, function (ret) {
+            if (ret.success == true) {
+                toastr.success("start task success ~ ");
+                window.location.href = '/tasks/';
+            }
+            else {
+                toastr.error(ret.msg);
+                $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+            }
+        })
+    }
+
+    function favorite(obj, task_id) {
+        $.post("/api/favorite/", { task_id: task_id }, function (ret) {
+            if (ret.success == true) {
+                toastr.success("favorite success!");
+                window.location.href='/accounts/mytasks/';
+            }
+            else {
+                toastr.error(ret.msg);
+                $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+            }
+        })
+    }
+    function unfavorite(obj, task_id) {
+        if (confirm('Are you sure to remove it?')) {
+            $.post('/api/unfavorite/', { task_id: task_id }, function (data) {
+                toastr.success('unfavorite success!');
+                window.location.href='/accounts/mytasks/';
+            });
+            $(obj).parents("tr").remove();
+            return true;
+        }
+        return false;
+    }
+    function getMytasks(page_index) {
+        $.get("/accounts/getmytasks/?page=" + page_index, function(ret){
+            $("#div_mytasks").html(ret);
+            $(".btn-group").removeClass("active");
+            $("#p_" + page_index).addClass("active");
+            $("#mytask_count").html($("#div_mytasks table").attr("task_count"));
+        })
+    }
+    function getMyfavorites(page_index) {
+        $.get("/accounts/getmyfavorites/?page=" + page_index, function(ret){
+            $("#div_myfavorites").html(ret)
+            $(".btn-group").removeClass("active");
+            $("#pf_" + page_index).addClass("active");
+            $("#myfavo_count").html($("#div_myfavorites table").attr("task_count"))
+        })
+    }
+    function getMyManualtasks(page_index) {
+        $.get("/accounts/getmymanualtasks/?page=" + page_index, function(ret){
+            $("#div_mymanualtasks").html(ret);
+            $(".btn-group").removeClass("active");
+            $("#pm_" + page_index).addClass("active");
+            $("#mymanual_count").html($("#div_mymanualtasks table").attr("task_count"));
+        })
+    }
+    function open_upload_modal(project, build, display_build, tag, task_id, test_id, config_name) {
+        $("#hid_project").val(project);
+        $("#hid_build").val(build);
+        $("#hid_display_build").val(display_build);
+        $("#hid_tag").val(tag);
+        $("#hid_task_id").val(task_id);
+        $("#hid_test_id").val(test_id);
+        $("#hid_config_name").val(config_name);
+        $("#upload_tables").empty();
+        $("#upload_result").modal();
+        $.getJSON("/api/config/"+$("#hid_config_name").val()+"/", function (ret) {
+            var comment_obj = JSON.parse(ret['test_comment']);
+            console.log(comment_obj);
+            $("#task_cfg").html(comment_obj["From"][0] + " | " + project + " / " + build + " / " + comment_obj["Image"] + " | " + comment_obj["Board"] + " | " + comment_obj["Display"] + " | " + comment_obj["Keybox"].replace(';', '') + " Keybox | " +  comment_obj["OSC"].replace(';', '') + " OSC | " + comment_obj["Log"]);
+            for(var casename in comment_obj["Cases"]) {
+                var row = $("#hid_template_case").find("div.form-group").clone();
+                $(row).find("div.control-label").html(comment_obj["Cases"][casename]);
+                $("#upload_tables").append(row);
+            }
+            $("#btn_mt_up_result").on("click", function(){
+                $("#upload_spinner").show();
+                $("#upload_tables div.form-group").each(function(){
+                    for(var i=0; i<3; i++) {
+                        var result = $(this).find("input[name='loop"+i.toString()+"']").val();
+                        if(result == "") { continue }
+                        var row_data = {
+                            'project': $("#hid_project").val(),
+                            'build': $("#hid_build").val(),
+                            'display_build': ret["display_build"],
+                            'tag': ret["tag"],
+                            'test_id': $("#hid_test_id").val(),
+                            'task_id': $("#hid_task_id").val(),
+                            'config_name': $("#hid_config_name").val(),
+                            'case_name': $(this).find("div.control-label").html(),
+                            'result': result,
+                            'unit': $(this).find("select").val(),
+                            'test_tag': 'mt',
+                            'loop': i,
+                            'sub_score_names': [],
+                            'sub_score_scores': []
+                        };
+                        $.post('/api/test_result', { "data":JSON.stringify(row_data) }, function(ret) {
+                            $("#upload_spinner").hide();
+                            $("#upload_result").modal('hide');
+                            window.location.reload();
+                        });
+                    }
+                });
+                $.post('/api/broadcast/', data={"task_id": $("#hid_task_id").val(), 'test_id': $("#hid_test_id").val(), 'test_config': $("#hid_config_name").val(), 'from': '{{ user.email }}', 'recipient':comment_obj["From"][1], 'cc':ret['owner'], 'msg': 'success'})
+            });
+        });
+    }
+    $(document).ready(function () {
+        getMytasks(1);
+        getMyfavorites(1);
+        getMyManualtasks(1);
+    });
+</script>
+{% endblock %}

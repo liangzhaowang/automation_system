@@ -1,0 +1,165 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+	<canvas id="canvas_cpu" height="200" width="1500"></canvas>
+	<canvas id="canvas_fps" height="200" width="1500"></canvas>
+	<canvas id="canvas_mem" height="200" width="1500"></canvas>
+
+{% endblock %}
+
+{% block js %}
+	<script src="{% static 'js/Chart.js' %}"></script>
+	    <script>
+        var time = [];
+        var config_cpu = {
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: [{
+                    label: 'usage',
+					backgroundColor: "",
+					borderColor: "rgb(54, 162, 235)",
+					data: [9.06, 9.83, 9.94, 10.2, 10.48, 9.12, 10.53, 10.18, 8.29, 8.15, 10.33, 9.51, 10.65, 9.9, 9.04, 11.39, 10.06, 8.79, 9.64, 8.84, 11.7, 10.63, 7.79, 11.29, 8.09, 9.22, 10.94, 10.49, 8.56, 8.65, 10.91, 10.77, 10.0, 9.79, 10.44, 9.72, 10.39, 9.6, 11.37, 10.35, 10.15, 8.52, 10.06, 11.07, 8.88, 11.99, 11.98, 10.07, 10.14, 11.01, 11.23, 8.38, 10.36, 9.99, 10.47, 9.87, 10.78, 10.92, 9.78, 9.4, 10.26, 10.47, 11.15, 10.55, 10.89, 10.23, 9.08, 9.92, 10.27, 9.43, 9.78, 9.28, 9.35, 9.65, 8.79, 11.37, 9.26, 9.46, 10.4, 10.35, 8.61, 9.54, 11.26, 10.04, 10.03, 7.68, 10.12, 9.21, 10.39, 9.9],
+					fill: false,
+                }]
+            },
+            options: {
+				responsive: false,
+				title: {
+					display: true,
+					text: 'CPU usages'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Second'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Usage percentage'
+						}
+					}]
+				}
+			}
+        }
+		var config_fps = {
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: [{
+                    label: 'usage',
+					backgroundColor: "",
+					borderColor: "rgb(54, 162, 235)",
+					data: ["63", "44", "1", "34", "78", "7", "21", "36", "77", "13", "14", "33", "3", "59", "54", "31", "38", "35", "18", "77", "93", "74", "46", "66", "37", "90", "1", "37", "52", "83", "83", "19", "74", "98", "36", "36", "91", "66", "96", "23", "3", "32", "76", "59", "43", "51", "87", "18", "28", "8", "64", "33", "53", "93", "81", "15", "86", "79", "100", "88", "87", "51", "51", "75", "96", "2", "21", "56", "2", "83", "44", "38", "70", "27", "91", "5", "84", "46", "94", "26", "7", "95", "100", "17", "86", "60", "26", "2", "67", "49"],
+					fill: false,
+                }]
+            },
+            options: {
+				responsive: false,
+				title: {
+					display: true,
+					text: 'FPS'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Second'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'FPS'
+						}
+					}]
+				}
+			}
+        }
+		var config_mem = {
+			type: 'line',
+			data: {
+				labels: time,
+                datasets: []
+            },
+            options: {
+				responsive: false,
+				title: {
+					display: true,
+					text: 'Memory'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Second'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Memory'
+						}
+					}]
+				}
+			}
+        }
+        window.onload = function() {
+			
+			$.get('/{{ api }}', function(data) {
+				// console.log(data.datasets.mem_dataset[0]);
+				config_mem.data.datasets = data.datasets.mem_dataset;
+				config_cpu.data.datasets = data.datasets.cpu_dataset;
+				config_fps.data.datasets = data.datasets.fps_dataset;
+				config_mem.data.labels = data.datasets.time;
+				config_cpu.data.labels = data.datasets.time;
+				config_fps.data.labels = data.datasets.time;
+
+				var ctx_mem = document.getElementById('canvas_mem').getContext('2d');
+				window.myLine = new Chart(ctx_mem, config_mem);
+
+				var ctx_fps = document.getElementById('canvas_fps').getContext('2d');
+				window.myLine = new Chart(ctx_fps, config_fps);
+
+				var ctx = document.getElementById('canvas_cpu').getContext('2d');
+				window.myLine = new Chart(ctx, config_cpu);
+			})
+			
+		};
+    </script>
+{% endblock %}

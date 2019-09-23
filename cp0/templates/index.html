@@ -1,0 +1,308 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-11">
+        <div class="tabs-container">
+            <div class="tabs-left">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a data-toggle="tab" href="#tab-6" aria-expanded="false"> Public Slaves</a>
+                    </li>
+                    <li>
+                        <a data-toggle="tab" href="#tab-7" aria-expanded="false"> Private Slaves</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="tab-6" class="tab-pane active">
+                        <div class="panel-body" style="height:700px;">
+                            <div class="fh-breadcrumb">
+                                <div class="fh-column">
+                                    <div class="full-height-scroll">
+                                        <ul class="list-group elements-list">
+                                            {% for ram in public_slaves.keys %}
+                                            <li class="list-group-item">
+                                                <a data-toggle="tab" href="#pubtab-{{ ram }}">
+                                                    <strong>{{ ram }} GB</strong>
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="full-height"  style="margin-left:80px">
+                                    <div class="full-height-scroll white-bg border-left" style="overflow: visible;">
+                                        <div class="element-detail-box">
+                                            <div class="tab-content">
+                                                {% for ram, slaves in public_slaves.items %}
+                                                <div id="pubtab-{{ ram }}" class="tab-pane {% if forloop.first %}active{% endif %}">
+                                                    {% for slave in slaves %}
+                                                    <div class="col-lg-4" name="slave" aria-id="{{ slave.id }}" aria-ip="{{ slave.ip }}">
+                                                        <div class="widget-head-color-box {{ slave.status.style }} p-xs text-center">
+                                                            <h4 class="font-bold no-margins">{{ slave.num }}</h4>
+                                                        <div class="fc fc-unthemed fc-ltr">
+                                                                <div class="fc-toolbar pull-right" style="margin-top: -16px;">
+                                                                    <div class="fc-right">
+                                                                        <a role="button" href="new/slave/{{ slave.id }}" style="margin-right:3px;">
+                                                                            <i class="fa fa-plus" style="color: aliceblue;"></i>
+                                                                        </a>
+                                                                        <li class="fa dropdown">
+                                                                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                                                                <i class="fa fa-tasks" style="color: aliceblue;"></i>
+                                                                            </a>
+                                                                            <ul class="dropdown-menu" style="width:220px;">
+                                                                                <table class="table issue-tracker no-margins" style="color: #676a6c; background-color: white;"> 
+                                                                                    <thead> 
+                                                                                        <tr style="color: #676a6c; background-color: aliceblue;">
+                                                                                            <th>Build </th>
+                                                                                            <th>Status </th>
+                                                                                            <th>Estimate </th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody id="est_tb_{{ slave.id }}"></tbody>
+                                                                                </table>
+                                                                            </ul>
+                                                                        </li>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            </h4>
+                                                        </div>
+                                                        <div class="widget-text-box" style="padding: 10px">
+                                                            <ul class="folder-list m-b-md" style="padding: 0">
+                                                                <li><a>
+                                                                    <i class="fas fa-server"></i> Hostname
+                                                                    <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.host_name|default:"undefined" }}">{{ slave.host_name|default:"undefined" }}</span>
+                                                                </a></li>
+                                                                <li><a>
+                                                                    <i class="fas fa-barcode"></i> SN
+                                                                    <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.sn|default:"undefined" }}">{{ slave.sn|default:"undefined" }}</span>
+                                                                </a></li>
+                                                                <li><a>
+                                                                    <i class="fas fa-comments"></i> Comment
+                                                                    <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.comment }}">{{ slave.comment }}</span>
+                                                                </a></li>
+                                                                <li><a>
+                                                                    <i class="fas fa-clock"></i>
+                                                                    Total need time:
+                                                                    <span id="sp_total_est_{{ slave.id }}" class="pull-right" style="color:#676a6c;width:80px; overflow:hidden;height:20px; text-align:right" title="{{ est.result }}">{{ est.result }}</span>
+                                                                </a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+    
+                                    </div>
+                                </div>
+    
+    
+    
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-7" class="tab-pane">
+                        <div class="panel-body" style="height:700px;">
+                            <div class="fh-breadcrumb">
+                                <div class="fh-column">
+                                    <div class="full-height-scroll">
+                                        <ul class="list-group elements-list">
+                                            {% for ram in private_slaves.keys %}
+                                            <li class="list-group-item">
+                                                <a data-toggle="tab" href="#pvttab-{{ ram }}">
+                                                    <strong>{{ ram }} GB</strong>
+                                                </a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+    
+                                    </div>
+                                </div>
+    
+                                <div class="full-height" style="margin-left:80px">
+                                    <div class="full-height-scroll white-bg border-left">
+                                        <div class="element-detail-box">
+                                            <div class="tab-content">
+                                                {% for ram, slaves in private_slaves.items %}
+                                                <div id="pvttab-{{ ram }}" class="tab-pane {% if forloop.first %}active{% endif %}">
+                                                    {% for slave in slaves %}
+                                                    <div class="col-lg-4" name="slave" aria-id="{{ slave.id }}" aria-ip="{{ slave.ip }}">
+                                                        <div class="widget-head-color-box {{ slave.status.style }} p-xs text-center">
+                                                            <h4 class="font-bold no-margins">{{ slave.num }}</h4>
+                                                            <div class="fc fc-unthemed fc-ltr">
+                                                                <div class="fc-toolbar pull-right" style="margin-top: -16px;">
+                                                                    <div class="fc-right">
+                                                                        <a role="button" href="new/slave/{{ slave.id }}" style="margin-right:3px;">
+                                                                            <i class="fa fa-plus" style="color: aliceblue;"></i>
+                                                                        </a>
+                                                                        <li class="fa dropdown">
+                                                                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                                                                <i class="fa fa-tasks" style="color: aliceblue;"></i>
+                                                                            </a>
+                                                                            <ul class="dropdown-menu">
+                                                                                <table class="table issue-tracker no-margins" style="color: #676a6c; background-color: white;">
+                                                                                    <thead>
+                                                                                        <tr style="color: #676a6c; background-color:aliceblue;">
+                                                                                            <th>Build </th>
+                                                                                            <th>Status </th>
+                                                                                            <th>Estimate </th>
+                                                                                        </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                        {% for task in queue %}
+                                                                                            {% if task.slave == slave %}
+                                                                                            <tr id="q{{ task.id }}" class="estimatetime" aria-project="{{ task.project.name }}"  aria-config="{{ task.test_config }}" aria-ip="{{ slave.ip }}" >
+                                                                                                <td><span>{{ task.build }}</span></td>
+                                                                                                <td><a class="pull-left" href="#"> {{ task.submitter.last_name }},{{ task.submitter.first_name }}</a></td>
+                                                                                                <td><span>{{ task.status }}</span></td>
+                                                                                                {% for est in tasks_estimate %}
+                                                                                                    {% if est.id == task.id %}
+                                                                                                        <td><span>{{ est.result }} S</span></td>
+                                                                                                    {% endif %}
+                                                                                                {% endfor %}
+                                                                                            </tr>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}  
+                                                                                    </tbody>
+                                                                                    <tfooter>
+                                                                                        <tr>
+                                                                                        {% for est in slave_estimate %}
+                                                                                            {% if est.id == slave.id %}
+                                                                                            <td><span>Total_time: </span></td>
+                                                                                            <td colspan='3'><a class="pull-right"> {{ est.result }}</a></td>
+                                                                                            {% endif %}
+                                                                                        {% endfor %}
+                                                                                        </tr>
+                                                                                    </tfooter>
+                                                                                </table>
+                                                                            </ul>
+                                                                        </li>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            </h4>
+                                                        </div>
+                                                        <div class="widget-text-box" style="padding: 10px">
+                                                            <ul class="folder-list m-b-md" style="padding: 0">
+                                                                <li>
+                                                                    <a href="#">
+                                                                        <i class="fas fa-server"></i> Hostname
+                                                                        <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.host_name|default:"undefined" }}">{{ slave.host_name|default:"undefined" }}</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="#">
+                                                                        <i class="fas fa-barcode"></i> SN
+                                                                        <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.sn|default:"undefined" }}">{{ slave.sn|default:"undefined" }}</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a href="#">
+                                                                        <i class="fas fa-comments"></i> Comment
+                                                                        <span class="pull-right" style="width:80px; overflow:hidden;height:20px; text-align:right" title="{{ slave.comment }}">{{ slave.comment }}</span>
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <i class="fas fa-clock"></i>
+                                                                    Total need time:
+                                                                    <span id="sp_total_est_{{ slave.id }}" class="pull-right" style="color:#676a6c;width:80px; overflow:hidden;height:20px; text-align:right"></span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    {% endfor %}
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-1">
+        <ul class="folder-list">
+            <li>
+                <a href="#">
+                    <span class="label label-danger">Offline</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="label label-warning">testing</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="label label-primary">standby</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}
+{% block js %}
+<script>
+    $("div[name='slave']").each(function(i, item){
+        $.ajax({
+            url: '/api/slave/' + $(item).attr('aria-id') + '/' + $(item).attr('aria-ip'),
+            type: 'get',
+            async: true,
+            success: function(data) {
+                console.log(data);
+                if (data['status_code'] == 200) {
+                    var tb_str = "";
+                    for(var task in data['testing_tasks']) {
+                        var min_str = Math.floor(data['testing_tasks'][task]["est"] / 60) != 0 ? Math.floor(data['testing_tasks'][task]["est"] / 60) + " m " : "";
+                        var sec_str = data['testing_tasks'][task]["est"] % 60 != 0 ? data['testing_tasks'][task]["est"] % 60 + " s" : "";
+                        tb_str += "<tr class='estimatetime'>\
+                            <td><span>" + data['testing_tasks'][task]["build"] + "</span></td>\
+                            <td><span>" + data['testing_tasks'][task]["status"] + "</span></td>\
+                            <td><span>" + min_str + sec_str + "</span></td>\
+                        </tr>";
+                    }
+                    for(var task in data['queue_tasks']) {
+                        var min_str = Math.floor(data['queue_tasks'][task]["est"] / 60) != 0 ? Math.floor(data['queue_tasks'][task]["est"] / 60) + " m " : "";
+                        var sec_str = data['queue_tasks'][task]["est"] % 60 != 0 ? data['queue_tasks'][task]["est"] % 60 + " s" : "";
+                        tb_str += "<tr class='estimatetime'>\
+                            <td><span>" + data['queue_tasks'][task]["build"] + "</span></td>\
+                            <td><span>" + data['queue_tasks'][task]["status"] + "</span></td>\
+                            <td><span>"+  min_str + sec_str + "</span></td>\
+                        </tr>";
+                    }
+                    var min_str = Math.floor(data['total_est'] / 60) != 0 ? Math.floor(data['total_est'] / 60) + " m " : "";
+                    var sec_str = data['total_est'] % 60 != 0 ? data['total_est'] % 60 + " s" : "";
+                    tb_str += "<tr>\
+                            <td><span>Total_time: </span></td>\
+                            <td colspan='3'><a class='pull-right'> " + min_str + sec_str + "</a></td>\
+                        </tr>";
+                    $("#est_tb_" + $(item).attr('aria-id')).html(tb_str);
+                    $("#sp_total_est_" + $(item).attr('aria-id')).html(min_str + sec_str);
+                    if(Math.floor(data['total_est'] / 60) >= 240) {
+                        $("#sp_total_est_" + $(item).attr('aria-id')).css('color', '#ed5565');
+                    }
+                    if (data['atf_task_id'] == 'None') {
+                        $(item).find("div:first-child").addClass("navy-bg");
+                    } else {
+                        $(item).find("div:first-child").addClass("yellow-bg");
+                    }
+                } else {
+                    $(item).find("div:first-child").addClass("red-bg");
+                }
+            }
+        })
+    })
+</script>
+{% endblock %}

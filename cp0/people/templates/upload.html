@@ -1,0 +1,236 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="/static/css/plugins/fullcalendar/fullcalendar.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/github-markdown.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/jquery-ui.min.css' %}" rel="stylesheet" type="text/css">
+<style>
+
+.a-upload {
+    padding: 5px 5px;
+    height: 35px;
+    line-height: 20px;
+    position: relative;
+    cursor: pointer;
+    color: #888;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    display: inline-block;
+    *display: inline;
+    *zoom: 1
+}
+
+.a-upload  input {
+    position: absolute;
+    font-size: 100px;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    filter: alpha(opacity=0);
+    cursor: pointer
+}
+
+.a-upload:hover {
+    color: #444;
+    background: #eee;
+    border-color: #ccc;
+    text-decoration: none
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="ibox-content">
+    <form name="upform" action="" method="POST">
+        <div class="row">
+            <div class="col-lg-6" style="font-size: 15px">
+                <input type ="file" class="a-upload" name="csv" id="myfile"/><br/>
+            </div>
+            <div class="col-lg-6" style="font-size: 15px">
+        Project:&nbsp;&nbsp;<select id="project" class="a-upload" lenth="200px">
+                            <option>-- select category --</option>
+                            <option>demo_video</option>
+                            <option>video</option>
+                            <option>others</option>
+                        </select>
+            </div>
+        </div>
+        <input type="button" style="font-size: 15px" class="btn btn-primary" data-toggle="modal" data-target="#build" value="upload" /><br/>
+        <div class="modal fade" id="build" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            Please input comments
+                        </h4>
+                    </div>
+                    <div class="modal-body" style="text-align: center">
+                        <input type="text" class="a-upload" style="height: 60px;width: 540px" id="number" />
+                    </div>
+                    <div id="BKC" class="modal-footer">
+                        <button type="button" onclick="upload()" class="btn btn-primary">submit</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div></br>
+<div class="ibox-content">
+    <table class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th style="text-align: center; font-size: 15px">
+                     User
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Project
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Comment
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Time
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Display
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    View
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Download
+                </th>
+                <th style="text-align: center; font-size: 15px">
+                    Delete
+                </th>
+            </tr>
+        </thead>
+        {% for i in all %}
+    <tr>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {{ i.user }}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {{ i.project }}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {{ i.build }}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {{ i.fmattime }}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {% ifequal i.project 'demo_video' %}
+                <a href="/{{ i.url }}" target="_blank"><i class="fa fa-video"></i></a>
+            {% endifequal %}
+            {% ifequal i.project 'video' %}
+                <a href="/{{ i.url }}" target="_blank"><i class="fa fa-video"></i></a>
+            {% endifequal %}
+            {% ifequal i.project 'others' %}
+                <a><i class="fa fa-ban"></i></a>
+            {% endifequal %}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {% ifequal i.project 'demo_video' %}
+                <a><i class="fa fa-eye" style="color: #999999"></i></a>
+            {% else %}
+                <a href="/view_log/{{ i.url }}/" target="_blank"><i class="fa fa-eye"></i></a>
+            {% endifequal %}
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            <a href="/down_log/{{ i.id }}" onclick="down_log('{{ i.id }}')"><i class="fa fa-download"></i></a>
+        </td>
+        <td class="text-center no-padding" style="font-size: 15px;vertical-align: middle" height="30 px">
+            {% ifequal i.user user %}
+                <a onclick="deldata('{{ i.id }}', '{{ i.project }}')"><i class="fa fa-trash"></i></a>
+            {% else %}
+                <a><i class="fa fa-trash" style="color: #999999"></i></a>
+            {% endifequal %}
+        </td>
+    </tr>
+        {% endfor %}
+    </table>
+</div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Mainly scripts -->
+<script src="/static/js/plugins/footable/footable.all.min.js"></script>
+<script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- Custom and plugin javascript -->
+<script src="/static/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/moment.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/fullcalendar.min.js"></script>
+
+<script>
+    function upload() {
+       var mydata = document.getElementById("myfile").files[0];
+       //console.log(mydata["name"]);
+       var projects = document.getElementById("project").value;
+       var builds = document.getElementById("number").value;
+       //console.log("notes",notes);
+       //console.log("mydata",document.getElementById("myfile"));
+        // console.log("builds",builds);
+       var formData = new FormData();
+       var xhr = new XMLHttpRequest();
+       var url = '/create_file/';
+       //console.log("url",url);
+       if (mydata == undefined){
+           alert("Please select files")
+       } else {
+           var file_name = mydata['name'];
+           //console.log(file_name.search('.mp4'));
+           if (projects == "-- select category --") {
+               alert("'Project' must not be null")
+           } else {
+               if (builds == "") {
+                   alert("Please input build number")
+               } else {
+                   formData.append("file", mydata);
+                   formData.append("projects", projects);
+                   formData.append("builds", builds);
+                   xhr.open('POST', url, true);
+                   xhr.onload = function () {
+                       if (xhr.status === 200) {
+                           alert('upload success');
+                           window.location.reload()
+                       } else {
+                           alert('upload error');
+                           window.location.reload()
+                       }
+                   };
+                   xhr.send(formData);
+               }
+           }
+
+       }
+    }
+
+    function down_log(id) {
+        var url = '/down_log/'+ id;
+        console.log(url);
+        window.location.href = url
+    }
+
+    function deldata(id, project) {
+        var open = confirm("confirm deletion?");
+        console.log(project);
+        if (open == true)
+        {
+            $.post('/delete/'+project+'/',{"data":id});
+            window.location.reload()
+        }
+
+    }
+    </script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link href="{% static 'css/plugins/codemirror/codemirror.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+    <img src="{{ content }}" alt="" style="width: 100%">
+
+{% endblock %}
+
+{% block js %}
+{% endblock %}

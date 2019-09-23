@@ -1,0 +1,313 @@
+{% load staticfiles %}
+{% load hometag %}
+<!DOCTYPE html>
+<html lang="es-US">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | {{ subtitle }}</title>
+    <link rel="shortcut icon" href="{% static 'img/logo.ico' %}?v=2">
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/animate.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/fontawesome-all.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/toastr/toastr.min.css' %}" rel="stylesheet">
+    {% block css %}
+    {% endblock %}
+    <link href="{% static 'css/style.css' %}?v=6" rel="stylesheet" type="text/css">
+</head>
+<body class="top-navigation fixed-nav gray-bg">
+<div id="wrapper">
+    <div id="page-wrapper">
+        <div class="row border-bottom white-bg">
+            <nav class="navbar navbar-fixed-top" role="navigation">
+                <div class="navbar-header">
+                    <button aria-controls="navbar" aria-expanded="false" data-target="#navbar" data-toggle="collapse"
+                            class="navbar-toggle collapsed"
+                            type="button">
+                        <i class="fa fa-reorder"></i>
+                    </button>
+                    {% if user.usercpz.hide_icon != True %}
+                    <a href="/" class="navbar-brand no-padding">
+                        <span>
+                            <img src="/static/cp0_white.png" style="padding-top: 8px; padding-left: 15px" height="42px">
+                        </span>
+                    </a>
+                    {% endif %}
+                    <a href="/" class="navbar-brand" {% if user.usercpz.hide_icon != True %}style="padding-left: 15px"{% endif %}>
+                        CUBE P ZERO
+                    </a>
+                </div>
+                <div class="navbar-collapse collapse" id="navbar">
+                    <ul class="nav navbar-nav">
+                        {% if user.is_authenticated %}
+                            <li class="dropdown {% active 'new' request.path %}">
+                                <a role="button" href="/new/">NEW TEST</a>
+                            </li>
+                        {% endif %}
+                        <li class="{% active 'release' request.path %}">
+                            <a role="button" href="/tasks">TASKS</a>
+                        </li>
+                        <li class="dropdown">
+                            <a aria-expanded="false" href="#" class="dropdown-toggle"
+                               data-toggle="dropdown">RESULTS<span
+                                    class="caret"></span></a>
+                            <ul role="menu" class="dropdown-menu">
+
+                                <li>
+                                    <a href="/production/gp21/"><i class="fa fa-angle-right"></i>
+                                        Gordon Peak 2.1
+                                    </a>
+                                    <a href="/production/gp2/"><i class="fa fa-angle-right"></i>
+                                        Gordon Peak 2.0
+                                    </a>
+                                    <a href="/production/kbl/"><i class="fa fa-angle-right"></i>
+                                        Kaby Lake
+                                    </a>
+                                    <a href="/history/aic/"><i class="fa fa-angle-right"></i>
+                                        AIC
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a aria-expanded="false" href="#" class="dropdown-toggle"
+                               data-toggle="dropdown"><i class="fa fa-code-branch" aria-hidden="true"></i>BKC Mngt.<span
+                                    class="caret"></span></a>
+                            <ul role="menu" class="dropdown-menu">
+
+                                <li>
+                                    <a href="/patch/m/"><i class="fa fa-angle-right"></i>
+                                        BXTP_PATCH_M
+                                    </a>
+                                    <a href="/patch/o/"><i class="fa fa-angle-right"></i>
+                                        BXTP_PATCH_O
+                                    </a>
+                                    <a href="/patch/p/"><i class="fa fa-angle-right"></i>
+                                        BXTP_PATCH_P
+                                    </a>
+                                    <a href="/patch/p_acrn/"><i class="fa fa-angle-right"></i>
+                                        BXTP_P_ACRN
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a aria-expanded="false" href="#" class="dropdown-toggle"
+                               data-toggle="dropdown"><i class="fa fa-object-group" aria-hidden="true"></i>Working Group<span
+                                    class="caret"></span></a>
+                            <ul role="menu" class="dropdown-menu">
+
+                                <li>
+                                    <a href="/patch/acrn_gfx/"><i class="fa fa-angle-right"></i>
+                                        BXTP_ACRN_GFX
+                                    </a>
+                                    <a href="/patch/camp/"><i class="fa fa-angle-right"></i>
+                                        BXTP_BOOT_CAMP
+                                    </a>
+                                    <a href="/patch/p_camp/"><i class="fa fa-angle-right"></i>
+                                        P_BOOT_CAMP(OMR1)
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <!--<a aria-expanded="false" role="button" href="http://10.239.93.50:8000"><i class="fa fa-code-fork"></i>BKC Patches</a>-->
+                        {% if user.is_authenticated %}
+                            <li>
+                                <a aria-expanded="false" role="button" href="/metrix/"><i class="fa fa-table"></i>Metrix</a>
+                            </li>
+                            <li>
+                                <a aria-expanded="false" role="button" href="/upload_file/"><i class="fa fa-file"></i>
+                                    FILES
+                                </a>
+                            </li>
+                            <li>
+                                <a aria-expanded="false" role="button" href="/pca/"><i class="fa fa-chart-line" ></i>Pca</a>
+                            </li>
+                        {% endif %}
+                        <li class="dropdown">
+                            <a aria-expanded="false" href="#" class="dropdown-toggle"
+                                data-toggle="dropdown">Server Status <span class="caret"></span></a>
+                            <ul role="menu" class="dropdown-menu">
+                                <li>
+                                    <a href="/statistics/"><i class="fa fa-angle-right"></i>
+                                        Cubep Statistics
+                                    </a>
+                                    <a href="/aic_static/usage_chart_v2/aic/aic_status/logs/instance_ins/server_status.json/"><i class="fa fa-angle-right"></i>
+                                        Aic_Server Statistics
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <ul class="nav navbar-top-links navbar-right">
+                        <li class="dropdown  cmp-list">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                <i class="fa fa-exchange-alt" aria-hidden="true"></i>
+                                <span class="label label-success">{{ cmp_length }}</span>
+                            </a>
+                            <ul id="cmp_list" class="dropdown-menu dropdown-messages">
+                                {% if cmp_list == None %}
+                                    <li>
+                                        <div class="dropdown-messages-box">
+                                            <div class="media-body">
+                                                Nothing to compare
+                                            </div>
+                                        </div>
+                                    </li>
+                                {% else %}
+                                    {% for cmp in cmp_list %}
+                                        <li>
+                                            <div class="dropdown-messages-box">
+                                                <div class="media-body">
+                                                    {%if cmp.loop %}
+                                                    <small class="pull-right">#{{ cmp.loop }}</small>
+                                                    {% else %}
+                                                    <a class="pull-right" onclick="remove(this, '{{ cmp.project }}/{{ cmp.build}}/{{ cmp.test }}/{{ cmp.case }}/{{ cmp.loop }}')"><span aria-hidden="true">×</span></a>
+                                                    {% endif %}
+                                                    <strong>{{ cmp.build }}</strong> / {{ cmp.test }}
+                                                    <br>
+                                                    <small class="text-muted">{{ cmp.project }} /
+                                                        {{ cmp.case }} </small>
+                                                    
+                                                    <!-- <a role="button" class="btn btn-white pull-right" ><span aria-hidden="true">×</span></i> -->
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li class="divider"></li>
+                                    {% endfor %}
+                                    <li>
+                                        <div class="text-center link-block">
+                                            <a id="compare" href="/compare/">
+                                                <strong>Compare</strong>
+                                            </a>
+                                            <a id="clear_compare">
+                                                <strong>Clear</strong>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                <i class="fa fa-user"></i>  <span class="label label-warning">0</span>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="/accounts/workspace/">
+                                        <i class="fas fa-desktop"></i> Workspace
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/dashboard/">
+                                        <i class="fas fa-cogs"></i> Settings
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/template/">
+                                        <i class="fas fa-sliders-h"></i> Test templates
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#">
+                                        <i class="fas fa-bell"></i> Alerts
+                                        <span class="pull-right label label-default" style="margin: 5px">0</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/mytasks/">
+                                        <i class="fas fa-tasks"></i> Tasks
+                                   </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/case/">
+                                        <i class="fas fa-plus-square"></i> Add Case
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/accounts/logout/">
+                                        <i class="fas fa-sign-out-alt"></i> Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                                <i class="fas fa-star"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-messages">
+                                {% for logger in favorites %}
+                                <li>
+                                    <div class="media-body">
+                                        [{{ logger.project.name }}] <a href="/{{ logger.result_link }}"><strong>{{ logger.build }}</strong></a><br>
+                                    </div>
+                                </li>
+                                <li class="divider"></li>
+                                {% endfor %}
+                                <li>
+                                    <div class="text-center link-block">
+                                        <a href="/accounts/mytasks/">
+                                            <strong>See All</strong>
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+        <div class="wrapper wrapper-content">
+            <div class="{{ container }}">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+        <div class="footer fixed">
+            {{ user.last_name }}, {{ user.first_name }} ({% if user.is_staff %}<a href="/admin" class="text-white">Admin</a>{% else %}User{% endif %})
+            <div class="pull-right">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mainly scripts -->
+<script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.min.js' %}"></script>
+<script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
+<script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="{% static 'js/ins.js' %}"></script>
+<script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
+<script src="{% static 'js/plugins/toastr/toastr.min.js' %}"></script>
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+<script>
+    {% if warning != 'None' and warning != None %}
+    toastr["warning"]('{{ warning }}');
+    {% endif %}
+
+    $("#clear_compare").on("click", function () {
+        $.get("/api/clear_compare_list/", function (ret) {
+            location.reload()
+        })
+    });
+
+    function remove(obj, cmp_item) {
+        $.post('/api/remove/', { "cmp_item": cmp_item }, function (data) {
+            toastr.success('remove success!');
+            $(obj).parent().parent(".dropdown-messages-box").parent().next().remove();
+            $(obj).parent().parent(".dropdown-messages-box").remove();
+            $("ul.navbar-right li.cmp-list").addClass("open");
+        });
+    }
+</script>
+
+{% block js %}
+
+{% endblock %}
+</body>
+
+</html>

@@ -1,0 +1,249 @@
+{% extends "pca_layout.html" %}
+{% load staticfiles %}
+#pca_container {
+  max-width: 400px;
+  max-height: 200px;
+}
+{% block sub_content %}
+<div id="pca_charts" class="gray-bg" style="margin-top:0px">
+    <div class="ibox-content" style="margin-top:0">
+        <div class="sk-spinner sk-spinner-wave">
+            <div class="sk-rect1"></div>
+            <div class="sk-rect2"></div>
+            <div class="sk-rect3"></div>
+            <div class="sk-rect4"></div>
+            <div class="sk-rect5"></div>
+        </div>
+        <div class="row">
+                <div class="col-lg-3" style="width:25%">
+                        <div class="panel panel-primary" style="height:auto;margin-left:30px">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    Add && Delete point
+                                </h4>
+                            </div>
+                            <div class="panel-body">
+                                <form role="form" class="form-inline">
+                                    <div class="form-group" style="width:100%">
+                                        <input type="text" class="form-control" onclick="setFocus()" style="width:100%" id="input_text" value="please input EB number" />
+                                    </div>
+                                    <br>
+                                    <div align="right">
+                                        <button type="button" class="btn btn-default" onclick="onClickButton(this)">add</button>
+                                        <button type="button" class="btn btn-default" onclick="onClickButton(this)">delete</button>
+                                    </div>
+                                </form>
+                                    <div class="form-group" style="width:100%">
+                                        <h4 class="panel-title">
+                                            Deleted EB list:
+                                        </h4>
+                                        <div style="width:100%">
+                                            <textarea type="text" class="form-control" style="width:100%;background-color:#fff" id="delete_text" rows="10" readonly="true"></textarea>
+                                        </div>
+                                  </div>
+                            </div>
+
+                        </div>
+                    <!--</div>-->
+                </div>
+                <div class="col-lg-9" style="width:75%">
+                        <!--<div class="white-bg" style="margin=1px">-->
+                            <div id="pca_container" style="margin-right:30px;margin-left:20px">
+                                    {% for item in keys %}
+                                    <div class="panel panel-primary" id="charts_container_{{item}}" style="width:auto;height:auto;    margin-bottom:3px">
+                                        <div class="panel-heading" style="width:100%;height:30px" id="charts_head_{{item}}">
+                                            <h4 class="panel-title" style="width:100%;margin-top: 0px;"><span class="caret"></span>
+                                            {{item}}
+                                                <span class="charts_help" style="float:right" aria-name="{{item}}" hidden >Please click this bar to show the Scatter chart of it.</span>
+                                            </h4>
+                                        </div>
+
+                                        <div class="panel-body" name="charts_container" hidden aria-name="{{item}}">
+                                            <canvas id="{{item}}" name="canvas" width="400px" height="150px"></canvas>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                            </div>
+                        <!--</div>-->
+                </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+
+<script src="{% static 'js/Chart.js' %}"></script>
+<script>
+$(document).ready(function(){
+        var raw_data = {{raw|safe}};
+        var ebList = {{pca_list|safe}};
+        $.each($("div[name=\"charts_container\"]"), function(k, v){
+            var caseName = v.getAttribute("aria-name");
+            var id = $(v).parent(".panel-primary").children(".panel-heading").attr("id");
+
+            draw_chart(raw_data,ebList,caseName);
+            $('#'+id).click(function (event) {
+                    if (this == event.currentTarget) {
+                        //console.log(this);
+                        //var help = $(this).children(".panel-title").children(".charts_help");
+                        //console.log(help);
+                        var selected = $(this).parent(".panel-primary").children(".panel-body");
+                        if (selected.is(':hidden')) {
+                            selected.show();
+                        //    help.hide();
+                        }
+                        else {
+                            selected.hide();
+                        //    help.show();
+                        }
+                    }
+                });
+        });
+
+        delete_list = {{delete_list|safe}};
+
+        var dlist = "";
+        for(i in delete_list){
+            dlist += delete_list[i];
+            dlist +="\n";
+        }
+
+        $("#delete_text").val(dlist);
+
+});
+
+function setFocus(){
+    var input_val = $("#input_text").val();
+    var keyword = /\d+_*[BW]*\d+/;
+    if(!input_val.match(keyword)){
+        //console.log(input_val);
+        $("#input_text").val("");
+    }
+}
+
+function eb_raw_data(raw_data,ebList,caseName){
+
+    var case_raw=Array();
+    for (i in raw_data[caseName]){
+        var axes_x = raw_data[caseName][i][0];
+        var index=ebList.indexOf(axes_x.toString());
+        case_raw.push({
+            'x': index,
+            'y': raw_data[caseName][i][1],
+            });
+    }
+    return case_raw;
+
+}
+
+function rewrite_Y_axes(caseName){
+    var options = Array();
+    options = {
+                title:{
+						display: true,
+						text: caseName+' Scatter Chart',
+                },
+                scales:{
+						xAxes: [{
+						    position: 'bottom',
+						    scaleLabel: {
+                                    display: true,
+                                    labelString: 'EB'
+                                    },
+						}],
+						yAxes: [{
+                                    "ticks": {
+                                    "beginAtZero": true,
+                                    "maxTicksLimit":10,
+                                    suggestedMax:80
+                                    },
+                                    scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value'
+                                    },
+                                }]
+                    }
+            };
+    if(caseName.indexOf("boot")!=-1 || caseName.indexOf("manhattan")!=-1){
+        options.scales.yAxes[0].ticks.suggestedMax = 45;
+    }
+    if(caseName.indexOf("Rlbench")!= -1){
+        options.scales.yAxes[0].ticks.suggestedMax = 30;
+    }
+    if(caseName.indexOf("Resume_time")!= -1){
+        options.scales.yAxes[0].ticks.suggestedMax = 4000;
+    }
+    if(caseName.indexOf("Antutu")!= -1){
+        options.scales.yAxes[0].ticks.suggestedMax = 90000;
+    }
+    return options;
+
+}
+
+function draw_chart(raw_data,ebList,caseName){
+
+    var ctx = document.getElementById(caseName);
+    Chart.defaults.global.elements.point.hitRadius=0;
+    Chart.defaults.global.elements.point.radius = 3;
+    Chart.defaults.global.elements.point.hoverRadius = 3;
+    Chart.defaults.global.elements.point.hoverBorderWidth = 0;
+    var myChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: '# of EB data',
+                data: eb_raw_data(raw_data,ebList,caseName),
+				backgroundColor: 'rgba(255,0,0,0.8)',
+            }]
+        },
+        options: rewrite_Y_axes(caseName),
+    });
+    //console.log(caseName);
+    $("#"+caseName).click(
+        function (evt) {
+            var onePoint = myChart.getElementAtEvent(evt)[0];
+            if (onePoint) {
+                var value = myChart.data.datasets[onePoint._datasetIndex].data[onePoint._index];
+                if (value){
+                    $("#input_text").val(ebList[value["x"]]);
+                }
+            }
+        }
+    );
+}
+
+function onClickButton(elem){
+    var eblist = Array();
+    eblist = {{pca_list|safe}};
+    eblist = eblist.concat({{delete_list|safe}});
+    ebNum = $("#input_text").val();
+
+    var data = {
+       "ebNum": ebNum,
+       "modify_style":$(elem).text()
+    };
+
+    if(eblist.indexOf(ebNum) == -1){
+        alert("please input EB num from the charts or delete list");
+        return;
+    }
+
+    $('#pca_charts').children('.ibox-content').toggleClass('sk-loading');
+    $.post('/pca/chartsmodify/', data, function(ret)
+    {
+        console.log(ret)
+        if (ret.success == true)
+        {
+            window.location.href='/pca/charts/';
+        }
+        else
+        {
+            $('#pca_charts').children('.ibox-content').toggleClass('sk-loading');
+        }
+    });
+}
+</script>
+{% endblock %}
+
+

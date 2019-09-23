@@ -1,0 +1,11 @@
+age example:
+sudo apt-get install gnuplot
+
+./cat_cpu_gpu.sh 
+during GFXBenchmark running
+Ctrl+c to stop this script once benchmark done
+It will auto generate csv files like out_cpu_gpu_cur_08_03_2017_11_43_56.csv
+
+./plot.sh out_cpu_gpu_cur_08_03_2017*****.csv "manhattan_offScreen_40FPS"
+                It will auto generate png result as attached
+

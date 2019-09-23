@@ -1,0 +1,2 @@
+start 
+[1A00:51 52s267ms  Temp. (id 0) = 48 C; Temp. (id 1) = 33 C; Supply: 11.99 V atc = 3; FAN 142 rpm; FAN 40 %            

@@ -1,0 +1,866 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="ibox_nt" class="ibox float-e-margins">
+                <div class="ibox-content">
+                    <form class="form-horizontal">
+                        <div class="spiner-example" style="display: none" id="spinner">
+                            <div class="sk-spinner sk-spinner-wave">
+                                <div class="sk-rect1"></div>
+                                <div class="sk-rect2"></div>
+                                <div class="sk-rect3"></div>
+                                <div class="sk-rect4"></div>
+                                <div class="sk-rect5"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Load a test template</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="template" id="template">
+                                    <option value="">No template</option>     
+                                    {% for template in templates %}
+                                    <option value="{{ template.id }}">{{ template }}</option>     
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Build with patch(s)</label>
+                            <div class="col-sm-9">
+                                <div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" value="bap" name="patch_method"> <i></i>
+                                        Build one image with all patches </label>
+                                    </div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" value="td" name="patch_method" checked> <i></i>
+                                        Test base build directly </label>
+                                    </div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" value="mt" name="patch_method"> <i></i>
+                                        Manual Test  </label>
+                                    </div>
+                                </div>
+                                <textarea name="patch" id="patch" rows="10" cols="inherit" style="width: 100%; display: none"></textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="form_project">
+                            <label class="col-sm-2 control-label">Project / Build Type</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="project" id="project">
+                                    <option id="project_null" value="null">Choose a Project</option>
+                                    {% for project in projects %}
+                                    {% if project.name == "pmr0_bxtp_ivi_stable" %}
+                                        <option value="{{ project.id }}" slave_project="{{ project.slave_project }}" selected>{{ project.name }}</option>
+                                    {% else %}
+                                        <option value="{{ project.id }}" slave_project="{{ project.slave_project }}">{{ project.name }}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-sm-5">
+                                <select data-placeholder="Select a Build" class="form-control" name="build_type" id="build_type">
+                                    <option id="build_type_null" value="null">Choose Build Type</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group" id="form_build_url">
+                            <label class="col-sm-2 control-label">URL</label>
+                            <div class="col-sm-8">
+                                <input placeholder="Select build type or customize an URL" id="build_url"
+                                       name="build_url" class="form-control required" type="text" aria-required="true">
+                            </div>
+                            <div class="col-sm-2"><a id="refresh" href="#" class="btn btn-primary">fetch</a></div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Build / Target / Slave</label>
+                            <div class="col-sm-3">
+                                <select placeholder="Select a Build" class="form-control chosen-select"
+                                        name="build_selector" id="build_selector">
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-control chosen-select" name="target_selector" id="target_selector">
+                                </select>
+                            </div>
+                            <div class="col-sm-3">
+                                <select class="form-control" name="slave" id="slave_selector">
+                                    <option value="null">Choose a test slave</option>
+                                    {% for slave in available_slaves %}
+                                        <option value="{{ slave.id }}" aria-ip="{{ slave.ip }}" aria-projects="{{slave.sn}}">
+                                            {{ slave.num }}, {{ slave.comment }}</option>
+                                    {% endfor %}    
+                                </select>
+                                <div id="mt_board_type" class="form-group" style="display:none">
+                                    <label class="checkbox-inline"><input type="checkbox" name="memsize" value="8G">8G</label>
+                                    <label class="checkbox-inline"><input type="checkbox" name="memsize" value="2G">2G</label>
+                                    <label class="checkbox-inline"><input type="checkbox" name="memsize" value="4G-H">4G-H</label>
+                                    <label class="checkbox-inline"><input type="checkbox" name="memsize" value="4G-L">4G-L</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div id="autotest_group">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Test Case</label>
+                                <div class="col-sm-9">
+                                    <table id="table_testcase" class="table table-striped animated fadeInTop no-margins"
+                                           stlye="table-layout: fixed" style="display: none;">
+                                        <thead>
+                                        <tr>
+                                            <td width="40px">
+                                                <input name="select_cases" id="select_cases" type="checkbox">
+                                            </td>
+                                            <td width="500px">Case Name</td>
+                                            <td width="180px">Tools</td>
+                                            <td width="80px">Loop</td>
+                                            <td width="80px">Weight</td>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="case_container"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group" id="group_range">
+                                <label class="col-sm-2 control-label">Customize Config</label>
+                                <div class="col-sm-10 m-b">
+                                    <a class="btn btn-white btn-xs" onclick="add_static()">
+                                        CMD: static
+                                    </a>
+                                    <a class="btn btn-white btn-xs" onclick="add_range()">
+                                        CMD: variable in range
+                                    </a>
+                                    <a class="btn btn-white btn-xs" onclick="add_list()">
+                                        CMD: variable in list
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Others</label>
+                                <div class="col-sm-9">
+                                    <div>
+                                        <div class="i-checks"><label>
+                                            <input type="checkbox" name="skip_flash"> <i></i> Skip download & flash image </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Test Tag<br><small class="text-navy">optional</small></label>
+                                <div class="col-sm-3">
+                                    <input id="test_tag" name="test_tag" class="form-control" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div id="manualtest_group" style="display:none">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Test Cases</label>
+                                <div class="col-sm-9" id="mt_testcases">
+                                    <label class="checkbox-inline" style="width:300px;"><input type="checkbox" name="memsize" value="ST_PERF_Cold_boot_to_IVE_Android_OS_UI">ST_PERF_Cold_boot_to_IVE_Android_OS_UI</label>
+                                    <label class="checkbox-inline" style="width:300px;"><input type="checkbox" name="memsize" value="ST_PERF_Cold_boot_to_splash_screen">ST_PERF_Cold_boot_to_splash_screen</label>
+                                    <label class="checkbox-inline" style="width:300px; margin-left:0px"><input type="checkbox" name="memsize" value="ST_PERF_Cold_boot_to_splash_video">ST_PERF_Cold_boot_to_splash_video</label>
+                                    <label class="checkbox-inline" style="width:300px;"><input type="checkbox" name="memsize" value="ST_PERF_Cold_boot_to_RVC">ST_PERF_Cold_boot_to_RVC</label>
+                                    <label class="checkbox-inline" style="width:300px; margin-left:0px"><input type="checkbox" name="memsize" value="ST_PERF_DS3_Resume_to_Android_OS_UI">ST_PERF_DS3_Resume_to_Android_OS_UI</label>
+                                    <label class="checkbox-inline" style="width:300px;"><input type="checkbox" name="memsize" value="ST_PERF_DS3_Resume_to_RVC">ST_PERF_DS3_Resume_to_RVC</label>
+                                    <label class="checkbox-inline" style="width:300px; margin-left:0px"><input type="checkbox" name="memsize" value="ST_PERF_AVB_stack_isolated_start_up_time">ST_PERF_AVB_stack_isolated_start_up_time</label>
+                                    <label class="checkbox-inline" style="width:300px;"><input type="checkbox" name="memsize" value="ST_PERF_Cold_boot_to_early_audio_playback_eAVB">ST_PERF_Cold_boot_to_early_audio_playback_eAVB</label>
+                                    <label class="checkbox-inline" style="width:300px; margin-left:0px; color:lightskyblue">
+                                        <p onclick="show_case_input(this)">manual input</p>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Config:</label>
+                                <label class="col-sm-2 control-label" style="text-align:left;">Display:</label>
+                                <label class="col-sm-2 control-label" style="text-align:left;">Keybox:</label>
+                                <label class="col-sm-2 control-label" style="text-align:left;">OSC:</label>
+                                <label class="col-sm-2 control-label" style="text-align:left;">Image:</label>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label"></label>
+                                <div class="col-sm-2" id="mt_display">
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="display" value="HDMI">HDMI</label>
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="display" value="eDP">eDP</label>
+                                </div>
+                                <div class="col-sm-2" id="mt_keybox">
+                                    <label class="radio-inline" style=""><input type="radio" name="keybox" value="YES">YES</label>
+                                    <label class="radio-inline" style=""><input type="radio" name="keybox" value="NO" checked>NO</label>
+                                </div>
+                                <div class="col-sm-2" id="mt_osc">
+                                    <label class="radio-inline" style=""><input type="radio" name="osc" value="YES">YES</label>
+                                    <label class="radio-inline" style=""><input type="radio" name="osc" value="NO" checked>NO</label>
+                                </div>
+                                <div class="col-sm-2" id="mt_image">
+                                    <label class="radio-inline" style=""><input type="radio" name="image" value="UserDebug" checked>UserDebug</label>
+                                    <label class="radio-inline" style=""><input type="radio" name="image" value="User">User</label>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">Log</label>
+                                <div class="col-sm-5" id="mt_log">
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="log" value="dmesg">dmesg</label>
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="log" value="logcat">logcat</label>
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="log" value="grabserial">grabserial</label>
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="log" value="USB2">USB2</label>
+                                    <label class="checkbox-inline" style=""><input type="checkbox" name="log" value="USB3">USB3</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                        <div class="col-sm-2 control-label">Assign To</div>
+                            <div class="col-sm-3">
+                                <select id="mt_assign" class="form-control" data-placeholder="Select a User" >
+                                    <option value="null">Choose a user</option>
+                                    {% for user in manual_tester %}
+                                        <option value="{{ user.id }}" aria-email="{{ user.email }}">{{ user.last_name }},{{ user.first_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">Results CC To</label>
+                            <div class="col-sm-3">
+                                <select id="mt_owner" class="form-control" data-placeholder="Select a User" >
+                                    <option value="null">Choose a user</option>
+                                    {% for user in test_owner %}
+                                        <option value="{{ user.id }}" aria-email="{{ user.email }}">{{ user.last_name }},{{ user.first_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Comments<br><small class="text-navy">optional</small></label>
+                            <div class="col-sm-9">
+                                <textarea id="test_comment" name="test_comment" rows="3" class="form-control" type="text"></textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Test Type</label>
+                            <div class="col-sm-9">
+                                <div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" name="tag" checked="" value="normal"> <i></i> Normal test </label>
+                                    </div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" name="tag" value="daily"> <i></i> Daily regression test </label>
+                                    </div>
+                                    <div class="i-checks"><label>
+                                        <input type="radio" name="tag" value="bkc"> <i></i> BKC regression test </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed" id="bkc_line" style="display: none"></div>
+                        <div class="form-group" id="bkc_group">
+                            <label class="col-sm-2 control-label">Daily/BKC/Weekly Name</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name='display_name' id='display_name'>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="text-center">
+                            <a id="btn_submit" data-toggle="modal" class="btn btn-primary disabled" onclick="submit()" href="#modal-form">Launch Test Set</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display: none">
+        <div class="col-sm-9 col-sm-offset-2" name="model_static">
+            <div class="row">
+                <div class="col-md-12 m-b"><input name="cmd" placeholder="command line" class="form-control" type="text"></div>
+            </div>
+        </div>
+    </div>
+    <div id="template_add_case" style="display:none">
+        <div class="input-group">
+            <input type="text" class="form-control">
+            <span class="input-group-addon"  onclick="add_new_testcase(this)">OK</span>
+            <span class="input-group-addon"  onclick="cancel_add_testcase(this)">Cancel</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    <script>
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+        var caseindex = 2;
+
+
+        function add_range() {
+            var model_range = $("div[name='model_range']").clone()[0];
+            $("#group_range").append(model_range);
+        }
+
+        function add_list() {
+            var model_list = $("div[name='model_list']").clone()[0];
+            $("#group_range").append(model_list);
+        }
+
+        function add_static() {
+            var model_static = $("div[name='model_static']").clone()[0];
+            $("#group_range").append(model_static);
+        }
+
+        function extend_case(obj, flag) {
+            var flag = flag || 0;
+            var gid = $(obj).attr("group");
+            var case_list = $("tr[group="+gid+"]");
+            if (case_list.css("display") == "none"){
+                case_list.show();
+                case_list.find(".chosen-select").chosen();
+            } else {
+                if(!flag) {
+                    case_list.hide();
+                }
+            }
+        }
+        function select_case(obj) {
+            var gid = $(obj).attr("group");
+            var case_list = $("tr[group="+gid+"]");
+            var check_list = $(case_list).find(".icheckbox_square-blue");
+            if($(obj).find(":checkbox").is(":checked")){
+                check_list.each(function(){
+                    extend_case(obj, 1);
+                    $(this).addClass("checked");
+                    $(this).find(":checkbox").prop("checked", true);
+                });
+            } else {
+                check_list.each(function(){
+                    $(this).removeClass("checked");
+                    $(this).find(":checkbox").prop("checked", false);
+                });
+            }
+        }
+
+        function submit() {
+            var submit_datalist = []
+            var case_inputs = $("input[name=\"case\"]:checked");
+            var arrayCaseName = [];
+            var arrayCaseLoop = [];
+            var arrayCaseTool = [];
+            var arrayCaseWeight = [];
+            var arrayConfigCMD= [];
+            var arrayConfigParams = [];
+            var skip_flash = false;
+            var isManual = $("input[name='patch_method']:checked").val() == "mt" ? true : false;
+            if(isManual) {
+                arrayCaseName.push("");
+                arrayCaseLoop.push("");
+                arrayCaseTool.push("");
+                arrayCaseWeight.push("");
+            } else {
+                for (var i = 0; i < case_inputs.length; i++) {
+                    arrayCaseName.push($("#" + case_inputs[i].id).attr("aria-name"));
+                    arrayCaseLoop.push($("#l" + case_inputs[i].id).val());
+                    arrayCaseTool.push($("#t" + case_inputs[i].id).val());
+                    arrayCaseWeight.push($("#w" + case_inputs[i].id).val());
+                }
+
+                // customized configs
+                $("div#group_range input[name='cmd']").each(function(){
+                    arrayConfigCMD.push($(this).val());
+                    var paras = new Array();
+                    $(this).parent().nextAll().children().each(function(i){
+                        paras[i] = $(this).val();
+                    });
+                    arrayConfigParams.push(paras);
+                });
+
+                skip_flash = $("input[name='skip_flash']").prop("checked");
+            }
+            var data = {
+                "project_id": $("#project option:selected").val(),
+                "project_name": $("#project option:selected").html(),
+                "slave_project": $("#project option:selected").attr("slave_project"),
+                "build_type_id": $("#build_type option:selected").val(),
+                "build_type": $("#build_type option:selected").html(),
+                "build_url": $("#build_url").val(),
+                "build": $("#build_selector option:selected").val(),
+                "slave_id": $("#slave_selector option:selected").val(),
+                "case_name": arrayCaseName,
+                "case_loop": arrayCaseLoop,
+                "case_tool": arrayCaseTool,
+                "case_weight": arrayCaseWeight,
+                "config_cmds": arrayConfigCMD,
+                "config_params": arrayConfigParams,
+                "skip_flash": skip_flash,
+                "patch": $("#patch").val(),
+                "tag": $("input[name='tag']:checked").val(),
+                "patch_method": $("input[name='patch_method']:checked").val(),
+                "display_build": $("#display_name").val(),
+                "test_tag": $("#test_tag").val(),
+                "test_comment": $("#test_comment").val(),
+                "test_target": $("#target_selector option:selected").val(),
+                "tester": $("#mt_assign option:selected").val(),
+                "owner": $("#mt_owner option:selected").attr('aria-email')
+            };
+            submit_datalist.push(JSON.stringify(data));
+            if(isManual) {
+                submit_datalist = [];
+                var comment = {"From":"", "Board":"", "Cases":[], "Display":"", "Keybox":"", "OSC":"", "Log":""};
+                if($("#mt_board_type input:checked").length < 1) {
+                    toastr.error("please select the Board memory!");
+                    return
+                }
+                if($("#mt_testcases input:checked").length < 1) {
+                    toastr.error("please select the Case!");
+                    return
+                }
+                if($("#mt_testcases input:checked").length < 1) {
+                    toastr.error("please select the Case!");
+                    return
+                }
+                if($("#mt_display input:checked").length < 1) {
+                    toastr.error("please select the Display!");
+                    return
+                }
+                if($("#mt_keybox input:checked").length < 1) {
+                    toastr.error("please select the Keybox!");
+                    return
+                }
+                if($("#mt_osc input:checked").length < 1) {
+                    toastr.error("please select the OSC!");
+                    return
+                }
+                if($("#mt_image input:checked").length < 1) {
+                    toastr.error("please select the Image!");
+                    return
+                }
+                $("#mt_testcases input:checked").each(function(){
+                    comment["Cases"].push($(this).val());
+                });
+                $("#mt_log input:checked").each(function(){
+                    comment["Log"] += $(this).val() + "; ";
+                });
+                comment["From"] = ["{{ user.last_name }}, {{ user.first_name }}", "{{ user.email }}"];
+                comment["Keybox"] = $("#mt_keybox input:checked").val() + "; ";
+                comment["OSC"] = $("#mt_osc input:checked").val() + "; ";
+                comment["Image"] = $("#mt_image input:checked").val() + "; ";
+                if($("#test_comment").val() != "") {
+                    comment["Comment"] = $("#test_comment").val();
+                }
+
+                $("#mt_board_type input:checked").each(function(){
+                    comment["Board"] = $(this).val() + "; ";
+                    $("#mt_display input:checked").each(function(){
+                        comment["Display"] = $(this).val() + "; ";
+                        data["test_comment"] = JSON.stringify(comment);
+                        data["upload_result"] = true;
+                        data["test_tag"] = "mt";
+                        submit_datalist.push(JSON.stringify(data));
+                    });
+                });
+            }
+
+            if(data["build_type_id"] == "null") {
+                toastr.error("please select the build type!");
+                return
+            }
+            if(data["build"] == "null") {
+                toastr.error("please select the build!");
+                return
+            }
+            if(!isManual && data["slave_id"] == "null") {
+                toastr.error("please select the slave!");
+                return
+            }
+            if(data["test_target"] == undefined) {
+                toastr.error("please select the test target!");
+                return
+            }
+            if(data["case_name"].length == 0) {
+                toastr.error("please select the case!");
+                return
+            }
+            $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+            function new_test(submit_datalist) {
+                if(submit_datalist.length == 0) {
+                    window.location.href = '/tasks/';
+                    return
+                }
+                console.log("send request ");
+                $.post('/new/', {'data': submit_datalist.pop()}, function (ret) {
+                    console.log("get response ");
+                    if (ret.success == true) {
+                        if (isManual) {
+                            $.post('/api/broadcast/', data = {"task_id": ret["task_id"], 'test_id': ret["test_id"], 'test_config': ret["test_config"], 'from': '{{ user.email }}', 'msg': 'new'});
+                        }
+                    }
+                    else {
+                        toastr.error(ret.msg);
+                        $('#ibox_nt').children('.ibox-content').toggleClass('sk-loading');
+                    }
+                    new_test(submit_datalist)
+                });
+            }
+            new_test(submit_datalist);
+        }
+
+        function show_case_input(obj) {
+            $(obj).parent().append($("#template_add_case").html());
+        }
+        function add_new_testcase(obj) {
+            if($(obj).parent().find("input").val().trim() == "") {
+                toastr.error("please select the case name!");
+                return
+            }
+            var new_label = $(obj).parent().parent().parent().find("label:eq("+caseindex+")").clone();
+            $(new_label).find("input").val($(obj).parent().find("input").val());
+            $(new_label).find("input").attr("checked", "checked");
+            $(new_label).html($(new_label).find("input")[0].outerHTML + $(obj).parent().find("input").val());
+            $($(new_label)).insertBefore($(obj).parent().parent());
+            $(obj).parent().remove();
+            caseindex += 1;
+        }
+        function cancel_add_testcase(obj) {
+            $(obj).parent().remove();
+        }
+        $(document).ready(function () {
+            var cfg = {};
+            var isDefaultSelect = false;
+
+            if('{{ config_name }}' != '') {
+                isDefaultSelect = true;
+                load_config('{{ config_name }}');
+            }
+
+
+            $(".i-checks").iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue'
+            });
+            $("#build_selector").chosen({width: "250px", search_contains: true,});
+            $("#select_cases").iCheck({
+                checkboxClass: 'icheckbox_square-green',
+                radioClass: 'iradio_square-green'
+            });
+
+            $("#table_testcase").hide();
+
+            $("input:radio[name=tag]").on("ifChecked", function(){
+                switch (this.value) {
+                    case 'daily':
+                        var d = new Date()
+                        $("#display_name").val(d.getFullYear().toString() + (d.getMonth() + 1).toString() + d.getDate().toString() + '_');  
+                        break;
+
+                    case 'normal':
+                        $("#display_name").val('');
+                        break;
+
+                    default:
+                        break;
+                }
+            });
+
+            // build_selector
+            function change_project() {
+                $("#project_null").attr("disabled", true);
+                $("#build_type").empty();
+                $("#build_type").append("<option id=\"build_type_null\" value=\"null\">Choose Build Type</option>")
+                $.ajax({
+                    url: "/api/build_path/" + $("select[name='project']").val(),
+                    async: false,
+                    success: function(data) {
+                        var option_str = "";
+                        $.each(data["data"], function (index) {
+                            if (isDefaultSelect && cfg["build_type"] == data["data"][index]['build_type'][1]) {
+                                option_str += "<option selected value=\"" + data["data"][index]['build_type'][0] + "\" aria-url=\"" + data["data"][index]['url'] + "\">" + data["data"][index]['build_type'][1] + "</option>";
+                            } else {
+                                option_str += "<option value=\"" + data["data"][index]['build_type'][0] + "\" aria-url=\"" + data["data"][index]['url'] + "\">" + data["data"][index]['build_type'][1] + "</option>";
+                            }
+                        });
+                        $("#build_type").append(option_str);
+                        var slave_option = "<option value='null'>Choose a test slave</option>";
+                        $("#slave_selector").find("option").each(function(){
+                            var str_projects = "*" + $(this).attr("aria-projects") + "*";
+                            if($(this).attr("aria-projects") == "None") {
+                                $(this).show();
+                            }
+                            else if(str_projects.indexOf("*" + $("select[name='project']").find("option:selected").text() + "*") > -1){
+                                $(this).show();
+                            } else {
+                                $(this).hide();
+                            }
+                            
+                        });
+                        
+
+                        if(isDefaultSelect) {
+                            $("#build_type").change();
+                        }
+
+                        get_cases();
+                    }
+                })
+            }
+
+            $("#project").change(function () {
+                change_project();
+            });
+
+            if(!isDefaultSelect) {
+                $("select[name='project']").change();
+            }
+
+            $("input[name=\"patch_method\"]").on('ifChecked', function(event) {
+                if($(this).val() == "bap") {
+                    $("#patch").show();
+                } else {
+                    $("#patch").hide();
+                }
+                if($(this).val() == "mt") {
+                    $("#btn_submit").removeClass("disabled");
+                    $("#autotest_group").hide();
+                    $("#manualtest_group").show();
+                    $("#slave_selector").hide();
+                    $("#mt_board_type").show();
+                } else {
+                    $("#autotest_group").show();
+                    $("#manualtest_group").hide();
+                    $("#slave_selector").show();
+                    $("#mt_board_type").hide();
+                }
+            }); 
+
+            // Refresh
+            $("#refresh").click(function () {
+                $("#spinner").show();
+                $("#build_type_null").attr("disabled", true);
+                $("#build_selector").empty();
+                $.post('/api/build_list/', {url: $("#build_url").val()}, function (builds) {
+                    $("#spinner").hide();
+                    $.each(builds['data'], function (index) {
+                        $("#build_selector").append("<option>" + builds['data'][index] + "</option>");
+                    });
+                    $("#build_selector").trigger("chosen:updated");
+                });
+                get_targets();
+            });
+
+            // Fill input#build_url
+            $("#build_type").change(function () {
+                if ($("input[name='patch_method']:checked").val() != 'td' && $("#build_type option:selected").html() == 'engineering')
+                {
+                    toastr.warning('Engineering build may lose some patches');
+                }
+                $("#build_type_null").attr("disabled", true);
+                $("#build_selector").empty();
+                $("#build_url").val($("#build_type").find("option:selected").attr("aria-url"));
+                $("#spinner").show();
+                $.post('/api/build_list/', {url: $("#build_url").val()}, function (builds) {
+                    $("#spinner").hide();
+                    $("#build_selector").append("<option value=\"null\">Select a Build</option>");
+                    $.each(builds['data'], function (index) {
+                        if(isDefaultSelect && builds['data'][index] == cfg["build"]) {
+                            $("#build_selector").append("<option selected>" + builds['data'][index] + "</option>");
+                        } else {
+                            $("#build_selector").append("<option>" + builds['data'][index] + "</option>");
+                        }
+                    });
+
+                    $("#build_selector").trigger("chosen:updated");
+
+                    if(isDefaultSelect) {
+                        $("#build_selector").change();
+                    }
+                });
+            });
+            
+            $("#build_selector").change(function() {
+                if($("#build_type").val() == 1 || $("#build_type").val() == 2) {
+                    $("#display_name").val($("#build_selector option:selected").text());
+                }
+                get_targets();
+            });
+
+            // Fetch test cases
+            $("#slave_selector").change(function () {
+                get_cases();
+            });
+
+            function get_cases() {
+                $("#case_container").empty();
+                var slave_id = $("#slave_selector").val();
+                var project_id = $("#project").val();
+                if (slave_id == "null" || project_id == "null") {
+                    return
+                }
+                $.get("/test_cases/" + slave_id + '/' + project_id + '/', function (data) {
+                    $.each(data, function (index) {
+                        $("#case_container").append(data[index]);
+                    });
+                    $("input[name^='case']").iCheck({
+                        checkboxClass: 'icheckbox_square-blue',
+                        radioClass: 'iradio_square-blue',
+                    });
+                    $("#table_testcase").show();
+                    $("#table_testcase tr:visible .chosen-select").chosen();
+                    $(".igroup .icheckbox_square-blue ins").click(function() {
+                        $(this).parents(".igroup").click()
+                    });
+                    if(isDefaultSelect){
+                        var tmp_group_id = "";
+                        var trs = $("#table_testcase tr");
+                        for(var i=trs.length-1; i>=0; i--) {
+                            var tmp_case_name = $(trs[i]).find("td:eq(1) font").text()
+                            var tmp_position = $.inArray(tmp_case_name, cfg["case_name"])
+                            if(tmp_position > -1) {
+                                tmp_group_id = $(trs[i]).attr("group")
+                                $(trs[i]).find("td input[name='case']").iCheck('check');
+                                $(trs[i]).find("td input[name='loop']").val(cfg["case_loop"][tmp_position]);
+                                $(trs[i]).find("td select.chosen-select").val(cfg["case_tool"][tmp_position]);
+                                $(trs[i]).find("td input[name='weight']").val(cfg["case_weight"][tmp_position]);
+                                continue;
+                            }
+
+                            if($(trs[i]).find("td:eq(1)").attr("group") && $(trs[i]).find("td:eq(1)").attr("group") == tmp_group_id) {
+                                $(trs[i]).find("td:eq(1)").click();
+                            }
+                        }
+                    }
+                });
+            }
+
+            // change template
+            $("#template").on('change', function load_template() {
+                var templateID = $(this).val();
+                if (templateID == "") {
+                    return
+                }
+                $.get("/api/test_template/" + templateID, function(tmp) {
+                    $("#project option[value=" + tmp.project_id + "]").prop('selected', true);
+                    change_project();
+                    $("#build_type option[value=" + tmp.build_type_id + "]").prop('selected', true).change();
+
+                    $("#slave_selector option[value='"+ tmp.slave_info['id'] +"']").prop('selected', true)
+                    
+                    $.get("/test_cases/" + tmp['slave_info']['id'] + '/' + tmp['project_id'] + '/', function (data) {
+                        $("#case_container").empty();
+                        $.each(data, function (index) {
+                            $("#case_container").append(data[index]);
+                        })
+                        $("input[name^='case']").iCheck({
+                            checkboxClass: 'icheckbox_square-blue',
+                            radioClass: 'iradio_square-blue',
+                        });
+                        $("#table_testcase").show();
+                        $("#table_testcase tr:visible .chosen-select").chosen();
+                        $(".igroup .icheckbox_square-blue ins").click(function() {
+                            $(this).parents(".igroup").click()
+                        });
+                        
+                        $.each(tmp['case_info'], function(i, d) {
+                            var selecor = "input[aria-name='" + d['case_name'] + "']";
+                            $(selecor).iCheck('check');
+                            $(selecor).closest('tr').show().find(".chosen-select").chosen();
+                            $("#l" + $(selecor).attr('id')).val(d['case_loop']);
+                        });
+                    });
+
+                });
+            });
+            
+
+            // Get targets
+            function get_targets() {
+                $("#spinner").show();
+                $("#target_selector").empty();
+                var post_url = "/api/target_list/";
+                var post_data = {
+                    url: $("#build_url").val() + $("#build_selector option:selected").val(),
+                    build: $("#build_selector option:selected").val(),
+                    project: $("#project option:selected").val(),
+                    build_path: $("#build_url").val()
+                };
+                $.post(post_url, post_data, function (data) {
+                    if (data['data'][0] == undefined || data['data'][0] == 'null') {
+                        $("#btn_submit").addClass("disabled");
+                        toastr.error('No target found');
+                    }
+                    else {
+                        var acrn_target = "";
+                        if (!data['data'].includes("gordon_peak") && $("#project option:selected").html() == 'bxtp_ivi_o') {
+                            toastr.warning('Slave support gordon_peak only!');
+                        }
+
+                        $.each(data['data'].sort(), function (index) {
+                            acrn_target = (acrn_target == '' && data['data'][index].indexOf('acrn') > -1) ? data['data'][index] : acrn_target;
+                            if (data['data'][index].indexOf('cel_kbl') > -1) {
+                                $("#target_selector").append("<option selected>" + data['data'][index] + "</option>");
+                            }
+                            else {
+                                $("#target_selector").append("<option>" + data['data'][index] + "</option>");
+                            }
+                        });
+                        if(isDefaultSelect) {
+                            $("#target_selector").val(cfg["test_target"]);
+                        } else if($("#project option:selected").text().indexOf('acrn') > -1 && acrn_target != "") {
+                            $("#target_selector").val(acrn_target)
+                        }
+                        $("#btn_submit").removeClass("disabled");
+                    }
+                    $("#spinner").hide();
+                });
+            }
+
+            function load_config(config_name) {
+                $.get("/api/show_config/"+config_name, function(data) {
+                    if(data == null) {
+                        toastr.error("Can't load the config "+config_name);
+                        return
+                    }
+                    cfg = data;
+                    $("input[name='patch_method'][value="+data["patch_method"]+"]").iCheck('check');
+                    if(data["patch_method"] != "td") {
+                        $("#patch").val(data["patch"])
+                    }
+                    if(data["skip_flash"]) {
+                        $("input[name='skip_flash']").iCheck('check');
+                    }
+                    $("#test_comment").val(data["test_comment"]);
+                    $("#test_tag").val(data["test_tag"]);
+                    $("input[name='tag'][value="+data["tag"]+"]").iCheck('check');
+                    $("#display_name").val(data["display_build"]);
+                    $("#project").val(data["project_id"]);
+                    $("#project").change()
+                    $("#slave_selector").val(data["slave_id"]);
+                    $("#slave_selector").change();
+                });
+            }
+
+            if('{{ slave_id }}' != '') {
+                $("#slave_selector").val('{{ slave_id }}');
+                $("#slave_selector").change();
+            }
+        })
+    </script>
+{% endblock %}

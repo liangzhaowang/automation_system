@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <long name="test13" value="378" />
+    <long name="test12" value="436" />
+    <long name="test11" value="651" />
+    <long name="test10" value="598" />
+    <long name="test1" value="13070" />
+    <long name="finish_time" value="1503330027949" />
+    <long name="test4" value="10" />
+    <long name="test5" value="7" />
+    <long name="test2" value="1263" />
+    <long name="test3" value="1240" />
+    <long name="test8" value="475" />
+    <long name="test9" value="1943" />
+    <long name="test6" value="96" />
+    <long name="test7" value="290" />
+    <long name="overall" value="20457" />
+</map>

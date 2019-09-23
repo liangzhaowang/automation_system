@@ -1,0 +1,4 @@
+cd /sdcard
+sh android.sh capture-end
+sleep 5
+exit

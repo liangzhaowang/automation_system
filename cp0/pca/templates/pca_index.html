@@ -1,0 +1,97 @@
+{% extends "pca_layout.html" %}
+{% block sub_content %}
+<div id="wrapper" style="margin-top:0px">
+    <div id="page-wrapper" class="gray-bg" style="margin-top:0; padding:0">
+
+        <div class="ibox-content" >
+        <h3>test case:</h3>
+            <div style="border-style: solid; border-color: #a9c6c9;" >
+                {%for item in keys %}
+                    <p><input name="case_name" type="checkbox" value="{{item}}" onclick="get_ajax_data()" checked />{{item}} </p>
+                {% endfor %}
+            </div>
+            <hr>
+            <div id="top-spinner" class="w3-top-spinner" style="display:none">
+                <i class="fa fa-spinner fa-spin" style="font-size:4em;color:blue;"></i>
+            </div>
+            <h3>selection parse data algorithm:</h3>
+                <p style="float:left"><input type="checkbox" id="p_select" value="pearson" onclick="get_parse_data(this)" checked />Pearson's correlation coefficient</p>
+                <p style="float:left;color:white">temp temp&#9;</p>
+                <p><input type="checkbox" id="m_select" value="mutural" onclick="get_parse_data(this)"  />Mutural inforamtion rate</p>
+            <div id="pca_container">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+$(document).ready(function(){
+    var url = window.location.href;
+
+    get_ajax_data();
+
+});
+
+function get_parse_data(elem){
+  var val = $(elem).val();
+
+  <!--console.log(val);-->
+  if(val == "pearson"){
+       document.getElementById("m_select").checked = false;
+  }
+  if(val == "mutural"){
+        document.getElementById("p_select").checked = false;
+  }
+    get_ajax_data();
+}
+
+function get_ajax_data() {
+  var chkItems = document.getElementsByName("case_name");
+  var case_data = new Array();
+  var j = 0;
+  var parseConf="";
+
+  if(document.getElementById("p_select").checked){
+        parseConf = 'pearson';
+  }else{
+        parseConf = 'mutural';
+  }
+
+  for (var i = 0; i < chkItems.length; i++) {
+    if (chkItems[i].checked) {
+      case_data[j] = chkItems[i].value;
+      j += 1;
+    }
+  }
+  if(j > 0){
+  var params = 'case='+case_data[0];
+  for( i in case_data){
+       if(i > 0){
+           params += '&case='+ case_data[i];
+       }
+  }
+  }else{
+        var params = '';
+    }
+  if(parseConf != ''){
+        params +='&parseconf='+parseConf;
+  }
+  <!--console.log(params);-->
+  $.ajax( {
+    type : "POST",
+    url : '/pca/casedata/',
+    data : params,
+    success : function(data) {
+         $('#pca_container').html(data)
+    }
+    });
+
+}
+
+
+</script>
+{% endblock %}

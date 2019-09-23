@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <canvas id="container1"></canvas>
+        <canvas id="container2"></canvas>
+        <canvas id="container3"  ></canvas>
+        <canvas id="container4"  ></canvas>
+        <canvas id="container5"  ></canvas>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script>
+        window.onload = function() {
+            $.getJSON('/chart_data/stack_bar/{{ link }}', function (mydata) {
+                console.log(mydata);
+                con_index = 0
+                var container1 = document.getElementById('container1');
+                var container2 = document.getElementById('container2');
+                var container3 = document.getElementById('container3');
+                var container4 = document.getElementById('container4');
+                var container5 = document.getElementById('container5');
+
+                Chart.defaults.global.defaultFontFamily = "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+
+
+                con_list = [container1, container2, container3, container4, container5]
+                color_list = ['#7cb5ec', '#90ed7d', '#8EE5EE', '#DDA0DD', '#CCDDFF', '#7cb5ec', '#6A6AFF']
+
+                for(var step in mydata){
+                    datalist = []
+                    if(mydata[step]["category"].length <= 0) { continue; }
+
+                    $(con_list[con_index]).parent().show();
+                    ctx = con_list[con_index].getContext('2d');
+                    for(var stage in mydata[step]["stage_name"]){
+                        datalist.push({
+                            label: mydata[step]["stage_name"][stage],
+                            backgroundColor: color_list[stage],
+                            stack: 'data',
+                            data: [mydata[step]["stage_data"][stage]]
+                        })
+                    }
+                    datalist.push(
+                        {
+                            label: 'start',
+                            backgroundColor: '#7cb5ec',
+                            stack: 'data',
+                            data: [0].concat(mydata[step]["start"])
+                        },
+                        {
+                                label: 'duration',
+                                backgroundColor: '#6A6AFF',
+                                stack: 'data',
+                                data: [0].concat(mydata[step]["duration"])
+                        }
+                    )
+                    var barChartData = {
+                        labels: ["Stage"].concat(mydata[step]["category"]),
+                        datasets: datalist
+                    };
+                    $(con_list[con_index]).attr('height', barChartData['labels'].length * 5 + 24)
+                    window.myBar = new Chart(ctx, {
+                        type: 'horizontalBar',
+                        data: barChartData,
+                        options: {
+                            title: {
+                                display: true,
+                                text: 'Chart for ' + step,
+                                fontSize: 20
+                            },
+                            tooltips: {
+                                mode: 'index',
+                                intersect: false
+                            },
+                            responsive: true,
+                            scales: {
+                                xAxes: [{
+                                    display: false,
+                                    stacked: true
+                                }],
+                                yAxes: [{
+                                    stacked: true,
+                                    responsive: true,
+                                    barThickness: 15
+                                }]
+                            },
+                        }
+                    });
+                    con_index += 1
+                }
+            })
+        }
+    </script>
+{% endblock %}

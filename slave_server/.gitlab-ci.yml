@@ -1,0 +1,15 @@
+before_script:
+  - cd /home/pnp010/shanshan/slave_server
+
+verify:
+  script:
+    - bash verify.sh
+
+pullcode:
+  script:
+    - bash auto_pull_code.sh
+  only:
+    - master
+
+variables:
+  CI_DEBUG_SERVICES: trace

@@ -1,0 +1,187 @@
+    <div class="ibox-content" id="pca_bt_container" style="display:none">
+        <div align="center">
+            <button type="button" id="pca_analyse_bt" class="btn btn-sm btn-success" onclick="onClickButton(this)">PCA Analyse</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pcaModal" tabindex="-1" role="dialog" aria-labelledby="pcaModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    <h4 class="modal-title" id="pcaModalLabel">PCA ANALYSE</h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class='btn-group'>
+                        <a class='btn '  id="pca_bnt_1" onclick="pcaButtonOnclick(this)">{{current_build}}</a>
+                        <a class='btn '  id="pca_bnt_2" onclick="pcaButtonOnclick(this)">{{prev_build}}</a>
+                    </div>
+                    <div id="build_display_contain" onload="displayCurrent(this)">
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="pca_submit" class="btn btn-default" style="margin-bottom: 0px;" aria-project="{{project_name}}"  aria-tag ="{{ tag }}" aria-currentbuild="{{current_build}}" onclick="onModalSubmit(this)">Submit</button>
+                    <button type="button" class="btn btn-primary" onclick="onClickCancel()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function displaydefault(status) {
+            var data_htlm = "<table class=\"table table-stripped toggle-arrow-tiny no-margins\" id=\"pca_table_summary\">\n" +
+                "            <thead>\n" +
+                "                <tr>\n" +
+                "                <th><input type=\"checkbox\" onclick=\"swapCheck(this)\" />All</th>\n" +
+                "                <th>Test Case</th>\n" +
+                "                <th>Unit</th>\n" +
+                "                <th>\n";
+            if(status == "prev"){
+                data_htlm += "<small>{{ prev_build }}</small>\n";
+            }
+            if(status == "cur"){
+                data_htlm += "<small>{{ current_build }}</small>\n";
+            }
+            data_htlm += "            </thead>\n" +
+                "            <tbody>\n" +
+                "            {% for case, value in summary.items %}\n" +
+                "            <tr>\n"
+            if(status == "prev") {
+
+                data_htlm += "                <td><input type=\"checkbox\" aria-name=\"{{ case }}\" aria-unit=\"{{ value.unit }}\" aria-result=\"{{ value.prev }}\"/></td>\n"
+            }
+            if(status == "cur") {
+                data_htlm +=  "                <td><input type=\"checkbox\" aria-name=\"{{ case }}\" aria-unit=\"{{ value.unit }}\" aria-result=\"{{ value.result }}\"/></td>\n"
+            }
+             data_htlm += "                <td name=\"trends\" style=\"cursor:pointer;\">{{ case }}</td>\n" +
+                "                <td>{{ value.unit }}</td>\n";
+            if(status == "prev"){
+                data_htlm += "<td>{{ value.prev }}</td>\n";
+            }
+            if(status == "cur"){
+                data_htlm += "<td>{{ value.result }}</td>\n";
+            }
+            data_htlm += "            </tr>\n" +
+                "            {% endfor %}\n" +
+                "            </tbody>\n" +
+                "        </table>\n";
+
+            $("#build_display_contain").html(data_htlm);
+        }
+        function pcaButtonOnclick(elem) {
+            var id=$(elem).attr("id");
+            if(id == "pca_bnt_1"){
+                displaydefault("cur");
+                $("#pca_submit").attr("aria-currentbuild","{{current_build}}")
+                $(elem).addClass("btn-primary")
+                if($("#pca_bnt_2").hasClass("btn-primary")){
+                    $("#pca_bnt_2").removeClass("btn-primary")
+                }
+            }
+            if(id == "pca_bnt_2"){
+                displaydefault("prev");
+                $("#pca_submit").attr("aria-currentbuild","{{prev_build}}")
+                $(elem).addClass("btn-primary")
+                if($("#pca_bnt_1").hasClass("btn-primary")){
+                    $("#pca_bnt_1").removeClass("btn-primary")
+                }
+            }
+        }
+        function onClickButton(elem){
+
+            var id = $(elem).attr("id");
+
+            if(id == "pca_analyse_bt"){
+                ClearCheckBox();
+                displaydefault("cur");
+                $("#pca_bnt_1").addClass("btn-primary");
+                if($("#pca_bnt_2").hasClass("btn-primary")){
+                    $("#pca_bnt_2").removeClass("btn-primary")
+                }
+                console.log($("#pca_bnt_2").text());
+                if($("#pca_bnt_2").text() == "None"){
+                    $("#pca_bnt_2").hide();
+                }else{
+                    $("#pca_bnt_2").show();
+                }
+
+                $('#pcaModal').modal('show');
+
+            }
+        }
+
+        function swapCheck(elem) {
+            if (elem.checked) {
+                $("input[type='checkbox']").each(function(k,v) {
+                     if(k > 0){
+                        v.checked = true;
+                    }
+                });
+                isCheckAll = true;
+            } else {
+                $("input[type='checkbox']").each(function(k,v) {
+                    if(k > 0){
+                        v.checked = false;
+                    }
+                });
+            }
+        }
+
+        function ClearCheckBox(){
+            $("input[type='checkbox']").each(function() {
+                this.checked = false;
+            });
+
+        }
+
+        function onClickCancel(){
+            $('#pcaModal').modal('hide');
+            ClearCheckBox();
+        }
+
+        function onModalSubmit(elem){
+            var data = {
+                "project" : $(elem).attr("aria-project"),
+                "tag" : $(elem).attr("aria-tag"),
+                "currentbuild" : $(elem).attr("aria-currentbuild"),
+                "subdata" : ""
+
+            };
+            var count = 0;
+            $("input[type='checkbox']").each(function(k,v) {
+                 if(k > 0 && v.checked){
+                    var key = $(v).attr("aria-name").toString();
+                    var val = $(v).attr("aria-result").toString();
+                    data.subdata+=key+":"+val+"|";
+                    count += 1;
+                }
+            });
+            console.log(data);
+            if(count > 0){
+                $.post('/pca_test_tag/addFromCustom/', data, function(ret)
+                {
+                    console.log(ret)
+                    if (ret.success == true)
+                    {
+                        window.location.href='/pca/charts/';
+                    }
+                    else
+                    {
+                        alert("connect error!!!");
+                    }
+                    $('#pcaModal').modal('hide');
+                    ClearCheckBox();
+                });
+            }else{
+                alert("please select case name!");
+            }
+
+        }
+    </script>
+
+

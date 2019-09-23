@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+Copyright (c) 2012 The Chromium Authors. All rights reserved.
+Use of this source code is governed by a BSD-style license that can be
+found in the LICENSE file.
+-->
+
+<link rel="import" href="/tracing/extras/importer/linux_perf/parser.html">
+
+<script>
+'use strict';
+
+/**
+ * @fileoverview Parses dmafence events in the Linux event trace format.
+ */
+tr.exportTo('tr.e.importer.linux_perf', function() {
+  const ColorScheme = tr.b.ColorScheme;
+  const Parser = tr.e.importer.linux_perf.Parser;
+
+  /**
+   * Parses linux dmafence trace events.
+   * @constructor
+   */
+  function DmafenceParser(importer) {
+    Parser.call(this, importer);
+
+    importer.registerEventHandler('dma_fence_init',
+        DmafenceParser.prototype.executeInitEvent.bind(this));
+    importer.registerEventHandler('dma_fence_signaled',
+        DmafenceParser.prototype.executeSignaledEvent.bind(this));
+    this.kthread_timeline = {};
+    this.kthread_total = {};
+    this.kthread_array_total = {};
+    this.kthread_array_ppid = new Array();
+    this.kthread_name = new Array();//{};
+    this.kthread_start = new Array();
+    this.kthread_tLastInit = new Array(); //{};
+    this.kthread_tLastSignaled = new Array();//{};
+
+    this.kthread_array_tLastInit =new Array();
+    this.kthread_array_tLastSignaled =new Array();
+  }
+
+  // Matches the dma_fence_init record
+  const dmafenceExecuteInitRE = /driver=(.+) timeline=(.+) context=(\d+) seqno=(\d+)/;
+
+  // Matches the dma_fence_init record
+  const dmafenceExecuteSignaledRE = /driver=(.+) timeline=(.+) context=(\d+) seqno=(\d+)/;
+
+  DmafenceParser.prototype = {
+    __proto__: Parser.prototype,
+
+    /**
+     * Parses dmafence events and sets up state in the importer.
+     */
+    executeInitEvent(eventName, cpuNumber, pid, ts, eventBase) {
+      const event = dmafenceExecuteInitRE.exec(eventBase.details);
+      if (!event) return false;
+      if(event[1] === 'dma_fence_array'){
+        this.saveInitArrayData(pid, eventBase.threadName + '_dma_fence_array', event[3], ts, 'timeline=' + event[2], event[4]);
+      } else {
+      this.saveInitData('dma_fence_context=' + event[3], event[3], ts,'timeline=' + event[2], event[4]);
+      }
+      return true;
+    },
+
+    executeSignaledEvent(eventName, cpuNumber, pid, ts, eventBase) {
+        
+        const event = dmafenceExecuteSignaledRE.exec(eventBase.details);
+        if (!event) return false;
+     
+        var cntxid = event[3] ; //this.getThreadPpid(event[4]);
+        var threadName = this.getThreadName(cntxid, event[4]);
+        var tInit = this.getThreadStartTime(cntxid, event[4]);
+        var tid = this.getThreadTid(cntxid);
+        var timeline = this.getContextTimeline(cntxid);
+
+   		if(threadName === undefined) return false;
+        if(cntxid === undefined) return false;
+        if(tInit === undefined) return false;
+        if(timeline === undefined) return false;
+         
+        if(event[1] === 'dma_fence_array'){
+            var initPid = this.getThreadInitPid(cntxid, event[4]);
+            var arrayTid = this.getThreadArrayTid(initPid); 
+            var kthread = this.getOrCreateArraykthreadsIfNeed(threadName,initPid, cntxid, tInit, arrayTid, event[4], ts, timeline);
+            if(initPid === undefined) return false;
+            if(arrayTid === undefined) return false;
+            if(kthread === undefined) return false ;
+        
+        } else {
+        var kthread = this.getOrCreatekthreadsIfNeed(threadName, cntxid, tInit, tid, event[4], ts, timeline);
+        
+        if(kthread === undefined) return false ;
+        }
+      return true;
+    },
+
+    getOrCreateArraykthreadsIfNeed(name, pid,cntxid, initTime, tid, seqno, signaledTime, timeline){
+          var kthread;
+		  var i;
+          for(i=0; i<tid; i++){
+             if(initTime > this.getThreadArrayLastSignaledTime(pid, i)){
+						
+				this.setThreadArrayLastTime(pid, i,initTime, signaledTime);
+                kthread = this.importer.getOrCreateBinderKernelThread(
+                                  name, '40000'+pid, i);
+                var process = this.importer.model_.getOrCreateProcess('40000'+pid);
+                if(process){
+                   process.name = name;
+                }
+
+                kthread.openSlice = cntxid;
+      			kthread.openSliceTS = initTime;
+				if (kthread.openSlice ) {
+					const slice = new tr.model.ThreadSlice('', 'dma_fence_array_' + cntxid,
+						ColorScheme.getColorIdForGeneralPurposeString(kthread.openSlice),
+						kthread.openSliceTS,
+						{},
+						signaledTime - kthread.openSliceTS);
+
+					kthread.thread.sliceGroup.pushSlice(slice);
+      			}
+               
+                break;
+				}
+		}
+        if(i === tid){
+			if(kthread === undefined){
+				var total = tid +1;
+				this.setThreadArrayTid(pid, total);
+				this.setThreadArrayLastTime(pid, tid, initTime, signaledTime);
+				kthread = this.importer.getOrCreateBinderKernelThread(
+                                  name, '40000'+pid, i);
+                kthread.openSlice = cntxid;
+      			kthread.openSliceTS = initTime;
+				if (kthread.openSlice ) {
+					const slice = new tr.model.ThreadSlice('', 'dma_fence_array' + cntxid,
+						ColorScheme.getColorIdForGeneralPurposeString(kthread.openSlice),
+						kthread.openSliceTS,
+						{},
+						signaledTime - kthread.openSliceTS);
+
+					kthread.thread.sliceGroup.pushSlice(slice);
+      			}
+			}
+		}
+
+		return kthread;
+
+	},
+ 
+ getOrCreatekthreadsIfNeed(name, pid, initTime, tid, seqno, signaledTime, timeline){
+          var kthread;
+		  var i;
+          for(i=0; i<tid; i++){
+             if(initTime > this.getThreadLastSignaledTime(pid, i)){
+						
+				this.setThreadLastTime(pid, i,initTime, signaledTime);
+                kthread = this.importer.getOrCreateBinderKernelThread(
+                                  name, 40000+pid, i);
+                var process = this.importer.model_.getOrCreateProcess(40000+pid);
+                if(process){
+                   process.name = timeline;
+                }
+
+                kthread.openSlice = seqno;
+      			kthread.openSliceTS = initTime;
+				if (kthread.openSlice ) {
+					const slice = new tr.model.ThreadSlice('', 'dma_fence_' + seqno,
+						ColorScheme.getColorIdForGeneralPurposeString(kthread.openSlice),
+						kthread.openSliceTS,
+						{},
+						signaledTime - kthread.openSliceTS);
+
+					kthread.thread.sliceGroup.pushSlice(slice);
+      			}
+               
+                break;
+				}
+		}
+        if(i === tid){
+			if(kthread === undefined){
+				var total = tid +1;
+				this.setThreadTid(pid, total);
+				this.setThreadLastTime(pid, tid, initTime, signaledTime);
+				kthread = this.importer.getOrCreateBinderKernelThread(
+                                  name, 40000+pid, i);
+                kthread.openSlice = seqno;
+      			kthread.openSliceTS = initTime;
+				if (kthread.openSlice ) {
+					const slice = new tr.model.ThreadSlice('', 'dma_fence_' + seqno,
+						ColorScheme.getColorIdForGeneralPurposeString(kthread.openSlice),
+						kthread.openSliceTS,
+						{},
+						signaledTime - kthread.openSliceTS);
+
+					kthread.thread.sliceGroup.pushSlice(slice);
+      			}
+			}
+		}
+
+		return kthread;
+
+	},
+    
+    getThreadName(pid, seqno){
+
+       if(this.kthread_name[pid] === undefined)
+           return this.kthread_name[pid];
+
+      return this.kthread_name[pid][seqno];
+    },
+
+    getThreadStartTime(pid, seqno){
+        if(this.kthread_start[pid] === undefined)
+            return this.kthread_start[pid];
+        return this.kthread_start[pid][seqno] ;
+    },
+ 
+    getThreadInitPid(cntxid, seqno){
+        if(this.kthread_array_ppid[cntxid] === undefined)
+            return this.kthread_array_ppid[cntxid];
+        return this.kthread_array_ppid[cntxid][seqno] ;
+    },
+
+    getThreadTid(ppid){
+        return this.kthread_total[ppid] ;
+    },
+
+    getContextTimeline(ppid){
+        return this.kthread_timeline[ppid] ;
+    },
+
+    setContextTimeline(ppid, timeline){
+        this.kthread_timeline[ppid] = timeline ;
+    },
+
+    setThreadTid(ppid, tid){
+        this.kthread_total[ppid] = tid ;
+    },
+
+    getThreadArrayTid(ppid){
+        return this.kthread_array_total[ppid] ;
+    },
+
+    setThreadArrayTid(ppid, tid){
+        this.kthread_array_total[ppid] = tid ;
+    },
+
+    getThreadArrayLastSignaledTime(pid, tid){
+        if(this.kthread_array_tLastSignaled[pid]===undefined)
+            return this.kthread_array_tLastSignaled[pid];
+
+        return this.kthread_array_tLastSignaled[pid][tid];
+    },
+ 
+    setThreadArrayLastTime(pid, tid, tInit, tSignaled){
+        
+        this.kthread_array_tLastInit[pid][tid] = tInit;
+        this.kthread_array_tLastSignaled[pid][tid] = tSignaled;
+    },
+
+    getThreadLastSignaledTime(pid, tid){
+        if(this.kthread_tLastSignaled[pid]===undefined)
+            return this.kthread_tLastSignaled[pid];
+
+        return this.kthread_tLastSignaled[pid][tid];
+    },
+ 
+    setThreadLastTime(pid, tid, tInit, tSignaled){
+        
+        this.kthread_tLastInit[pid][tid] = tInit;
+        this.kthread_tLastSignaled[pid][tid] = tSignaled;
+    },
+
+    saveInitData(threadName, cntxid, ts, timeline, seqno){
+           if(this.kthread_total[cntxid] === undefined){
+                this.kthread_total[cntxid] = 1;
+                this.kthread_timeline[cntxid] = timeline;
+                this.kthread_name[cntxid] = new Array();
+                this.kthread_start[cntxid] = new Array();
+				this.kthread_tLastInit[cntxid] = new Array();
+				this.kthread_tLastSignaled[cntxid] = new Array();
+                this.setThreadLastTime(cntxid, 0, ts, 0);
+            }
+            this.kthread_name[cntxid][seqno] = threadName;
+            this.kthread_start[cntxid][seqno] = ts;
+   },
+ 
+    saveInitArrayData(pid, threadName, cntxid, ts, timeline, seqno){
+           if(this.kthread_total[cntxid] === undefined){
+                this.kthread_total[cntxid] = 1;
+                this.kthread_timeline[cntxid] = timeline;
+                this.kthread_name[cntxid] = new Array();
+                this.kthread_start[cntxid] = new Array();
+				this.kthread_tLastInit[cntxid] = new Array();
+				this.kthread_tLastSignaled[cntxid] = new Array();
+                this.kthread_array_ppid[cntxid] = new Array();
+                this.setThreadLastTime(cntxid, 0, ts, 0);
+            }
+            this.kthread_name[cntxid][seqno] = threadName;
+            this.kthread_start[cntxid][seqno] = ts;
+            this.kthread_array_ppid[cntxid][seqno] = pid;
+            if(this.kthread_array_total[pid] === undefined){
+               this.kthread_array_total[pid] = 1;
+               this.kthread_array_tLastInit[pid] = new Array();
+               this.kthread_array_tLastSignaled[pid] = new Array();
+               this.setThreadArrayLastTime(pid, 0, ts, 0);
+          }
+   },
+  };
+
+  Parser.register(DmafenceParser);
+
+  return {
+    DmafenceParser,
+  };
+});
+</script>
+

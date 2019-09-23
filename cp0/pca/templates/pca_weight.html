@@ -1,0 +1,170 @@
+<div>
+
+    <table class="hovertable",title="weight percentage table">
+    <tr>
+        <th>options</th>
+        {%for key in keys %}
+        <th>{{key}}</th>
+        {% endfor %}
+    </tr>
+
+    <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="weight_data" aria-buff="{{weight}}">
+        <td>pca weight</td>
+        {%for skey in keys %}
+            <td name="weight_vcol" id="weight_{{skey}}" ></td>
+        {% endfor %}
+
+    </tr>
+    <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="percentage_data" >
+         <td>correction coeffient</td>
+        {%for skey in keys %}
+            <td name="percentage_vcol" id="percentage_{{skey}}" ></td>
+        {% endfor %}
+    </tr>
+    <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="pre_weight_perc" >
+         <td>weight</td>
+        {%for skey in keys %}
+            <td name="pre_weight_perc_vcol" id="pre_weight_perc_{{skey}}" ></td>
+        {% endfor %}
+    </tr>
+    <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="weight_perc" >
+         <td>weight percentage</td>
+        {%for skey in keys %}
+            <td name="weight_perc_vcol" id="weight_perc_{{skey}}" ></td>
+        {% endfor %}
+    </tr>
+    </table>
+</div>
+
+
+<script>
+$(document).ready(function(){
+
+    var weight_v_data = $("#weight_data").attr("aria-buff");
+        <!--console.log(weight_v_data);-->
+        if(weight_v_data.length){
+        var weight_vdata_array = data_to_array(weight_v_data);
+        <!--console.log(weight_vdata_array.length);-->
+        if (weight_vdata_array.length){
+            $.each($("td[name=\"weight_vcol\"]"), function(k, v){
+                var raw_data = get_item_data(k,weight_vdata_array,true);
+                $("#"+v.getAttribute("id")).html(raw_data);
+                if(parseFloat(raw_data)<0.0){
+                    $("#"+v.getAttribute("id")).css("background-color","#66ff66");
+                }
+            });
+        }
+
+        var percentage_array = {{coef|safe}};
+        console.log(percentage_array)
+        if (percentage_array.length > 0){
+            $.each($("td[name=\"percentage_vcol\"]"), function(k, v){
+               // var raw_data = data_format_out(k,percentage_array,true)
+                $("#"+v.getAttribute("id")).html(Number(percentage_array[k]).toFixed(5));
+                <!--if(parseFloat(raw_data)<0.0){-->
+                    <!--$("#"+v.getAttribute("id")).css("background-color","#66ff66");-->
+                <!--}-->
+            });
+        }
+
+
+        var sub_out_array = new Array();
+        if (percentage_array.length > 0){
+            $.each($("td[name=\"pre_weight_perc_vcol\"]"), function(k, v){
+                <!--var raw_data = data_format_out(k,sub_out_array,true)-->
+                var raw_data = get_item_data(k,weight_vdata_array,true);
+                var weight = Number(raw_data)*Number(percentage_array[k]);
+                sub_out_array[k] = weight;
+                $("#"+v.getAttribute("id")).html(weight.toFixed(5));
+                if(parseFloat(raw_data)<0.0){
+                    $("#"+v.getAttribute("id")).css("background-color","#66ff66");
+                }
+            });
+        }
+
+        var sub_out_sum = get_percentage_sum(sub_out_array);
+        <!--console.log(sub_out_sum);-->
+        <!--console.log(sub_out_array);-->
+        weight_percent_array = get_percentage_array(sub_out_array,sub_out_sum);
+        <!--console.log(weight_percent_array)-->
+        var weight_percent_out_array = get_data_array(weight_percent_array);
+        if (weight_percent_out_array.length > 0){
+            $.each($("td[name=\"weight_perc_vcol\"]"), function(k, v){
+                var raw_data = data_format_out(k,weight_percent_out_array,true);
+                $("#"+v.getAttribute("id")).html(raw_data);
+                if(parseFloat(raw_data)<0.0){
+                    $("#"+v.getAttribute("id")).css("background-color","#66ff66");
+                }
+            });
+        }
+    }
+
+
+});
+
+function get_percentage_array(array,array_sum){
+    <!--console.log(array)-->
+    <!--console.log(array_sum)-->
+    var new_array = new Array()
+    for (i in array){
+        new_array[i] = array[i]/array_sum
+    }
+    <!--console.log(new_array)-->
+    return new_array
+}
+
+function get_percentage_sum(array){
+    var sum = 0.0
+    for(i in array){
+        sum += array[i]
+    }
+    return sum
+}
+
+function get_data_array(array){
+    var percentage_array = new Array();
+    percentage_array[0] = array;
+    return percentage_array;
+}
+
+function data_format_out(k,data_array,reta_flag){
+    var raw_data = get_item_data(k,data_array,reta_flag)*100;
+    raw_data = raw_data.toFixed(2)+"%"
+    return raw_data
+
+}
+function data_to_array(data){
+   var temp_data = data.replace('[[','').replace(']]','')
+   temp_data = temp_data.split('], [')
+   <!--console.log(temp_data);-->
+   total_list = new Array();
+   var i = 0
+   for( i in temp_data){
+        <!--console.log(temp_data[i]);-->
+        total_list[i]=temp_data[i].split(',');
+        i += 1;
+   }
+   <!--console.log(total_list);-->
+   return total_list;
+}
+
+function get_item_data(k,data_array,reqc){
+    if(reqc){
+    var data_len = data_array[0].length;
+    }else{
+    var data_len = data_array.length;
+    }
+    <!--console.log(k,data_len);-->
+    raw = parseInt(k/data_len);
+    col = k%data_len;
+
+    if((typeof data_array[raw][col]) == 'number'){
+        return data_array[raw][col]
+    }else{
+        return data_array[raw][col].replace("'",'').replace("'",'')
+    }
+}
+
+
+</script>
+

@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <style>
+        .comparision td {
+            position: relative;
+        }
+
+        .comparision-hide {
+            display: none;
+        }
+
+        .comparision-build-info {
+            width: 200px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row"></div>
+<div class="col-lg-12">
+<div class="ibox">
+    <div class="ibox-content">
+        <div class="row m-b-sm m-t-sm">
+            <a style="position:absolute; right:15px; top:5px;" class="btn btn-primary btn-sm" href="/api/download_eb_excel/{{ project }}/{{ cmp }}" > Download </a>
+        </div>
+        <table class="table table-stripped table-bordered no-margins">
+            <thead>
+            <tr>
+                
+                <th>Test Case</th>
+                <th>Unit</th>
+                <th>Target</th>
+                {% for build in tests %}
+                <th>
+                    <small>{{ build }}</small>
+                </th>
+                {% endfor %}
+                <th>Diff</th>
+                <th>Rate</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in data_table %}
+                <tr>
+                    {% for col in row %}
+                        <td name="trends" style="cursor:pointer;">{{ col|safe }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+{% endblock %}

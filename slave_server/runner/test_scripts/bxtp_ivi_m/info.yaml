@@ -1,0 +1,84 @@
+scripts:
+  - name: full boot
+    script: boot_analyze/boot_analyze_1_4_000.py
+    unit: sec
+    loop: 3
+    arg: -e -i config/bxtp_m_config
+
+  - name: antutu_score_m
+    script: benchmark/adb_antutu_5_6.py
+    unit: score
+    loop: 1
+    arg: ''
+
+  - name: Rlbench_m
+    script: benchmark/adb_rlbench.py
+    unit: sec
+    loop: 1
+    arg: ''
+
+  - name: Resume_time
+    script: suspend_resume/resume_time.py
+    unit: msec
+    loop: 1
+    arg: ''
+
+  - name: Gfx_manhattan_4013_offscreen
+    script: benchmark/adb_gfx_gl_4_0_offscreen.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: Gfx_manhattan_4013_onscreen
+    script: benchmark/adb_gfx_gl_4_0_onscreen.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: 1080p_T-Rex_4013_offscreen
+    script: benchmark/adb_gfx_T-Rex_offscreen_4_0.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: T-Rex_4013_onscreen
+    script: benchmark/adb_gfx_T-Rex_onscreen_4_0.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: stability_resume
+    script: stability_resume/suspend_resume_stability.py
+    unit: 
+    positive: 
+    loop: 1
+    arg: ''
+
+  - name: demo
+    script: demo/demo.py
+    unit: fps
+    loop: 1
+
+  - name: Gfx_manhattan_offscreen_m
+    script: benchmark/adb_gfx_311_offscreen.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: Gfx_manhattan_onscreen_m
+    script: benchmark/adb_gfx_311_onscreen.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: GLBenchmark_offscreen_m
+    script: benchmark/adb_glbench_offscreen.py
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: GLBenchmark_onscreen_m
+    script: benchmark/adb_glbench_onscreen.py
+    unit: fps
+    loop: 1
+    arg: ''

@@ -1,0 +1,205 @@
+start 
+[1A00:51 20s268ms  Temp. (id 0) = 46 C; Temp. (id 1) = 33 C; Supply: 12.03 V atc = 3; FAN 141 rpm; FAN 40 %            
+[1A00:51 30s268ms  Temp. (id 0) = 46 C; Temp. (id 1) = 33 C; Supply: 11.98 V atc = 3; FAN 141 rpm; FAN 40 %            
+00:51 30s554ms Wakeup button pressed for shutdown
+00:51 30s555ms ------------------------------------------------------
+00:51 30s555ms ACTIVE stay alive Reasons:
+00:51 30s555ms  SoC is active 
+00:51 30s804ms SLCAN command - enter S3 mode on shutdown
+00:51 30s804ms Set ram refresh action to 1
+00:51 31s391ms UART reset performed
+00:51 31s395ms SOC - SUS stat changed to 0
+00:51 31s395ms SUS STAT LOW detected, count 1
+00:51 31s395ms Boot Selector: using default entry
+00:51 31s395ms UART restart requested
+00:51 31s395ms SUS stat low during normal run - shutting down
+[0;37;42m00:51 31s395ms Sus stat event detected, triggering shutdown.
+[0;32;40m00:51 31s395ms master_state_engine      -> clean up for shutdown
+00:51 31s395ms UART reset performed
+00:51 31s396ms master_state_engine      -> wait for sus stat - stop iA SoC
+00:51 31s397ms SoC did switch off properly
+00:51 31s397ms Pending UART restart requested cancelled
+00:51 31s397ms master_state_engine      -> wait for iA SoC shutdown
+00:51 31s398ms soc_bxt_control          -> shutdown(1)
+[0;37;42m00:51 31s399ms Entering S3 mode
+[0;32;40m00:51 31s399ms soc_bxt_control          -> shutdown(2)
+00:51 31s400ms soc_bxt_control          -> off state
+00:51 31s400ms master_state_engine      -> stop peripherals
+00:51 31s401ms master_state_engine      -> wait for peripherals - stop iA SoC
+00:51 31s401ms dirana3                  -> shutdown(1)
+00:51 31s401ms wakeup_reasons           -> shutdown(1)
+00:51 31s401ms restart_control          -> shutdown(1)
+00:51 31s402ms abl_control_uart         -> shutdown(1)
+00:51 31s402ms dirana3                  -> off state
+00:51 31s402ms tdf8532                  -> shutdown(1)
+00:51 31s402ms wakeup_reasons           -> off state
+00:51 31s402ms restart_control          -> off state
+00:51 31s402ms can_gw_filter            -> shutdown(1)
+00:51 31s403ms console_queue            -> shutdown(1)
+00:51 31s403ms timestamp                -> shutdown(1)
+00:51 31s403ms led_control              -> shutdown(1)
+00:51 31s403ms persistency              -> shutdown(1)
+00:51 31s403ms abl_control_uart         -> off state
+00:51 31s403ms mpu6000                  -> shutdown(1)
+00:51 31s404ms tdf8532                  -> shutdown(2)
+00:51 31s404ms can_gw_filter            -> off state
+00:51 31s406ms tdf8532                  -> off state
+00:51 31s408ms console_queue            -> off state
+00:51 31s408ms timestamp                -> off state
+00:51 31s408ms hardware_monitoring_and_ -> shutdown(1)
+00:51 31s408ms mpu6000                  -> off state
+00:51 31s428ms led_control              -> off state
+00:51 31s428ms persistency              -> off state
+00:51 31s428ms hardware_monitoring_and_ -> off state
+00:51 31s429ms master_state_engine      -> wait for power supplies - stop vehicle bus
+00:51 31s430ms Shutdown power supplies!
+00:51 31s430ms cm_power_control_gr_mrb  -> Shutdown(1)
+00:51 31s432ms cm_power_control_gr_mrb  -> Shutdown(2)
+00:51 31s434ms cm_power_control_gr_mrb  -> Shutdown(3)
+00:51 31s436ms cm_power_control_gr_mrb  -> Shutdown(4)
+00:51 31s438ms cm_power_control_gr_mrb  -> Shutdown(5)
+00:51 31s440ms cm_power_control_gr_mrb  -> Shutdown(6)
+00:51 31s442ms cm_power_control_gr_mrb  -> Shutdown(7)
+00:51 31s444ms cm_power_control_gr_mrb  -> Shutdown(8)
+00:51 31s446ms cm_power_control_gr_mrb  -> Shutdown(9)
+00:51 31s448ms cm_power_control_gr_mrb  -> Shutdown(10)
+00:51 31s450ms cm_power_control_gr_mrb  -> Shutdown(11)
+00:51 31s452ms cm_power_control_gr_mrb  -> Off state
+00:51 31s452ms master_state_engine      -> wait for vehicle bus
+00:51 31s452ms vehicle_bus_communicatio -> shutdown(1) - prepare shutdown
+00:51 31s452ms can_lifecycle            -> shutdown(1) (no ASR)
+00:51 31s453ms vehicle_bus_communicatio -> shutdown(2) - shutdown trcv
+00:51 31s453ms can_lifecycle            -> off state
+00:51 31s454ms can_transceiver          -> shutdown(1)
+00:51 31s455ms Set CAN Transceiver to sleep mode
+00:51 31s455ms can_transceiver          -> shutdown(2)
+00:51 31s456ms can_transceiver          -> off state
+00:51 31s707ms vehicle_bus_communicatio -> off state
+00:51 31s708ms master_state_engine      -> clean up
+00:51 31s709ms ------------------------------------------------------
+00:51 31s709ms ACTIVE stay alive Reasons:
+00:51 31s908ms master_state_engine      -> check, if all modules did shut down
+[0;37;42m00:51 31s909ms System Shutdown completed!
+[0;32;40m00:51 31s909ms master_state_engine      -> off state
+[1;37;41m00:51 42s583ms DNX disabled
+[0;32;40m00:51 42s583ms Set boot selector for(once) to ID 0x1 
+00:51 42s583ms Boot Selector: using once entry
+00:51 42s583ms Wakeup button state (Normal Boot) = 1 (501 ms pressed)
+00:51 42s584ms ------------------------------------------------------
+00:51 42s584ms ACTIVE stay alive Reasons:
+00:51 42s584ms  wakeup button (trigger) 
+00:51 42s585ms master_state_engine      -> possible wakeup reason detected
+00:51 42s585ms master_state_engine      -> CAN active
+00:51 42s585ms vehicle_bus_communicatio -> startup(1) - configure trcv
+00:51 42s585ms can_lifecycle            -> startup(1)
+00:51 42s586ms vehicle_bus_communicatio -> startup(2) - wait for trcv, complete startup
+00:51 42s586ms can_lifecycle            -> on state
+00:51 42s587ms can_transceiver          -> startup(1) - enable power
+00:51 42s588ms can_transceiver          -> startup(2) - configure trcv
+00:51 42s589ms Set CAN Transceiver to operational
+00:51 42s589ms Received command from serial line/CAN Transceiver operational change: slcan_cmd_open_channel() 
+00:51 42s589ms can_transceiver          -> on state
+00:51 42s589ms vehicle_bus_communicatio -> on state
+00:51 42s595ms System startup check: - temperature 42 C, threshold 85 C, min voltage: 8.00 V, current voltage 12.18 V 
+00:51 42s595ms master_state_engine      -> start low level iA SoC reqs
+00:51 42s596ms SoC startup started!
+00:51 42s596ms master_state_engine      -> wait for power supply - start iA SoC
+00:51 42s596ms ------------------------------------------------------
+00:51 42s596ms ACTIVE stay alive Reasons:
+00:51 42s596ms  wakeup button (trigger) 
+00:51 42s596ms  (startup in progress) 
+00:51 42s598ms cm_power_control_gr_mrb  -> Start iA SoC power supplies
+00:51 42s600ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (1)
+00:51 42s600ms master_state_engine      -> wait for SoC start - start Abl
+00:51 42s600ms dirana3                  -> startup(1)  - delay
+00:51 42s600ms wakeup_reasons           -> startup(1)
+00:51 42s601ms soc_bxt_control          -> start SoC (reset)
+00:51 42s601ms wakeup_reasons           -> on state
+00:51 42s602ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (2)
+00:51 42s602ms soc_bxt_control          -> start SoC (power on)
+00:51 42s604ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (3)
+00:51 42s606ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (4)
+00:51 42s608ms hardware_monitoring_and_ -> startup(1)
+00:51 42s610ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (5)
+00:51 42s612ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (6)
+00:51 42s612ms soc_bxt_control          -> wait for sus stat signal
+00:51 42s613ms soc_bxt_control          -> SoC started
+00:51 42s614ms cm_power_control_gr_mrb  -> Enable peripheral power supplies (7)
+00:51 42s614ms soc_bxt_control          -> on state
+00:51 42s614ms master_state_engine      -> wait for abl - start deferred power supply
+00:51 42s614ms restart_control          -> startup(1)
+00:51 42s614ms can_gw_filter            -> startup(1)
+00:51 42s615ms abl_control_uart         -> startup(1) - Start UART
+00:51 42s615ms restart_control          -> on state
+[1;37;41m00:51 42s616ms abl_control_uart        : state startup(1) - Start UART -> triggered fallback to state on state
+[0;32;40m00:51 42s616ms master_state_engine      -> wait for power supply - start deferred peripherals
+00:51 42s616ms can_gw_filter            -> on state
+00:51 42s616ms UART reset performed
+00:51 42s617ms SUS STAT LOW detected, count 1
+00:51 42s617ms Boot Selector: using default entry
+00:51 42s617ms UART restart requested
+00:51 42s617ms UART reset performed
+00:51 42s618ms Starting recovery sequence from S3 mode - toggle SoC Pwr on 
+00:51 42s618ms Set ram refresh action to 0
+00:51 42s618ms cm_power_control_gr_mrb  -> Enable USB power supplies (0)
+00:51 42s618ms mpu6000                  -> startup (1) - reset
+00:51 42s620ms cm_power_control_gr_mrb  -> Enable USB power supplies (1)
+00:51 42s622ms cm_power_control_gr_mrb  -> Enable USB power supplies (2)
+00:51 42s624ms cm_power_control_gr_mrb  -> On state
+00:51 42s624ms master_state_engine      -> wait for SLCAN - start synced peripherals
+00:51 42s624ms tdf8532                  -> startup(1) - enable tdf8532
+00:51 42s626ms TDF8532 support is enabled
+00:51 42s628ms persistency              -> startup(1)
+00:51 42s628ms hardware_monitoring_and_ -> on state
+00:51 42s642ms Starting recovery sequence from S3 mode - toggle SoC Pwr on - done
+00:51 42s651ms dirana3                  -> startup(2)  - reset
+00:51 42s652ms dirana3                  -> startup(3)  - wait for DLE
+00:51 42s653ms persistency              -> on state
+00:51 42s662ms dirana3                  -> startup(4) - keycodes (no fw download)
+00:51 42s699ms dirana3                  -> on state
+00:51 42s718ms mpu6000                  -> startup (2) - configure
+00:51 42s723ms mpu6000                  -> on state
+00:51 42s726ms tdf8532                  -> startup(3) - write keycode
+00:51 42s730ms tdf8532                  -> startup(4) - write config seq 1
+00:51 42s742ms tdf8532                  -> startup(5) - wait for diag1
+00:51 42s758ms tdf8532                  -> startup(6) - write config seq 2
+00:51 42s768ms tdf8532                  -> on state
+00:51 42s942ms Perform late UART reinit after s3 resume
+00:51 42s942ms UART reset performed
+00:51 43s116ms Changed HW flow control setting for UART 5 to 1
+00:51 43s652ms SLCAN command - SoC software stack loaded acknowledge received
+00:51 43s653ms led_control              -> startup(1)
+00:51 43s653ms SLCAN firmware, sync or timeout ready
+00:51 43s653ms Timestamp update(1): begin 3102585 ms
+00:51 43s653ms Timestamp update(3): abl ok 0 ms (-3102585 ms after start)
+00:51 43s653ms master_state_engine      -> wait for all modules
+00:51 43s654ms Startup wakeup reasons: 0x10000020
+00:51 43s654ms Startup Counter: 4
+[0;37;42m00:51 43s654ms System Start completed! (ABL Blob 1)
+[0;32;40m00:51 43s654ms master_state_engine      -> on state
+00:51 43s654ms ------------------------------------------------------
+00:51 43s654ms ACTIVE stay alive Reasons:
+00:51 43s654ms  wakeup button (trigger) 
+00:51 43s658ms console_queue            -> startup(1)
+00:51 43s658ms timestamp                -> startup(1)
+00:51 43s663ms console_queue            -> on state
+00:51 43s663ms timestamp                -> on state
+00:51 43s678ms led_control              -> on state
+00:51 44s524ms ------------------------------------------------------
+00:51 44s524ms ACTIVE stay alive Reasons:
+00:51 44s524ms  wakeup button (trigger) 
+00:51 44s524ms  SoC is active 
+00:51 51s488ms  Temp. (id 0) = 39 C; Temp. (id 1) = 33 C; Supply: 12.03 V atc = 2; FAN 108 rpm; FAN 20 %            
+[1A00:52 01s488ms  Temp. (id 0) = 41 C; Temp. (id 1) = 33 C; Supply: 11.99 V atc = 3; FAN 108 rpm; FAN 20 %            
+[1A00:52 11s488ms  Temp. (id 0) = 37 C; Temp. (id 1) = 33 C; Supply: 12.00 V atc = 2; FAN 108 rpm; FAN 20 %            
+[1A00:52 21s488ms  Temp. (id 0) = 36 C; Temp. (id 1) = 32 C; Supply: 12.08 V atc = 2; FAN 108 rpm; FAN 20 %            
+[1A00:52 31s488ms  Temp. (id 0) = 36 C; Temp. (id 1) = 33 C; Supply: 12.07 V atc = 2; FAN 108 rpm; FAN 20 %            
+[1A00:52 41s488ms  Temp. (id 0) = 38 C; Temp. (id 1) = 33 C; Supply: 12.04 V atc = 2; FAN 0 %            
+[1A00:52 51s488ms  Temp. (id 0) = 40 C; Temp. (id 1) = 33 C; Supply: 11.98 V atc = 3; FAN 0 %            
+[1;37;41m00:53 01s488ms FAN does not rotate - FAN is faulty or blocked! 
+[0;32;40m00:53 01s488ms  Temp. (id 0) = 40 C; Temp. (id 1) = 33 C; Supply: 11.93 V atc = 3; FAN 20 %            
+[1A00:53 11s488ms  Temp. (id 0) = 42 C; Temp. (id 1) = 33 C; Supply: 11.95 V atc = 3; FAN 106 rpm; FAN 20 %            
+[1A00:53 21s488ms  Temp. (id 0) = 42 C; Temp. (id 1) = 33 C; Supply: 12.03 V atc = 3; FAN 107 rpm; FAN 20 %            
+[1A00:53 31s488ms  Temp. (id 0) = 44 C; Temp. (id 1) = 33 C; Supply: 12.02 V atc = 3; FAN 107 rpm; FAN 20 %            
+[1A00:53 41s488ms  Temp. (id 0) = 45 C; Temp. (id 1) = 33 C; Supply: 11.99 V atc = 3; FAN 107 rpm; FAN 20 %            
+[1A00:53 51s488ms  Temp. (id 0) = 43 C; Temp. (id 1) = 33 C; Supply: 11.88 V atc = 3; FAN 110 rpm; FAN 40 %            

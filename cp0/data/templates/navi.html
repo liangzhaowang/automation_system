@@ -1,0 +1,39 @@
+<form class="form-inline m-b">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form-group">
+                <select name="" id="project_selector" class="form-control" style="width: 200px">
+                {% for project in active_projects %}
+                {% ifequal project.name project_name %}
+                <option selected value="{{ project.name }}">{{ project.name }}</option>
+                {% else %}
+                <option value="{{ project.name }}">{{ project.name }}</option>
+                {% endifequal %}
+                {% endfor %}
+                <option disabled value="">======== inactive =======</option>
+                {% for project in inactive_projects %}
+                {% ifequal project.name project_name %}
+                <option selected value="{{ project.name }}">{{ project.name }}</option>
+                {% else %}
+                <option value="{{ project.name }}">{{ project.name }}</option>
+                {% endifequal %}
+                {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <select name="" id="view_selector" class="form-control" style="width: 200px">
+                    {% for view in views  %}
+                    {% ifequal view.0 tag %}
+                    <option selected value="{{ view.0 }}">{{ view.1 }}</option>
+                    {% else %}
+                    <option value="{{ view.0 }}">{{ view.1 }}</option>
+                    {% endifequal %}
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <button type="button" id="result_go" class="btn btn-primay form-control">Go</button>
+            </div>
+        </div>
+    </div>
+</form>

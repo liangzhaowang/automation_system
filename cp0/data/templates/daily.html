@@ -1,0 +1,362 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% load chart %}
+
+{% block css %}
+    <link href="{% static 'css/plugins/footable/footable.core.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'css/plugins/iCheck/custom.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+
+{% include "navi.html" %}
+<div class="row">
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h3>
+                    <p>build {{ current_build }}</p>
+                    <small>origin {{ data.0.raw.0.build }}</h3></small>
+                {{ builds|length }} builds
+            </div>
+            <div class="ibox-content full-height-scroll">
+                <ul class="list-group clear-list" style="height: 330px">
+                    {% for build in builds %}
+                    <li class="list-group-item {% ifequal forloop.counter0 0 %}fist-item{% endifequal %}">
+                        {% if show_del %}
+                        <button class="btn btn-warning btn-xs" type="button" onclick="removedata('{{ project_name }}','{{ build }}')">
+                            <i style="font-size: 8px" class="fa fa-times"></i>
+                        </button>
+                        {% endif %}
+                        <a class="active" href="/{{ tag }}/{{ project_name }}/{{ build }}/">
+                            {{ build }} {% ifequal build current_build %}
+                            <i class="fas fa-arrow-circle-left"></i>
+                            <a aria-data="{{ project_name }}/{{ current_build }}///" name="add_cmp" href="#"><i class="fa fa-exchange-alt" overflow:hidden title="daily"></i></a>
+                            {% endifequal %}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% include 'pca_raw_tag.html' %}
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">daily
+                <h5>Trends</h5>
+            </div>
+            <div id="line" class="ibox-content">
+                <canvas id="container"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-content">
+                <a style="position:absolute; right:50px; top:23px;" title="download as excel" href="/api/download_daily_excel/{{ project_name }}/{{ current_build }}"><i class="fa fa-download"></i></a>
+                <form action="/daily/{{ project_name }}/{{ current_build }}/bisects/" method="post">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-1">
+                            <button class="btn btn-primary btn-sm" type="submit"> Test each merge request</button>
+                        </div>
+                        <div class="col-md-1 col-md-offset-1">
+                            <a href="/daily/{{ project_name }}/{{ current_build }}/bisects/view/" class="btn btn-primary btn-sm">View results</a>
+                        </div>
+                    </div>
+                    <table class="footable table table-stripped toggle-arrow-tiny no-margins" id="table_summary">
+                        <thead>
+                            <tr>
+                                <th data-sortable="false"></th>
+                                <th>Test Case</th>
+                                <th>Unit</th>
+                                <th>
+                                    <small>{{ prev_build }}</small>
+                                </th>
+                                <th>daily
+                                    <small>{{ current_build }}</small>
+                                </th>
+                                <th>Fluctuation</th>
+                                <th>Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for case, value in summary.items %}
+                            <tr>
+                                <td><div class="i-checks"><label class="no-margins"><input id="c_{{ forloop.counter0 }}" name="cb_case[]" type="checkbox" value="{{ case }}"></label></div></td>
+                                <td name="trends" style="cursor:pointer;">{{ case }}</td>
+                                <td>{{ value.unit }}</td>
+                                <td>{{ value.prev }}</td>
+                                <td>{{ value.result }}</td>
+                                {% if value.down == False %}
+                                <td class="text-better">{{ value.fluc }}
+                                    <i class="fa fa-level-up"></i>
+                                </td>
+                                <td class="text-better">{{ value.rate }}%
+                                    <i class="fa fa-level-up"></i>
+                                </td>
+                                {% else %}
+                                <td class="text-worth">{{ value.fluc }}
+                                    <i class="fa fa-level-down"></i>
+                                </td>
+                                <td class="text-worth">-{{ value.rate }}%
+                                    <i class="fa fa-level-down"></i>
+                                </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        {% include 'raw_table.html' %}
+    </div>
+</div>
+
+<div class="modal inmodal fade" id="modalMergereq" tabindex="-1" role="dialog"  aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Preparation</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal">
+                        <div id="case_container">
+
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">Test Slave</label>
+                            <div class="col-sm-2">
+                                <select class="form-control m-b" name="account">
+                                    <option>option 1</option>
+                                    <option>option 2</option>
+                                    <option>option 3</option>
+                                    <option>option 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <table id="tb_merge_request" class="table table-bordered">
+                            <thead>
+                                <th>Build</th>
+                                <th>Status</th>
+                            </thead>
+                            <tbody id="tbody_merge_request">
+                                <tr id="tr_merge_request">
+                                    <td>{{ current_build }}</td>
+                                </tr>
+                                <tr>
+                                    <td>{{ prev_build }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/plugins/footable/footable.all.min.js' %}"></script>
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js' %}"></script>
+    
+    <script src="{% static 'js/plugins/toastr/toastr.min.js' %}"></script>
+    <script>
+        {% comment %} function bisects() {
+            var case_inputs = $("input[name='cb_case']:checked")
+            var arrayCaseName = [];
+            for (var i=0; i < case_inputs.length; i++)
+            {
+                arrayCaseName.push($("#" + case_inputs[i].id).val());
+            }
+
+            $.post('./bisects/', {'cases': arrayCaseName} ,function(data) {
+                console.log(data);
+            });
+        }; {% endcomment %}
+
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+
+        $("#result_go").click(function() {
+            var url = "/" + $("#view_selector").val() + "/" + $("#project_selector").val() + "/";
+            window.location.href = url;
+        });
+
+        $("a[name='add_cmp']").on("click", function() {
+            var post = $(this).attr("aria-data");
+            console.log(post);
+            $.post('/api/add_to_compare_list/', {data: post}, function (ret) {
+                if (ret == '1')
+                {
+                    location.reload();
+                } else if(ret == '-1') {
+                    alert('comparison type is mismatching, please clear compare container first.');
+                }
+            })
+        });
+
+        $('#table_summary').footable({ paginate: false });
+
+        $('table[name="table_detail"]').footable({paginate: false});
+
+        function view_attachment(id) {
+            var url = '/' + $('#' + id).val();
+            window.open(url);
+        }
+
+        function dl_attachment(id) {
+            var url = '/download/' + $('#' + id).val();
+            window.location.href = url;
+        }
+
+        $(document).ready(function () {
+            if('{{project_name}}' == 'bxtp_ivi_o'){
+                $("#pca_bt_container").show();
+            }else{
+                $("#pca_bt_container").hide();
+            }
+
+            var newdata;
+            $.get('/api/trend/{{ project_name }}/{{ tag }}/', function (data2) {
+                newdata = data2;
+                var case_name = $("td[name='trends']:first").text();
+                var builds = data2[case_name]['build'];
+                var results = data2[case_name]['result'];
+                for (var i=results.length-1;i>=0;i--){
+                    if (results[i]==false){
+                        results.splice(i,1);
+                        builds.splice(i,1);
+                    }
+                }
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: builds,
+                        datasets: [{
+                            lineTension: 0,
+                            label: case_name,
+                            backgroundColor: '#7cb5ec',
+                            borderColor: '#7cb5ec',
+                            data: results,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: false,
+                                scaleLabel: {
+                                    display: true
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value'
+                                }
+                            }]
+                        }
+                    }
+                };
+                var ctx = document.getElementById('container').getContext('2d');
+                window.myLine = new Chart(ctx, config)
+            });
+            $("td[name='trends']").click(function(){
+                var case_name = $(this).text();
+                var builds = newdata[case_name]['build'];
+                var results = newdata[case_name]['result'];
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: builds,
+                        datasets: [{
+                            lineTension: 0,
+                            label: case_name,
+                            backgroundColor: '#7cb5ec',
+                            borderColor: '#7cb5ec',
+                            data: results,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        title: {
+                            display: true
+                        },
+                        tooltips: {
+                            mode: 'index',
+                            intersect: false
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            xAxes: [{
+                                display: false,
+                                scaleLabel: {
+                                    display: true
+                                }
+                            }],
+                            yAxes: [{
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Value'
+                                }
+                            }]
+                        }
+                    }
+                };
+                window.myLine.destroy();
+                var ctx = document.getElementById('container').getContext('2d');
+                window.myLine = new Chart(ctx, config)
+		    })
+        });
+        function removedata(project, build) {
+            var conf = confirm('Remove the data?');
+            if (conf == true){
+                $.post('/api/remove_data/',{'project':project, 'tag':'daily', 'build':build}, function (ret) {
+                    alert(ret);
+                    window.location='/daily/{{ project_name }}/'
+                    }
+                )
+            }
+
+
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,299 @@
+<div>
+
+        <h3>correlation matrix table</h3>
+    <div style="overflow:auto">
+        <!-- Table goes in the document BODY -->
+        <table class="hovertable",title="correlation matrix table">
+            <tr>
+                <th>options</th>
+                {%for key in keys %}
+                <th style="overflow:auto">{{key}}</th>
+                {% endfor %}
+            </tr>
+
+            {%for key in keys %}
+            <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="cor_mat_data">
+                <td>{{key}}</td>
+                {%for skey in keys %}
+                    <td name="col" id="{{key}}_{{skey}}" ></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+        <hr>
+
+        <h3>counter matrix table</h3>
+        <div style="overflow:auto">
+        <!-- Table goes in the document BODY -->
+        <table class="hovertable",title="counter matrix table">
+            <tr>
+                <th>options</th>
+                {%for key in keys %}
+                <th style="overflow:auto">{{key}}</th>
+                {% endfor %}
+            </tr>
+
+            {%for key in keys %}
+            <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="counter_mat" >
+                <td>{{key}}</td>
+                {%for skey in keys %}
+                    <td name="count_col" id="count_{{key}}_{{skey}}" ></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+            <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="counter_sum">
+                <td>correlation counter</td>
+                {%for skey in keys %}
+                    <td name="count_sum" id="csum_{{key}}_{{skey}}" ></td>
+                {% endfor %}
+
+            </tr>
+        </table>
+    </div>
+        <hr>
+
+        <h3>feature vector table</h3>
+    <div style="overflow:auto">
+        <table class="hovertable",title="feature_vector table">
+            <tr>
+                <th>options</th>
+                {%for key in keys %}
+                <th>{{key}}</th>
+                {% endfor %}
+                <th>vector sum</th>
+            </tr>
+
+            {%for key in keys %}
+            <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="feature_vector_data" aria-buff="{{feature_vector}}">
+                <td>vector{{forloop.counter }}</td>
+                {%for skey in keys %}
+                    <td name="vcol" id="v_{{key}}_{{skey}}" ></td>
+                {% endfor %}
+                <td name="vector_sum" id="vector_sum_{{forloop.counter}}"></td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+        <hr>
+
+        <h3>feature value table</h3>
+        <!--<form id="valform" >-->
+                <table class="hovertable",title="feature_vector table">
+                    <tr>
+                        <th>options</th>
+                        <th>feature value</th>
+                        <th>select</th>
+                    </tr>
+
+                    {%for key in keys %}
+                    <tr onmouseover="this.style.backgroundColor='#ffff66';" onmouseout="this.style.backgroundColor='#d4e3e5';" id="feature_val_data"  aria-keys="{{keys}}">
+                        <td>vector{{forloop.counter }}</td>
+                        <td name="valcol" id="val_{{key}}" ></td>
+                        <td name="valselect" id="sel_{{key}}" ></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <!--<input padding="100" type="button" id="subBtn" class="btn btn-primary" value="submit" />-->
+        <!--</form>-->
+        <hr>
+        <div id="top-spinner" class="w3-top-spinner" style="display:none">
+            <i class="fa fa-spinner fa-spin" style="font-size:4em;color:blue;"></i>
+        </div>
+        <h3>weight percentage table</h3>
+        <div id="pca_weight" style="overflow:auto">
+
+        </div>
+
+
+        <h3>image score table</h3>
+    <div style="overflow:auto">
+        <table class="hovertable",title="image score table">
+            <tr>
+                <td>version</td>
+                {%for version in image_version %}
+                    <th style="overflow:auto">{{version}}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>score</td>
+                {%for score in image_score %}
+                    <th style="overflow:auto">{{score}}</th>
+                {% endfor %}
+            </tr>
+        </table>
+    </div>
+        <hr>
+
+</div>
+
+<script>
+$(document).ready(function(){
+    var data_array = {{correlation_matrix|safe}}
+    <!--console.log(data_array);-->
+    if(data_array.length){
+        $.each($("td[name=\"col\"]"), function(k, v){
+            var raw_data = get_item_data(k,data_array,false);
+            $("#"+v.getAttribute("id")).html(raw_data);
+            <!--console.log(raw_data,parseFloat(raw_data)>0.4);-->
+            if(Math.abs(parseFloat(raw_data))>0.3 && Math.abs(parseFloat(raw_data)) < 1.0){
+                $("#"+v.getAttribute("id")).css("background-color","#ff6666");
+            }
+            if(Math.abs(parseFloat(raw_data)) == 1.0){
+                $("#"+v.getAttribute("id")).css("background-color","#CAFF70");
+            }
+        });
+    }
+
+    var count_data_array = {{count_mat|safe}}
+    if (count_data_array.length){
+
+        $.each($("td[name=\"count_col\"]"), function(k, v){
+            var raw_data = parseFloat(get_item_data(k,count_data_array,false));
+            $("#"+v.getAttribute("id")).html(raw_data.toFixed(0));
+         });
+        $.each($("td[name=\"count_sum\"]"), function(k, v){
+            var raw_data = get_col_sum(k,count_data_array,false)
+            $("#"+v.getAttribute("id")).html(raw_data);
+        });
+
+    }
+
+
+    var vdata_array = {{feature_vector|safe}};
+    if (vdata_array.length){
+        $.each($("td[name=\"vcol\"]"), function(k, v){
+            var raw_data = get_item_data(k,vdata_array,false);
+            $("#"+v.getAttribute("id")).html(raw_data);
+            if(Math.abs(parseFloat(raw_data))>0.3 && Math.abs(parseFloat(raw_data)) < 1.0){
+                $("#"+v.getAttribute("id")).css("background-color","#ff6666");
+            }
+        });
+        $.each($("td[name=\"vector_sum\"]"), function(k, v){
+            <!--console.log(k);-->
+            var raw_sum = get_row_sum(k,vdata_array)
+            $("#"+v.getAttribute("id")).html(raw_sum);
+        });
+    }
+
+
+    var val_data_array = {{feature_val|safe}};
+
+    if (val_data_array.length){
+        $.each($("td[name=\"valcol\"]"), function(k, v){
+            var raw_data = get_item_data(k,val_data_array,true);
+            $("#"+v.getAttribute("id")).html(raw_data);
+            if(Math.abs(parseFloat(raw_data))>1.0){
+                $("#"+v.getAttribute("id")).css("background-color","#ff6666");
+            }
+        });
+        $.each($("td[name=\"valselect\"]"), function(k, v){
+            if(k==0){
+                $("#"+v.getAttribute("id")).append('<input name="feature_val_id" type="checkbox" onclick="get_val_ajax_data()" value='+k+' checked/>');
+            }else{
+                $("#"+v.getAttribute("id")).append('<input name="feature_val_id" type="checkbox" onclick="get_val_ajax_data()" value='+k+' />');
+            }
+
+        });
+    }
+
+        get_val_ajax_data();
+
+});
+
+function get_col_sum(col,data,include_self){
+    var sum = 0
+    <!--console.log(data);-->
+    for( i in data){
+        temp_array = data[i];
+        if(include_self){
+            <!--console.log(temp_array[col]);-->
+            sum += parseInt(temp_array[col])
+        }else{
+            if( col != i){
+                sum += parseInt(temp_array[col])
+            }
+        }
+    }
+
+    return sum;
+}
+
+function get_row_sum(row,data){
+    var sum = 0.0
+    <!--console.log(data);-->
+
+    for(i in data[row]){
+        sum += parseFloat(data[row][i]);
+    }
+    sum = sum.toFixed(3)
+
+    return sum;
+
+}
+
+function get_item_data(k,data_array,reqc){
+    if(reqc){
+    var data_len = data_array[0].length;
+    }else{
+    var data_len = data_array.length;
+    }
+    <!--console.log(k,data_len);-->
+    raw = parseInt(k/data_len);
+    col = k%data_len;
+
+    if((typeof data_array[raw][col]) == 'number'){
+        return data_array[raw][col]
+    }else{
+        return data_array[raw][col].replace("'",'').replace("'",'')
+    }
+}
+function get_val_ajax_data(){
+    var val_data_array = {{feature_val|safe}};
+     var coef = {{coeffient|safe}};
+      <!--console.log(coef);-->
+      var chkItems = document.getElementsByName("feature_val_id");
+      var case_data = new Array();
+      var j = 0;
+      for (var i = 0; i < chkItems.length; i++) {
+        if (chkItems[i].checked) {
+          case_data[j] = chkItems[i].value;
+          j += 1;
+        }
+      }
+      var valform = 'case='+case_data[0];
+          for( i in case_data){
+               if(i > 0){
+                   valform += '&case='+ case_data[i]
+               }
+          }
+        //submit
+        var v_data = $("#feature_vector_data").attr("aria-buff");
+        var v_keys = $("#feature_val_data").attr("aria-keys");
+
+        valform += "&values="+val_data_array;
+        for(i in coef) {
+          valform += "&coefs="+coef[i];
+          }
+
+        <!--console.log(v_data);-->
+        if(v_data.length){
+            <!--var valform = $("#valform").serialize();-->
+            var params = valform+'&vactor='+v_data+'&keys='+v_keys
+            <!--console.log(params);-->
+            $.ajax( {
+                type : "POST",
+                url : '/pca/valdata/',
+                data : params,
+                success : function(data) {
+                    $('#pca_weight').html(data);
+                }
+            });
+
+        }
+
+}
+
+</script>
+

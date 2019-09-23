@@ -1,0 +1,120 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static 'css/plugins/fullcalendar/fullcalendar.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+{% include "navi.html" %}
+<div class="row">
+    <div class="col-lg-10">
+        <div class="ibox float-e-margins">
+            <div class="ibox-content">
+                <div class="sk-spinner sk-spinner-wave">
+                    <div class="sk-rect1"></div>
+                    <div class="sk-rect2"></div>
+                    <div class="sk-rect3"></div>
+                    <div class="sk-rect4"></div>
+                    <div class="sk-rect5"></div>
+                </div>
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2">
+        <div class="ibox float-e-margins">
+            <div class="ibox ibox-title">
+                <h5>Filter by User</h5>
+            </div>
+            <div class="ibox ibox-content no-margins">
+                <ul class="list-group clear-list">
+                    {% for user in active_user %}
+                    <li class="list-group-item {% ifequal forloop.counter0 0 %}fist-item{% endifequal %}">
+                        <a name="user_selector" data-toggle="tab" href="#" aria-id="{{ user.id }}" class="client-link">{{ user.last_name }}, {{ user.first_name }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/plugins/fullcalendar/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/fullcalendar/fullcalendar.min.js' %}"></script>
+    <script>
+        $("#result_go").click(function() {
+            var url = "/" + $("#view_selector").val() + "/" + $("#project_selector").val() + "/";
+            window.location.href = url;
+        });
+        $(document).ready(function () {
+            $('#calendar').fullCalendar({
+                header: {
+                    center: 'title',
+                    right: 'prev, month, basicWeek, basicDay, next today',
+                    left: 'all, cold_boot_camp'
+                },
+                loading: function(isLoading, view ) {
+                    if(isLoading) {
+                        $(this).parent().addClass('sk-loading');
+                    } else {
+                        $(this).parent().removeClass('sk-loading');
+                    }
+                },
+                eventLimit: true,
+                height: 900,
+                editable: false,
+                weekends: true,
+                allDayDefault: true,
+                droppable: false, // this allows things to be dropped onto the calendar
+                events: '/api/history/{{ project_name }}/builds/',
+                eventClick: function (calEvent, jsEvent, view) {
+                    switch(calEvent.source.url)
+                    {
+                        case "/api/history/{{ project_name }}/builds/":
+                            window.open("/raw/{{ project_name }}/" + calEvent.title + '/' + calEvent.last_test_id);
+                            break;
+
+                        case "/api/history/{{ project_name }}/cold_boot_camp/builds/":
+                            window.open("/cold_boot_camp/{{ project_name }}/" + calEvent.title);
+                            break;
+
+                        default:
+                            window.open("/raw/{{ project_name }}/" + calEvent.title + '/' + calEvent.last_test_id);
+                    }
+                },
+                views: {
+                    agenda: {
+                        eventLimit: 5
+                    }
+                },
+                customButtons: {
+                    cold_boot_camp: {
+                        text: 'cold_boot_camp',
+                        click: function() {
+                            $('#calendar').fullCalendar('removeEvents');
+                            $('#calendar').fullCalendar('addEventSource', '/api/history/{{ project_name }}/cold_boot_camp/builds/');
+                        },
+                    },
+                    all: {
+                        text: 'all',
+                        click: function() {
+                            $('#calendar').fullCalendar('removeEvents');
+                            $('#calendar').fullCalendar('addEventSource', '/api/history/{{ project_name }}/builds/');
+                        },
+                    }
+                },
+            });
+
+            $("a[name='user_selector']").on("click", function () {
+                var user_id = $(this).attr("aria-id");
+                $("#calendar").fullCalendar('removeEvents');
+                $("#calendar").fullCalendar('addEventSource', '/api/history/{{ project_name }}/builds?user_id=' + user_id);
+            });
+        });
+
+    </script>
+{% endblock %}

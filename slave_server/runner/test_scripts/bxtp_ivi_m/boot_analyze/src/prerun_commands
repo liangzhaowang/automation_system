@@ -1,0 +1,9 @@
+adb root
+sleep 1
+adb remount
+adb shell cat /proc/cmdline > $(pwd)/./out/proc_cmdline.log
+adb push $(pwd)/./src/abl_dumper_app /data/
+adb shell chmod a+x /data/abl_dumper_app
+adb shell /data/abl_dumper_app > $(pwd)/./out/abl_dump.txt
+python $(pwd)/./src/parse_coldboot_progress.py -d -O out/ -o $(pwd)/./out/boot_progress.csv
+sleep 30

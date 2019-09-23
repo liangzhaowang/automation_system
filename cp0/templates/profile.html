@@ -1,0 +1,428 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static 'css/plugins/fullcalendar/fullcalendar.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/fullcalendar/fullcalendar.print.css' %}" rel='stylesheet' media='print'>
+    <link href="{% static 'css/plugins/slick/slick.css' %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/slick/slick-theme.css' %}" rel="stylesheet">
+    <style>
+        .example:after {
+            content: "Example";
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            background-color: #f5f5f5;
+            color: #9da0a4;
+            border-radius: 4px 0 4px 0
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row m-b-lg m-t-lg">
+        <div class="col-md-6">
+            <div class="profile-image">
+                <img src="/static/img/avatars/{{ user.usercpz.get_avatar }}" class="img-circle circle-border m-b-md" alt="profile">
+            </div>
+            <div class="profile-info">
+                <div class="">
+                    <div>
+                        <h2 class="no-margins">
+                            {{ user.last_name }} {{ user.first_name }}
+                        </h2>
+                        <h4>{{ user.email }}</h4>
+                        <small>
+                            Last login: {{ user.last_login }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <h3>About {{ user.last_name }} {{ user.first_name }}</h3>
+                    <p class="small font-bold">
+                        <span><i class="fa fa-circle text-navy"></i> Administrator</span>
+                    </p>
+                </div>
+            </div>
+            <div class="ibox">
+                <div onclick="add_new_slave()"  class="btn btn-primary !ibox-content font-bold" style="display: block; height:48px; text-align: center; font-size: 24px;">
+                    Add new slave
+                </div>
+            </div>
+
+            {% for slave in slaves %}
+            <div class="widget-head-color-box {{ slave.status.style }} p-xs text-center">
+                <h2 class="font-bold no-margins"><i class="fas fa-box"></i> {{ slave.num|default:"?" }}</h2>
+            </div>
+            <div class="widget-text-box">
+                
+                {% if slave.status.error %}
+                <div class="alert alert-danger mini-alert"><a class="alert-link" href="#">{{ slave.status.error }} </a></div>
+                {% endif %}
+                    
+                <ul class="folder-list m-b-md" style="padding: 0">
+                    <li><a href="#"> <i class="fas fa-memory"></i> RAM <span class="pull-right">{{ slave.ram|default:"undefined" }} G</span></a></li>
+                    <li><a href="#"> <i class="fas fa-server"></i> Hostname <span class="pull-right">{{ slave.host_name|default:"undefined" }}</span></a></li>
+                    <li><a href="#"> <i class="fas fa-barcode"></i> SN <span class="pull-right">{{ slave.sn|default:"undefined" }}</span></a></li>
+                    <li><a href="#"> <i class="fas fa-wifi"></i>IP <span class="pull-right">{{ slave.ip }}</span></a></li>
+                    <li><a href="#"> <i class="fas fa-thumbtack"></i> {{ slave.comment|default:"No comment" }}</a></li>
+                    <div id="id_install_stat_{{ slave.id }}" class="progress progress-striped active" style="display: none; margin-top:8px; margin-bottom:0px;">
+                        <div class="progress-bar progress-bar-success" role="progressbar"><div style="width:220px; color:indigo;"></div></div>
+                    </div>
+                    <div id="id_install_log_{{ slave.id }}" style="display:none; background:darkgray; color:white; padding-left:5px; height:40px;"></div>
+                </ul>
+                <div class="text-center">
+                    <a class="btn btn-xs btn-white" {% for stat in private_slave_stat %} {% if stat.slave_id == slave.id and stat.is_running %}  disabled title="this slave is running" {% endif %} {% endfor %}onclick="open_update_modal({{ slave.id }})"><i class="fas fa-download"></i> Update </a>
+                    <a class="btn btn-xs btn-white" onclick="show_modal({{ slave.id }})"><i class="fas fa-edit"></i> Edit </a>
+                    <a class="btn btn-xs btn-white"><i class="fa fa-times"></i> Unregister</a>
+                </div>
+            </div>
+            {% endfor %}    
+        </div>
+        <div class="col-lg-9">
+            <div class="ibox">
+                <div class="ibox-title">
+                    <h5>Projects</h5>
+                    <div class="ibox-tools">
+                        <a href="" class="btn btn-primary btn-xs">Create new project</a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="row m-b-sm m-t-sm">
+                        <div class="col-md-1">
+                            <button type="button" id="loading-example-btn" class="btn btn-white btn-sm"><i class="fa fa-refresh"></i> Refresh</button>
+                        </div>
+                        <div class="col-md-11">
+                            <div class="input-group"><input type="text" placeholder="Search" class="input-sm form-control"> <span class="input-group-btn">
+                                <button type="button" class="btn btn-sm btn-primary"> Go!</button> </span></div>
+                        </div>
+                    </div>
+
+                    <div class="project-list">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Active</th>
+                                    <th>Details</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects  %}
+                                <tr>
+                                    <td class="project-status">
+                                        <div class="switch">
+                                            <div class="onoffswitch">
+                                                <input type="checkbox" {% ifequal project.active True %}checked{% endifequal %} class="onoffswitch-checkbox" id="preject_{{ project.id }}"
+                                                    name="active_project" aria-id="{{ project.id }}">
+                                                <label class="onoffswitch-label" for="preject_{{ project.id }}">
+                                                    <span class="onoffswitch-inner"></span>
+                                                    <span class="onoffswitch-switch"></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="project-title">
+                                        <a href="project_detail.html">{{ project.name }}</a>
+                                        <br>
+                                        <small>{{ project.builder_name }}</small>
+                                    </td>
+                                    <td class="project-actions">
+                                        <div class="btn-group">
+                                            <button data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle" aria-expanded="false">Image link <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                {% for build_path in project.build_paths %}
+                                                <li><a target="_blank" href="{{ build_path.url }}">{{ build_path.get_build_type_display }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button data-toggle="dropdown" class="btn btn-default btn-xs dropdown-toggle" aria-expanded="false">Buildbot link <span class="caret"></span></button>
+                                            <ul class="dropdown-menu">
+                                                <li><a href="#">blank</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% for formset in formsets %}
+        <div class="modal inmodal" id="modal_slave_{{ formset.0.id.value }}" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+            <div class="modal-dialog">
+                <div class="modal-content animated fadeIn">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                        <h4 class="modal-title">A</h4>
+                        <small class="font-bold"></small>
+                    </div>
+                    <form method="post" class="form-horizontal" action="/update_slave/{{ formset.0.id.value }}/">
+                        {{ formset.management_form }}
+                        <div class="modal-body">
+                            {% for field in formset.0 %}
+                            <div class="form-group">
+                                <div class="col-sm-2 control-label">
+                                    {% if field.field.required %}
+                                        <font style="color:red">*</font>
+                                    {% endif %}
+                                    {{ field.label }}
+                                </div>
+                                <div class="col-sm-10">
+                                    {{ field }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Save changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal inmodal" id="new_slave" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content animated fadeIn">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">New Slave</h4>
+                    <small class="font-bold"></small>
+                </div>
+                <form method="post" class="form-horizontal" action="/add_slave/">
+                    <div class="modal-body">
+                        {% for field in newslavefrom %}
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label">
+                                {% if field.field.required %}
+                                    <font style="color:red">*</font>
+                                {% endif %}
+                                {{ field.label }}
+                            </div>
+                            <div class="col-sm-10">{{ field }}</div>
+                        </div>
+                        {% endfor %}
+                        <div class="form-group">
+                            <div class="col-sm-2 control-label">
+                                <font style="color:red">*</font>Pass Word
+                            </div>
+                            <div class="col-sm-10"><input type="password" name="passwd" required id="id_passwd" maxlength="30" class="form-control"></div>
+                        </div>
+                        <div style="display: none">
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" onclick="test_connect()" class="btn btn-white" style="float:left">Test Connect</button>
+                        <label id="result_testcon" style="float:left; padding:7px;"></label>
+                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal inmodal" id="update_slave" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+            <div class="modal-content animated fadeIn">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Update Slave</h4>
+                    <small class="font-bold"></small>
+                </div>
+                <form method="post" class="form-horizontal">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label">
+                                <font style="color:red">*</font>Host Password
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="password" name="passwd" required id="id_update_passwd" maxlength="30" class="form-control">
+                                <input type="hidden" name="slave_id" required id="id_update_slave_id" maxlength="30" class="form-control">
+                            </div>
+                            <div class="slick-loading" style="width:30px; height:30px; margin:2px 50%; position: absolute; display:none"></div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button id="id_hidden_submit" type="submit" style="display:none"></button>
+                        <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="update_slaveserver()">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="{% static 'js/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'js/plugins/fullcalendar/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/fullcalendar/fullcalendar.min.js' %}"></script>
+    <script>
+        var interval;
+        function show_modal(slave_id) {
+            $("#modal_slave_" + slave_id).modal();
+        }
+
+        function add_new_slave() {
+            $("#new_slave").modal();
+        }
+
+        function test_connect() {
+            ip = $('#id_ip').val();
+            hostname = $('#id_host_name').val();
+            username = $('#id_user_name').val();
+            passwd = $('#id_passwd').val();
+            if(ip == "") {
+                $("#result_testcon").html("Please input the ip!");
+                $("#result_testcon").css("color", "red");
+                $("#id_ip").focus();
+                return;
+            }
+            if(username == "") {
+                $("#result_testcon").html("Please input the User Name!");
+                $("#result_testcon").css("color", "red");
+                $("#id_user_name").focus();
+                return;
+            }
+            if(hostname == "") {
+                $("#result_testcon").html("Please input the hostname!");
+                $("#result_testcon").css("color", "red");
+                $("#id_host_name").focus();
+                return;
+            }
+            if(passwd == "") {
+                $("#result_testcon").html("Please input the Pass Word!");
+                $("#result_testcon").css("color", "red");
+                $("#id_passwd").focus();
+                return;
+            }
+            $("#result_testcon").css("color", "blue");
+            $("#result_testcon").html("connecting....");
+            $.post('/api/test_connect/', { 'ip': ip, 'hostname': hostname, 'username': username, 'passwd': passwd}, function(ret){
+                if(ret["result"]){
+                    $("#result_testcon").css("color", "green");
+                } else {
+                    $("#result_testcon").css("color", "red");
+                }
+                $("#result_testcon").html(ret["msg"]);
+            })
+        }
+
+        function check_install_status() {
+            $.get('/api/check_slave_install_status/', function(ret) {
+                if($.isEmptyObject(ret)){
+                    clearInterval(interval)
+                }
+                for(var id in ret){
+                    s = ret[id].split(",")[0];
+                    p = ret[id].split(",")[1];
+                    m = ret[id].split(",")[2];
+                    $("#id_install_stat_"+id).css("display", "block");
+                    $("#id_install_log_"+id).css("display", "block");
+                    $("#id_install_stat_"+id+" .progress-bar").css("width", p);
+                    $("#id_install_stat_"+id+" div div").html(s+" - "+p);
+                    $("#id_install_log_"+id).html(m);
+                    if(s == 'failed'){
+                        $("#id_install_stat_"+id+" div div").css("color", "red");
+                    }
+                }
+            })
+        }
+
+        function open_update_modal(slave_id) {
+            $("#id_update_slave_id").val(slave_id);
+            $("#update_slave").modal();
+        }
+
+        function update_slaveserver() {
+            $("#id_hidden_submit").click();
+            if($("#id_update_passwd").val() == ""){
+                return
+            }
+            $(".slick-loading").show();
+            $.post('/api/update_slaveserver/', {"slave_id": $("#id_update_slave_id").val(), "passwd": $("#id_update_passwd").val()}, function (ret) {
+                $("#update_slave").modal("hide");
+                $(".slick-loading").hide();
+                if(ret["result"] == 1) {
+                    toastr.success('update success!');
+                }
+                else {
+                    toastr.success('update failed!');
+                }
+            });
+        }
+
+        $("input[name='active_project']").change(function() {
+            var id = $(this).attr('aria-id');
+            var active = $(this).prop('checked');
+            $.post('/api/project/active/', {"id": id, "active": active}, function (ret) {
+                console.log(ret);
+            })
+        });
+
+        $(document).ready(function() {
+            $(".form-group label").addClass("col-sm-2 control-label");
+            $(".form-group input").addClass("form-control");
+
+            interval = setInterval("check_install_status()", 2000);
+            check_install_status();
+
+            var errs = $('{{ newslavefrom.errors }}').children("li");
+            if(errs.length > 0) {
+                $("#new_slave").modal();
+                $("#id_"+errs[0].childNodes[0].data).focus();
+                for(var i=0; i<errs.length; i++){
+                    var field_name = errs[i].childNodes[0].data;
+                    var msg = $(errs[i].childNodes[1]).text();
+                    $("#id_"+field_name).parent().append('<ul class="errmsg" style="margin-bottom:-2px; color:red;"><li>'+msg+'</li></ul>');
+                }
+            }
+            $("form input").change(function(){
+                $(this).siblings("ul.errmsg").remove();
+            });
+
+            var date = new Date();
+            var d = date.getDate();
+            var m = date.getMonth();    
+            var y = date.getFullYear();
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                editable: true,
+                droppable: true, // this allows things to be dropped onto the calendar
+                drop: function() {
+                    // is the "remove after drop" checkbox checked?
+                    if ($('#drop-remove').is(':checked')) {
+                        // if so, remove the element from the "Draggable Events" list
+                        $(this).remove();
+                    }
+                },
+                events: [
+                    
+                ]
+            });
+        });
+    </script>
+{% endblock %}

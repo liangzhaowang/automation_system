@@ -1,0 +1,6 @@
+cd /data
+chmod a+x WD_drive_Prepare_script.sh
+./WD_drive_Prepare_script.sh
+sleep 10
+exit
+

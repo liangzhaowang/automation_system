@@ -1,0 +1,326 @@
+tools:
+  - name: Systrace
+    script: tools/systrace/systrace_tool.py
+    unit: ''
+    loop: 1
+    arg: ''
+
+  - name: Socwatch
+    script: tools/socwatch/soc.py
+    unit: ''
+    loop: 1
+    arg: ''
+
+  - name: Memory
+    script: tools/memory/mem.py
+    unit: ''
+    loop: 1
+    arg: ''
+
+  - name: Bootgraph
+    script: tools/bootgraph/boot.py
+    unit: ''
+    loop: 1
+    arg: ''
+
+scripts:
+  - name: full_boot
+    group: { id: 1, name: 'boot' }
+    script: script/boot_analyze_2_0/boot_analyze_2_0.py
+    unit: sec
+    loop: 3
+    arg: -a -p 123456 -c configration_o.conf
+  - name: quick_boot
+    group: { id: 1, name: 'boot' }
+    script: script/quick_boot/bootanalyze.py
+    unit: sec
+    loop: 3
+    arg: -r -c runner/test_scripts/bxtp_ivi_o/script/quick_boot/config.yaml -a -n 2 -f -e 100 -w 50 -v -b -y -m WaitForDisplay=1000,SystemUi_start=12.5
+  - name: boot_file_cp0 patch list 601001, 615293
+    group: { id: 1, name: 'boot' }
+    script: script/boot_file_cp0/boot_file_cp0.py
+    unit: ''
+    arg: 'tmp'
+    positive:
+    loop: 1
+  - name: cold_boot_to_audio
+    group: { id: 1, name: 'boot' }
+    script: script/cold_boot_audio/boot_analyze_2_0.py
+    unit: sec
+    loop: 3
+    arg: -a
+
+  - name: Rlbench
+    group: { id: 2, name: 'Rlbench' }
+    apk: test_src/RL_Benchmark.apk
+    script: script/benchmark/adb_rlbench.py
+    unit: sec
+    loop: 1
+    arg: ''
+
+  - name: GFX5_openGL_high
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    unit: fps
+    loop: 1
+    itemtext: 'gl_5_high#ES 3.1'
+    arg: ''
+  - name: GFX5_openGL_high_off
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'gl_5_high_off#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_normal
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'gl_5_normal#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_normal_off
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'gl_5_normal_off#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Car_Chase
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'Car Chase#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Car_Chase_offscreen
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: '1080p Car Chase offscreen#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Manhattan31
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'Manhattan 3.1#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Manhattan31_1080_offscreen
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: '1080p Manhattan 3.1 Offscreen#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Manhattan311_1440_offscreen
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: '1440p Manhattan 3.1.1 Offscreen#ES 3.1'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_gl_manhattan_wqhd_off
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'gl_manhattan_wqhd_off#ES 3.0'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: GFX5_openGL_Manhattan
+    group: { id: 3, name: 'GFX5' }
+    apk: test_src/gfxbench_gl-5.0.0-RC4+corporate.armeabi-v7a.x86_64.arm64-v8a.x86.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'Manhattan#ES 3.0'
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: Gfx_manhattan_4013_offscreen
+    group: { id: 4, name: 'GFX4' }
+    apk: test_src/gfxbench_gl-4.0.13-candidate+corporate.x86_64.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: '1080p Manhattan Offscreen#ES 3.0'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: Gfx_manhattan_4013_onscreen
+    group: { id: 4, name: 'GFX4' }
+    apk: test_src/gfxbench_gl-4.0.13-candidate+corporate.x86_64.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'Manhattan#ES 3.0'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: 1080p_T-Rex_4013_offscreen
+    group: { id: 4, name: 'GFX4' }
+    apk: test_src/gfxbench_gl-4.0.13-candidate+corporate.x86_64.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: '1080p T-Rex Offscreen'
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: T-Rex_4013_onscreen
+    group: { id: 4, name: 'GFX4' }
+    apk: test_src/gfxbench_gl-4.0.13-candidate+corporate.x86_64.apk
+    script: script/benchmark/adb_gfx_gl4.py
+    itemtext: 'T-Rex'
+    unit: fps
+    loop: 1
+    arg: ''
+
+#   - name: JIO_Random_Read
+#     group: { id: 5, name: 'JIO' }
+#     apk: test_src/JIO_Benchmark_V1.7.2.apk
+#     script: script/benchmark/adb_jio_random.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+#   - name: JIO_Random_Write
+#     group: { id: 5, name: 'JIO' }
+#     apk: test_src/JIO_Benchmark_V1.7.2.apk
+#     script: script/benchmark/adb_jio_random.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+# 
+#   - name: vellamo_chrome_browser
+#     group: { id: 6, name: 'vellamo' }
+#     apk: test_src/Vellamo-3.2.apk
+#     script: script/benchmark/adb_vellamo.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+#   - name: Vellamo_Metal
+#     group: { id: 6, name: 'vellamo' }
+#     apk: test_src/Vellamo-3.2.apk
+#     script: script/benchmark/adb_vellamo.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+#   - name: vellamo_Multicore
+#     group: { id: 6, name: 'vellamo' }
+#     apk: test_src/Vellamo-3.2.apk
+#     script: script/benchmark/adb_vellamo.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+#   - name: Vellamo_webview_browser
+#     group: { id: 6, name: 'vellamo' }
+#     apk: test_src/Vellamo-3.2.apk
+#     script: script/benchmark/adb_vellamo.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+# 
+#   - name: MobileXPRT_ux
+#     group: { id: 7, name: 'MobileXPRT' }
+#     apk: test_src/MobileXPRTInstaller_64b_WW17.apk
+#     script: script/benchmark/adb_mobilexprt.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+#   - name: MobileXPRT_perf
+#     group: { id: 7, name: 'MobileXPRT' }
+#     apk: test_src/MobileXPRTInstaller_64b_WW17.apk
+#     script: script/benchmark/adb_mobilexprt.py
+#     unit: fps
+#     loop: 1
+#     arg: ''
+
+  - name: Antutu_5_6
+    group: { id: 8, name: 'Antutu' }
+    script: script/benchmark/adb_antutu_5_6.py
+    unit: score
+    loop: 1
+    arg: ''
+
+  - name: H264_2160P_60FPS
+    group: { id: 10, name: 'video' }
+    script: script/script_video/video_playback.py
+    app_package: com.android.gallery3d
+    app_activity: .app.GalleryActivity
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: H264_1080P_60FPS
+    group: { id: 10, name: 'video' }
+    script: script/script_video/video_playback.py
+    app_package: com.android.gallery3d
+    app_activity: .app.GalleryActivity
+    unit: fps
+    loop: 1
+    arg: ''
+#   - name: H264_720P_30FPS
+#     group: { id: 10, name: 'video' }
+#     script: script/script_video/video_playback.py
+#     app_package: com.google.android.apps.photos
+#     app_activity: com.google.android.apps.photos.home.HomeActivity
+#     unit: fps
+#     loop: 1
+#     arg: ''
+  - name: H265_2K_8bit
+    group: { id: 10, name: 'video' }
+    script: script/script_video/video_playback.py
+    app_package: com.android.gallery3d
+    app_activity: .app.GalleryActivity
+    unit: fps
+    loop: 1
+    arg: ''
+  - name: H265_2K_10bit
+    group: { id: 10, name: 'video' }
+    script: script/script_video/video_playback.py
+    app_package: com.android.gallery3d
+    app_activity: .app.GalleryActivity
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: demo
+    group: { id: 11, name: 'demo' }
+    script: script/demo/demo.py
+    unit: fps
+    arg: ''
+    positive: 
+    loop: 1
+
+  - name: eavb
+    group: { id: 12, name: 'eavb' }
+    script: script/script_eavb/boot_analyze_1_4_000.py
+    unit: sec
+    loop: 3
+    arg: -e -i config/bxtp_o_config
+
+  - name: gallery_imge_list
+    group: { id: 13, name: 'gallery' }
+    script: script/script_fps/Flinging_image_list_in_Gallery.py
+    app_package: com.android.gallery3d
+    app_activity: com.android.gallery3d.app.GalleryActivity
+    unit: fps
+    loop: 1
+    arg: ''
+
+  - name: Resume_time
+    group: { id: 9, name: 'Resume' }
+    script: script/suspend_resume/resume_time.py
+    unit: msec
+    loop: 3
+    arg: ''
+  - name: stability_resume
+    group: { id: 14, name: 'StabilityResume' }
+    script: script/suspend_resume/resume_ttyUSB3.py
+    unit:
+    positive:
+    loop: 1
+    arg: ''

@@ -1,0 +1,5 @@
+*.pyc
+*~
+.idea/*
+runner/test_scripts/*/*/2018*/
+runner/test_scripts/*/*/*/2018*/

@@ -1,0 +1,4 @@
+cd /data
+chmod a+x fio_rand_write-sh
+./fio_rand_write-sh
+exit

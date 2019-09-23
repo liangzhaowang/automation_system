@@ -1,0 +1,358 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/plugins/w3/w3.css" rel="stylesheet" type="text/css">
+<style>
+    .table > tbody > tr > td {
+        padding: 5px;
+        text-overflow: ellipsis; /* for IE */
+        -moz-text-overflow: ellipsis; /* for Firefox,mozilla */
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .searchbar{
+        width: 500px;
+        float: right;
+    }
+
+    .font_gray_color{
+        color:rgb(103, 106, 108);
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div class="ibox">
+        <div id="wrapper">
+            <div id="page-wrapper" class="gray-bg">
+                <div class="ibox-content">
+                <div class="row border-bottom white-bg">
+                    <nav class="navbar navbar-static-top">
+                        <div class="navbar-collapse collapse">
+                               <div class="w3-dropdown-hover w3-hide-small top-block">
+                                    <button class="w3-button mtx-hover-blue font_gray_color" id="drpdbtn-project" title="">Project <i class="fa fa-caret-down"></i></button>
+                                    <div class="w3-dropdown-content w3-card-4 w3-bar-block w3-small mtx-max-width-240 font_gray_color" id="prj-select" user_name={{Muser}} >
+                                        {% for P_project in Mproject %}
+                                        <a class="w3-bar-item w3-button w3-padding-tiny prj-opt" id="{{P_project}}" onclick="change_project(this)">{{P_project}}</a>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+
+                                <div class="w3-dropdown-hover w3-hide-small top-block">
+                                    <button class="w3-button mtx-hover-blue font_gray_color" title="" id="drpdbtn-device">Device <i class="fa fa-caret-down"></i></button>
+                                    <div class="w3-dropdown-content w3-card-4 w3-bar-block w3-small mtx-max-width-240 font_gray_color" id="dvc-select">
+
+                                    </div>
+                                </div>
+
+                                <div class="w3-dropdown-hover w3-hide-small top-block">
+                                    <button class="w3-button mtx-hover-blue font_gray_color" title="" id="drpdbtn-dist">Distro <i class="fa fa-caret-down"></i></button>
+                                    <div class="w3-dropdown-content w3-card-4 w3-bar-block w3-small mtx-max-width-240 font_gray_color" id="dist-select">
+
+                                    </div>
+                                </div>
+
+                                <div class="w3-dropdown-hover w3-hide-small top-block">
+                                    <button class="w3-button mtx-hover-blue font_gray_color" title="" id="drpdbtn-testcycle">Test Cycle <i class="fa fa-caret-down"></i></button>
+                                    <div class="w3-dropdown-content w3-card-4 w3-bar-block w3-small mtx-max-width-240 font_gray_color" id="testcycle-select">
+                                      <a class="w3-bar-item w3-button w3-padding-tiny testcycle-opt" id="Weekly" testcycle="Weekly" onclick="change_testcycle(this)">Weekly</a>
+                                      <a class="w3-bar-item w3-button w3-padding-tiny testcycle-opt" id="Daily" testcycle="Daily" onclick="change_testcycle(this)">Daily</a>
+                                      <a class="w3-bar-item w3-button w3-padding-tiny testcycle-opt" id="DevTest" testcycle="DevTest" onclick="change_testcycle(this)">On-demand</a>
+                                    </div>
+                                </div>
+
+                                <div align="right" padding="10" class="searchbar">
+                                    <form name="input" aria-name="{{ searchTree }}" style="padding-right: 30px;">
+                                        JiraTree Search: <input type="text" name="subkey" id="input_data"/>
+                                        <input type="button" value="SeachTree" class="btn btn-primary" onclick="clicksubmit(this)"/>
+                                    </form>
+                                </div>
+                        </div>
+                        <div id="prfrnc" class="w3-threeauarter w3-container" style="background:rgb(0, 113, 197);color:#fff">
+                            <span >Preferences:</span>
+                             <!--Android | BXTP IVI Entry 1G | 1A M | Weekly | Two builds-->
+                            <span id="stat_project"></span>
+                            <span>|</span>
+                            <span id="stat_device"></span>
+                            <span>|</span>
+                            <span id="stat_distro"></span>
+                            <span>|</span>
+                            <span id="stat_testcycle"></span>
+                        </div>
+                    </nav>
+                </div>
+                    <!-- loading spinner -->
+                    <!--   <div id="top-spinner" class="w3-modal w3-display-middle"> -->
+                    <div id="top-spinner" class="w3-top-spinner" style="display:none">
+                        <i class="fa fa-spinner fa-spin" style="font-size:4em;color:blue;"></i>
+
+                    </div>
+                <div id="metrix_container" style="overflow:auto">
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
+{% block js %}
+<script>
+var project= 'Android'
+var device;
+var distro;
+var testcycle = 'Weekly'
+var data_obj;
+$(document).ready(function(){
+    show_desktop();
+    get_default_config(project,set_state_metrix);
+});
+
+function set_state_metrix(project, device, distro,testcycle){
+    get_display_config();
+    var value = 'project='+encodeURIComponent(project)+'&device='+encodeURIComponent(device)+'&distro='+encodeURIComponent(distro)+'&usergroup=PnP%20SQE&testcycle='+encodeURIComponent(testcycle)+'&sessiona=0&sessionb=0';
+    $('#stat_project').html(project);
+    <!--console.log(value);-->
+    $('#stat_device').html(decodeURIComponent(device));
+    $('#stat_distro').html(decodeURIComponent(distro));
+    $('#stat_testcycle').html(decodeURIComponent(testcycle));
+
+    $.ajax({
+        url: "/metrix/data/",
+        type: "post", // or "get"
+        data: value,
+        success: function(data) {
+            $('#metrix_container').html(data)
+        },
+        complete: function(XMLHttpRequest, textStatus){
+        document.getElementById('top-spinner').style.display='none';
+        }
+
+        });
+}
+
+function set_scroll_menu(data_obj){
+    <!--console.log( "key is " + project + ", value is " + Object.keys(data_obj[project]) );-->
+    var device_keys = Object.keys(data_obj[project]);
+    $('#dvc-select').html('')
+    $('#dist-select').html('')
+    for(dev in device_keys){
+        if(device_keys[dev] != 'roles'){
+        $('#dvc-select').append('<a class="w3-bar-item w3-button w3-padding-tiny dvc-opt" id=\"'+device_keys[dev]+'\" onclick="change_device(this)">'+device_keys[dev]+'</a>')
+        }
+    }
+    <!--console.log( "device is " + device );-->
+    var Distro_keys = Object.values(data_obj[project][decodeURIComponent(device)])
+
+    for(dist in Distro_keys){
+        $('#dist-select').append('<a class="w3-bar-item w3-button w3-padding-tiny dvc-opt" id=\"'+Distro_keys[dist]+'\" onclick="change_distro(this)">'+Distro_keys[dist]+'</a>')
+    }
+}
+
+function get_display_config(){
+    username = $('#prj-select').attr("user_name");
+
+    var url ="https://metrix.sh.intel.com/sqe/ajax_transaction/metrix/iamws_authorizations_endpoint_onestep.jsp";
+    var Metrix_data= 'user=CCR\\'+username;
+    $.getJSON(
+        url,
+        Metrix_data,
+        function(data) {
+            <!--console.log(data[0]);-->
+            data_obj = data[0];
+            set_scroll_menu(data_obj)
+        },
+
+    );
+}
+
+function get_default_config(project,FUN){
+        data = 'project='+encodeURIComponent(project)
+
+        $.ajax({
+        url: "/metrix/get_dedualt_config/",
+        type: "get",
+        data: data,
+        success: function(data) {
+                project = data.project;
+                device = data.device;
+                distro = data.distro;
+                FUN(project, device, distro,testcycle);
+        },
+        complete: function(XMLHttpRequest, textStatus){
+
+        }
+
+        });
+        return 1;
+
+}
+
+
+function clicksubmit(elem){
+    var bug_id = $('#input_data').val();
+    var dir = $(elem).parent().attr("aria-name");
+    bug_id = bug_id.replace(/(^\s+)|(\s+$)/g,"");
+    bug_id = bug_id.toUpperCase();
+    reg = /^[A-Z]+-[0-9]+$/
+    //console.log(elem.data)
+	var selector = $(elem)
+    if(reg.test(bug_id)){
+        $.ajax({
+        url: '/metrix/jira_raw_data/'+bug_id+':'+dir+'/',
+        type: "get",
+        beforeSend: function(XMLHttpRequest){
+            selector.attr({"disabled":"disabled"});
+        },
+        success: function(data) {
+            <!--console.log('success');-->
+        },
+        complete: function(XMLHttpRequest, textStatus){
+                <!--console.log('complete');-->
+                $.ajax({
+                url: '/metrix/examp/'+bug_id+':'+dir+'/',
+                type: "get",
+                success: function(data) {
+                    var openstr = '/metrix/examp_templates/examps'+bug_id+'_'+dir+'.html';
+                    openWins(openstr);
+                    },
+                complete: function(XMLHttpRequest, textStatus){
+                    document.getElementById('top-spinner').style.display='none';
+                    selector.removeAttr("disabled");
+                    },
+                error: function(jqXHR, textStatus, errorThrown){
+                    selector.removeAttr("disabled");
+                }
+                });
+            },
+        error: function(jqXHR, textStatus, errorThrown){
+            selector.removeAttr("disabled");
+            }
+
+        });
+    }
+    else{
+        alert("please input keynote like 'OAM-00000'")
+    }
+}
+
+
+function openWins(openurl) {
+           var name="_blank";
+           var iWidth=950;
+           var iHeight=600;
+           var iTop = (window.screen.availHeight - 30 - iHeight) / 2;
+           var iLeft = (window.screen.availWidth - 10 - iWidth) / 2;
+           window.open(openurl, name, 'height=' + iHeight + ',,innerHeight=' + iHeight + ',width=' + iWidth + ',innerWidth=' + iWidth + ',top=' + iTop + ',left=' + iLeft + '');
+
+       }
+
+function change_project(elem){
+	//console.log("change_project");
+	//change project
+	//console.log(elem.id);
+
+	if( elem.id == project ) {
+        shading_desktop();
+		return;
+        }
+	// clear filter options
+	clear_datatable_filter();
+    show_desktop();
+	project = elem.id;
+	<!--console.log(elem.id);-->
+    get_default_config(project,req_report_data_twinbuilds);
+
+
+}
+
+function change_testcycle(elem){
+	//console.log("change_project");
+	//change project
+	//console.log(elem.id);
+
+	if( elem.id == project ) {
+        shading_desktop();
+		return;
+        }
+	// clear filter options
+	clear_datatable_filter();
+    show_desktop();
+	testcycle = elem.id;
+	req_report_data_twinbuilds( project, device, distro,testcycle);
+
+}
+
+function change_device( elem ){
+	//console.log("change_device");
+	//change device
+
+	if( elem.id == device ) {
+             shading_desktop();
+             return;
+        }
+	// clear filter options
+	clear_datatable_filter();
+	show_desktop();
+	device = elem.id;
+	req_report_data_twinbuilds( project, device, distro, testcycle);
+
+}
+
+function show_desktop(){
+	document.getElementById('top-spinner').style.display = 'block';
+}
+function shading_desktop(){
+	document.getElementById('top-spinner').style.display = 'block';
+	setTimeout(function(){ document.getElementById('top-spinner').style.display = 'none'; }, 300);
+}
+
+function clear_datatable_filter(){
+	$("#metrix_container").html('');
+}
+
+function change_distro( elem ){
+
+
+	if( elem.id == distro ) {
+             shading_desktop();
+             return;
+        }
+	clear_datatable_filter();
+	show_desktop();
+	distro = elem.id;
+	req_report_data_twinbuilds( project, device, distro, testcycle);
+
+}
+
+function req_report_data_twinbuilds( project, device, distro ,testcycle) {
+
+    set_scroll_menu(data_obj);
+    $('#stat_project').html(project);
+    $('#stat_device').html(decodeURIComponent(device));
+    $('#stat_distro').html(decodeURIComponent(distro));
+    $('#stat_testcycle').html(decodeURIComponent(testcycle));
+    <!--console.log( "Get reportData from database" );-->
+    key="project="+encodeURIComponent(project)+"&device="+encodeURIComponent(device)+"&distro="+encodeURIComponent(distro)+"&usergroup=PnP%20SQE&testcycle="+encodeURIComponent(testcycle)+"&sessiona=0&sessionb=0",
+    $.ajax({
+        url: "/metrix/data/",
+        type: "post", // or "get"
+        data: key,
+        success: function(data) {
+            $('#metrix_container').html(data)
+        },
+        complete: function(XMLHttpRequest, textStatus){
+            document.getElementById('top-spinner').style.display='none';
+        }
+
+    });
+
+
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+echo "Running Sequential Read test"
+echo "Number of jobs 32"
+sleep 1
+sync && echo 3 > /proc/sys/vm/drop_caches && ./fio --name=seq_read --rw=read --size=64m  --bs=1024k --direct=0 --iodepth=64 --ioengine=sync --directory=/data/local/tmp --numjobs=32 --output=/data/FIO_Seq_RD_Run1.txt
+sleep 5
+sync && echo 3 > /proc/sys/vm/drop_caches && ./fio --name=seq_read --rw=read --size=64m  --bs=1024k --direct=0 --iodepth=64 --ioengine=sync --directory=/data/local/tmp --numjobs=32 --output=/data/FIO_Seq_RD_Run2.txt
+sleep 5
+sync && echo 3 > /proc/sys/vm/drop_caches && ./fio --name=seq_read --rw=read --size=64m  --bs=1024k --direct=0 --iodepth=64 --ioengine=sync --directory=/data/local/tmp --numjobs=32 --output=/data/FIO_Seq_RD_Run3.txt
+sleep 5
+sync && echo 3 > /proc/sys/vm/drop_caches && ./fio --name=seq_read --rw=read --size=64m  --bs=1024k --direct=0 --iodepth=64 --ioengine=sync --directory=/data/local/tmp --numjobs=32 --output=/data/FIO_Seq_RD_Run4.txt
+echo "done"
+sleep 5

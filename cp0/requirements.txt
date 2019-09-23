@@ -1,0 +1,13 @@
+django<2
+django-cors-headers
+redis
+pyyaml
+requests
+attr
+pymongo
+numpy
+xlwt
+celery
+django-celery-results
+raven
+sentry_sdk

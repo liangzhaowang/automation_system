@@ -1,0 +1,278 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block css %}
+    <style>
+        .comparision td {
+            position: relative;
+        }
+
+        .comparision-hide {
+            display: none;
+        }
+
+        .comparision-build-info {
+            width: 200px;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <table id="test_info" class="table comparision m-b-xxs">
+                        <tbody>
+                            <tr class="no-padding">
+                                <td id="blank" data-model-name="blank"></td>
+                                <td aria-test="1" style="width: 200px">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">project</text>
+                                            <text x="35" y="14">project</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ curr_data.project }}</text>
+                                            <text x="125" y="14">{{ curr_data.project }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">build</text>
+                                            <text x="35" y="14">build</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ curr_data.build }}</text>
+                                            <text x="125" y="14">{{ curr_data.build }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">test</text>
+                                            <text x="35" y="14">test</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ curr_data.test_id }}</text>
+                                            <text x="125" y="14">{{ curr_data.test_id }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#46BC99" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">result</text>
+                                            <text x="35" y="14">result</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ curr_data.result }}</text>
+                                            <text x="125" y="14">{{ curr_data.result }}</text>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                </td>
+                                {% for data in cmp_data %}
+                                    <td aria-test="1" style="width: 200px">
+                                    <div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">project</text>
+                                            <text x="35" y="14">project</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ data.project }}</text>
+                                            <text x="125" y="14">{{ data.project }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">build</text>
+                                            <text x="35" y="14">build</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ data.build }}</text>
+                                            <text x="125" y="14">{{ data.build }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#0366d6" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">test</text>
+                                            <text x="35" y="14">test</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ data.test_id }}</text>
+                                            <text x="125" y="14">{{ data.test_id }}</text>
+                                        </g>
+                                    </svg>
+                                    <br>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="184" height="20">
+                                        <linearGradient id="b" x2="0" y2="100%">
+                                            <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
+                                            <stop offset="1" stop-opacity=".1"/>
+                                        </linearGradient>
+                                        <clipPath id="a">
+                                            <rect width="184" height="20" rx="3" fill="#fff"/>
+                                        </clipPath>
+                                        <g clip-path="url(#a)">
+                                            <path fill="#555" d="M0 0h69v20H0z"/>
+                                            <path fill="#46BC99" d="M69 0h115v20H69z"/>
+                                            <path fill="url(#b)" d="M0 0h184v20H0z"/>
+                                        </g>
+                                        <g fill="#fff" text-anchor="middle"
+                                           font-family="DejaVu Sans,Verdana,Geneva,sans-serif" font-size="11">
+                                            <text x="35" y="15" fill="#010101" fill-opacity=".3">result</text>
+                                            <text x="35" y="14">result</text>
+                                            <text x="125" y="15" fill="#010101" fill-opacity=".3">{{ data.result }}</text>
+                                            <text x="125" y="14">{{ data.result }}</text>
+                                        </g>
+                                    </svg>
+                                    </div>
+                                </td>
+                                {% endfor %}
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="height: 100px; overflow:scroll;" id="content">
+                        <table id="test_data" class="table table-bordered table-striped table-hover comparision">
+                            <tbody>
+                                {% for raw in curr_raw %}
+                                    <tr>
+                                        <td id="stage{{ forloop.counter0 }}" data-model-name="stage">
+                                            <span class="badge badge-plain">{{ raw.remark }}</span>
+                                             to<br>
+                                            <span class="badge badge-plain">{{ raw.next_remark }}</span>
+                                        </td>
+                                        <td aria-test="1" style="width: 200px;">
+                                            {{ raw.start }} <i class="fa fa-arrow-right"></i> {{ raw.next_start }}
+                                        </td>
+                                        <td aria-test="2" style="width: 200px;">
+                                            {% ifequal raw.cmp_start.0 None %}
+                                            None
+                                            {% else %}
+                                            {{ raw.cmp_start.0 }} <i class="fa fa-arrow-right"></i> {{ raw.cmp_next_start.0 }}
+                                            <br>
+                                            <div class="stat-percent font-bold {{ raw.cmp_delta_class }}">{{ raw.cmp_delta.0|default_if_none:"<i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>" }}</div>
+                                            {% endifequal %}
+                                        </td>
+                                        <td aria-test="3" style="width: 200px;">
+                                            {% ifequal raw.cmp_start.1 None %}
+                                            None
+                                            {% else %}
+                                            {{ raw.cmp_start.1 }} <i class="fa fa-arrow-right"></i> {{ raw.cmp_next_start.1 }}
+                                            <br>
+                                            <div class="stat-percent font-bold {{ raw.cmp_delta_class }}">{{ raw.cmp_delta.1|default_if_none:"<i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>" }}</div>
+                                            {% endifequal %}
+                                        </td>
+                                        <td aria-test="4" style="width: 200px;">
+                                            {% ifequal raw.cmp_start.2 None %}
+                                            None
+                                            {% else %}
+                                            {{ raw.cmp_start.2 }} <i class="fa fa-arrow-right"></i> {{ raw.cmp_next_start.2 }}
+                                            <br>
+                                            <div class="stat-percent font-bold {{ raw.cmp_delta_class }}">{{ raw.cmp_delta.2|default_if_none:"<i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i>" }}</div>
+                                            {% endifequal %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+<script>
+$(document).ready(function () {
+    $("#content").height($(document).height() - 350);
+    $("#test_info").width($("#test_data").width());
+})
+</script>
+{% endblock %}

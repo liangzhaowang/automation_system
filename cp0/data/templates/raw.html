@@ -1,0 +1,314 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="{% static 'css/plugins/footable/footable.core.css' %}" rel="stylesheet" type="text/css">
+    <style>
+    .btns{
+        border-Radius: 0px;
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row" id="main" aria-task-id="{{ task.id }}">
+    <div class="col-lg-3">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h3><small>build</small> {{ build }}</h3>
+                {{ test_id_list|length }} tests
+            </div>
+            <div class="ibox-content">
+                <ul class="list-group clear-list">
+                    {% for test in test_id_list reversed %}
+                    <li class="list-group-item {% ifequal forloop.counter0 0 %}fist-item{% endifequal %}">
+                        <div class="pull-right"><span class="badge badge-success">{{ test.test_count }}</span></div>
+                        {% if show_del %}
+                        <div class="btn-group">
+                            <button data-toggle="dropdown" class="btn btn-info btn-xs dropdown-toggle">convert
+                            <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <button class="btns btn-info btn-xs" style="width: 30%" onclick="change(this, '{{ project_name }}','daily','{{ test.test_id }}')"><a>Daily</a></button><input type="text" style="width: 70%">
+                                </li>
+                                <li>
+                                    <button class="btns btn-info btn-xs" style="width: 30%" onclick="change(this, '{{ project_name }}','bkc','{{ test.test_id }}')"><a>Bkc</a></button><input type="text" style="width: 70%">
+                                </li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <a  href="/raw/{{ project_name }}/{{ build }}/{{ test.test_id }}" style="color: {{ test.color }}">
+                            {{ test.test_id }} {% ifequal test_id test.test_id %}<i class="fas fa-arrow-circle-left"></i>{% endifequal %}
+                        </a>
+                        <br>
+                        <small>
+                            {% ifequal test.task None %}
+                            Unknown
+                            {% else %}
+                            {{ test.task.submitter.last_name }}, {{ test.task.submitter.first_name }}
+                            {% endifequal %}
+                        </small>
+                        {% ifnotequal test.mt_comment|length 0 %}
+                            <small>
+                                <p style="margin-bottom:0px;" class="text-muted">{{ test.mt_comment.Board }}</p>
+                                <p class="text-muted">{{ test.mt_comment.Comment }}</p>
+                            </small>
+                        {% else %}
+                            <small><p class="text-muted">{{ test.task.comment }}</p></small>
+                        {% endifnotequal %}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-9">
+        <div class="social-feed-box">
+            <div class="social-body">
+                <div class="tag-list">
+                    <span class="tag-item">Project | {{ project_name }}</span>
+                    <span class="tag-item">Build | <a target="_blank" href="{{ config.buildbot_link }}">{{ build }}</a></span>
+                    <span class="tag-item">Test | {{ test_id }}</span>
+                    <span class="tag-item">Create | {{ task.create_time }}</span>
+                    <span class="tag-item">Config | <a name="config" aria-config="{{ task.test_config }}" href="#">{{ task.test_config }}</a></span>
+                    <span class="tag-item">Slave | 
+                        {% if task.test_tag == 'mt' %}
+                        <i class="fas fa-user"></i>
+                        {% else %}
+                        {{ task.slave.num }}
+                        {% endif %}</span>
+                    <span class="tag-item">Task | {{ task.id }}</span>
+                    <span class="tag-item">Compare | <a aria-data="{{ project_name }}/{{ current_build }}/{{ test_id }}//"
+                        name="add_cmp" href="#"><i class="fa fa-exchange-alt"></i></a></span>
+                    <span class="tag-item">Duration | {{ task.duration_time }}</span>
+                </div>
+            </div>
+            {% ifnotequal task None %}
+            <div class="social-avatar">
+                <a href="" class="pull-left">
+                    <img alt="image"
+                            src="/static/img/avatars/{{ task.submitter.usercpz.get_avatar }}">
+                </a>
+                <div class="media-body">
+                    <a href="#">
+                        {{ task.submitter.last_name }}, {{ task.submitter.first_name }}
+                    </a>
+                    <small class="text-muted">{{ task.create_time }}</small>
+                </div>
+            </div>
+            <div class="social-body">
+                <p>
+                    {% ifnotequal task.comment '' %}
+                        {% if task.comment|length > 100 %}
+                            <small><p class="text-muted">{{ task.test_tag }}</p></small>
+                        {% else %}
+                            <small><p class="text-muted">{{ task.comment }}</p></small>
+                        {% endif %}
+                    {% endifnotequal %}
+                </p>
+            </div>
+            <div class="social-footer">
+                <div id="div_replies">
+                    {% for m in message %}
+                        <div class="social-comment">
+                            <a href="" class="pull-left">
+                                <img alt="image" src="/static/img/avatars/{{ m.user.usercpz.get_avatar }}">
+                            </a>
+                            <div class="media-body">
+                                <a href="#">
+                                    {{ m.user.last_name }}, {{ m.user.first_name }}
+                                </a>
+                                {{ m.content }}
+                                <br>
+                                <small class="text-muted">{{ m.create_time|date:'M j, Y, f A' }}</small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <div class="social-comment">
+                    <div class="media-body">
+                        <textarea id="text_comment" class="form-control m-b-sm"
+                                    placeholder="Write comment..." aria-avatar="{{ user.usercpz.get_avatar }}"
+                                    aria-user="{{ user.last_name }}, {{ user.first_name }}"></textarea>
+                        <button class="btn btn-xs btn-primary" onclick="submit_comment()">Reply</button>
+                        <button class="btn btn-xs btn-danger" onclick="clear_comment()">Clear</button>
+                    </div>
+                </div>
+            </div>
+            {% endifnotequal %}
+        </div>
+        <div class="ibox">
+            <div class="ibox-title">
+                <h3>Summary</h3>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-stripped table-bordered no-margins" id="table_summary">
+                    <thead>
+                    <tr>
+                        <th>Test Case</th>
+                        <th>Median</th>
+                        <th>Average</th>
+                        <th>Max.</th>
+                        <th>Min.</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for result in data %}
+                        <tr>
+                            <td name="trends" style="cursor:pointer;">
+                                <a href="#case_{{ result.case_name }}">{{ result.case_name }}</a>
+                            </td>
+                            <td>{{ result.median }}</td>
+                            <td>{{ result.average }}</td>
+                            <td>{{ result.maximum }}</td>
+                            <td>{{ result.minimum }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% include 'raw_table.html' %}
+    </div>
+</div>
+<div class="modal inmodal" id="modal" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="config_title" name="test_config"></h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                    <tr>
+                        <td style="width:100px;">Project</td>
+                        <td id="project_name"></td>
+                    </tr>
+                    <tr>
+                        <td>Skip Flash</td>
+                        <td id="skip_flash"></td>
+                    </tr>
+                    <tr>
+                        <td>Tag</td>
+                        <td id="tag"></td>
+                    </tr>
+                    <tr>
+                        <td>Method</td>
+                        <td id="patch_method"></td>
+                    </tr>
+                    <tr>
+                        <td>Case</td>
+                        <td id="case_name"></td>
+                    </tr>
+                    <tr>
+                        <td>Based on</td>
+                        <td id="based_on"></td>
+                    </tr>
+                    <tr>
+                        <td>Patch</td>
+                        <td id="patch"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/plugins/footable/footable.all.min.js' %}"></script>
+
+<script>
+    $("a[name='add_cmp']").on("click", function () {
+        $.post('/api/add_to_compare_list/', {data: $(this).attr("aria-data")}, function (ret) {
+            if (ret == '1') {
+                location.reload();
+            } else if(ret == '-1') {
+                alert('comparison type is mismatching, please clear compare container first.');
+            }
+        })
+    })
+
+    function clear_comment() {
+        $("#text_comment").val('');
+    }
+
+    function submit_comment() {
+        var content = $("#text_comment").val();
+        $.post(
+            "/api/add_comment",
+            {"task_id": $("#main").attr("aria-task-id"), "content": content},
+            function (data) {
+                if (data.status == "success") {
+                    clear_comment();
+                    var template = "<div class=\"social-comment\">\n" +
+                        "<a href=\"\" class=\"pull-left\">\n" +
+                        "<img alt=\"image\" src=\"/static/img/avatars/" +
+                        $("#text_comment").attr('aria-avatar') + "\">\n</a>\n" +
+                        "<div class=\"media-body\">\n<a href=\"#\">\n" +
+                        $("#text_comment").attr('aria-user') +
+                        "</a>\n" +
+                        content +
+                        "<br>\n" +
+                        "<small class=\"text-muted\">" + data.datetime + "</small>\n" +
+                        "</div>\n" +
+                        "</div>"
+                    $("#div_replies").append(template);
+                }
+            }
+        )
+    }
+
+
+    function view_attachment(id) {
+        var url = $('#' + id).val();
+        window.open('/' + url);
+    }
+
+    function dl_attachment(id) {
+        var url = '/download/' + $('#' + id).val();
+        window.location.href = url;
+    }
+
+    $('table[name="table_detail"]').footable({paginate: false});
+
+    $("a[name='config']").on("click", function () {
+        $.get("/api/show_config/" + $(this).attr("aria-config"), function (data) {
+            $("p[name='test_config']").empty();
+            $("#patch").empty();
+            $("#based_on").empty();
+            $("#config_title").html(data.build);
+            $("#project_name").html(data.project_name);
+            $("#skip_flash").html(data.skip_flash);
+            $("#tag").html(data.tag);
+            $("#patch_method").html(data.patch_method);
+            $("#case_name").html(data.case_names);
+            $("#based_on").html(data.based_link);
+            $("#patch").html(data.patches);
+        })
+        $("#modal").modal()
+    });
+    function change(obj, project,collection,testid){
+        var inputtext= $(obj).parent().find("input").val();
+        $(obj).parent().find("input").val("");
+        if (inputtext){
+            $.post("/api/convert",{'project':project, 'collection':collection ,'build':inputtext, 'testid':testid},function (ret) {
+                alert(ret)
+            })
+        }
+        else {
+            alert('please input build info');
+            return false
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,1219 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="/static/css/plugins/fullcalendar/fullcalendar.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/github-markdown.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet" type="text/css">
+    <style>
+        .patch-selector {
+            width: 1380px;
+        }
+
+        .cate-control,
+        .single-line {
+            background-color: #FFFFFF;
+            background-image: none;
+            border: 1px solid #999;
+            border-radius: 1px;
+            color: inherit;
+            display: block;
+            padding: 6px 12px;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+            width: 100%;
+            font-size: 14px;
+        }
+        #title1{
+            text-transform: uppercase;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5 id="title1">BXTP IVI {{ project }} BKC PATCHES DASHBOARD <span class="badge">{{counts}}</span></h5>
+                <div class="pull-right">
+                    <span class="fa fa-star"></span>&nbsp;Patch Data will refresh after one minute
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th  style="text-align:center;">
+                            <input id="allselects" type="checkbox" onclick="slectsalls()" checked="checked"/>
+                        </th>
+                        <th  style="text-align:center;">
+                            Time
+                        </th>
+                        <th  style="text-align:center;">
+                            Patch
+                        </th>
+                        <th  style="text-align:center;">
+                            Owner
+                        </th>
+                        <th  style="text-align:center;">
+                            Subject
+                        </th>
+                        <th  style="text-align:center;">
+                            Status
+                        </th>
+                        <th  style="text-align:center;">
+                            Tracked_id
+                        </th>
+                        <th  style="text-align:center;">
+                            Category
+                        </th>
+                        <th  style="text-align:center;">
+                            Comments
+                        </th>
+                        <th  style="text-align:center;">
+                            Action
+                        </th>
+                    </tr>
+                    </thead>
+                    {% for i in str %}
+                    <tr>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <input  class="qxs" type="checkbox" id="{{i.shortpatch}}"  checked="checked" onclick="discopy()"/>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.fomartted_date}}
+                        </td>
+                        <td  class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <a href={{i.patch}}  name="alltest" target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.shortpatch}}</a>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.owner}}
+                        </td>
+                        <td class="text-left no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.subject}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.status}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <div class="readonly">
+                                {% ifequal i.track 'None' %} {{i.track}} {% else %}
+                                <a href={{i.track}} target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.data}}</a><br>                                                        {% endifequal %}
+                            </div>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.category}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.comments}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 10px;vertical-align: middle">
+                            <input type="submit" value="Delete" onclick="deltips({{i.id}})" class="btn btn-primary btn-xs" style="font-size: 12px;vertical-align: middle"
+                            />
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </table><br>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <textarea class="form-control" rows="10" id="clipboard"  style="text-align:left;font-size: 13px;width:-webkit-fill-available;background-color: #FFFFFF" readonly="readonly">{{clipboard}}</textarea><br><br>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <input type="button" onClick="copypatch()" value="Copy To Clipboard" class="btn btn-primary block  m-b" style="height:35px;font-size: 13px;"/>
+                            </div>
+                            <div class="col-lg-6">
+                                <button class="btn btn-primary text-center" data-toggle="modal" data-target="#Eblink" style="height:35px;font-size: 13px" onclick="Get_list()">Generate Bkc</button>
+                                <div class="modal fade" id="Eblink" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    Please Select
+                                                </h4>
+                                            </div>
+                                            <div class="modal-body" style="padding: 10px 10px 10px 10px">
+                                                <select id="slist" class="form-control m-b" rows="2">
+                                                </select>
+                                                <select id="project" class="form-control m-b" rows="2">
+                                                </select>
+                                                <select id="slave" class="form-control m-b" rows="2">
+                                                </select>
+                                            </div>
+                                            <div id="BKC" class="modal-footer">
+                                                <button type="button" onclick="BKC()" class="btn btn-primary">submit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=col-lg-6>
+                        <div class="form-group">
+                            <select id="cate" class="form-control m-b">
+                                <option>=== select category ===</option>
+                                <option>s2r</option>
+                                <option>cold boot opt</option>
+                                <option>graphics</option>
+                                <option>wifi</option>
+                                <option>debug only</option>
+                                <option>others</option>
+                            </select>
+                            {% csrf_token %}
+                            <textarea class="form-control"  id="comments" placeholder="comments" rows="1" style="width:-webkit-fill-available;margin-bottom: 18px"></textarea>
+                            <textarea class="form-control" placeholder="Add Patch Here" rows="4" id="pnp" style="width:-webkit-fill-available"></textarea><br><br>
+                                <div id="add" class="bs-example">
+                                    <button type="button" onclick="submit()" class="btn btn-primary " style="height:35px;width:150px;font-size: 13px;" data-loading-text="Loading...">Add Patch</button><br>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>ALL PATCH LIST HISTORY</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="width:65%">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 id="build_no" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>TIME</td>
+                        <td id="h1" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>PATCH</td>
+                        <td id="h2" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>OWNER</td>
+                        <td id="h3" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>STATUS</td>
+                        <td id="h4" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>TRACKED</td>
+                        <td id="h5" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>CATEGORY</td>
+                        <td id="h6" name="tests" width="90%"></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5 id="title1">ALL PATCH LIST OF BXTP_{{ project }} <span class="badge">{{all_counts}}</span></h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="footable table table-stripped toggle-arrow-tiny no-margins collapse in" id="table_summary">
+                        <thead>
+                            <th width="5%"  style="text-align:center"; data-sort-ignore="true">
+                                <input id="allselect" type="checkbox" onclick="slectsall()"/>
+
+                            </th>
+                            <th width="10%" style="text-align:center;">
+                                Time
+                            </th>
+                            <th width="6%" style="text-align:center;">
+                                Patch
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Owner
+                            </th>
+                            <th width="24%" style="text-align:center;">
+                                Subject
+                            </th>
+                            <th  width="8%"style="text-align:center;">
+                                Status
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Tracked_id
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Category
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Comments
+                            </th>
+                        </thead>
+                        {% for l in ALL %}
+                        <tr>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <input class="qx" type="checkbox" id="{{l.id}}" onclick="discopy()"/>
+                        </td>
+                            <td  class="text-center no-padding" style="font-size: 13px;vertical-align: middle" width="12%">
+                                {{l.fomartted_date}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                <a href={{l.patch}} name="alltests" target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{l.shortpatch}}</a><br>
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.owner}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.subject}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle" name="display" abbr="{{l.id}}">
+                                {{l.status}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {% ifequal l.track 'None' %}
+                                {{l.track}}
+                                {% else %}
+                                <a href={{l.track}} target="_blank" class="btn btn-link"
+                                   style="font-size: 13px;vertical-align: middle">{{l.data}}</a><br>
+                                {%endifequal %}
+                            </td>
+                            <td class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.category}}
+                            </td>
+                            <td class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.comments}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Mainly scripts -->
+<script src="/static/js/plugins/footable/footable.all.min.js"></script>
+<script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- Custom and plugin javascript -->
+<script src="/static/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/moment.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/fullcalendar.min.js"></script>
+
+<script>
+    window.onload = setdisplay;
+    var unSelected = "#ff4500";
+    var selected = "#0071C5";
+    $(function () {
+        $("#cate").css("color", unSelected);
+        $("option").css("color", selected);
+        $("select").change(function () {
+            var selItem = $(this).val();
+            if (selItem == $(this).find('option:first').val()) {
+                $(this).css("color", unSelected);
+            } else {
+                $(this).css("color", selected);
+            }
+        });
+    })
+
+    function copypatch() {
+        var patch = document.getElementById("clipboard");
+        patch.select();
+        document.execCommand("Copy");
+        alert("Copy Success");
+    }
+
+    $.ajaxSetup({
+        data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    function submit() {
+        var cate = $("#cate").val();
+        var content = $("#pnp").val();
+        var comments = $("#comments").val();
+        if (cate == "=== select category ===")
+        {
+            $("#add .btn").html("Add Patch");
+            alert("Please Select Category");
+            return false;
+        }
+        $("#add .btn").html("Loading......");
+        $.post('/test/{{ project }}/', { "content": content, "cate": cate, "comments":comments }, function (ret) {
+            $("#add button").html("Add Patch");
+            alert(ret);
+            if (ret=="Please input normal patches"){
+                return false
+            }
+            window.location.reload();
+        })
+    }
+
+    function BKC() {
+        var EB = $("#slist").val();
+        var slave = $("#slave").val();
+        var clip = $("#clipboard").val();
+        var project_id = $("#project").val();
+        var project_name = $("#project option:selected").text();
+        var data = {
+                "project_id": project_id,
+                "project_name": project_name,
+                "slave_project": "bxtp_ivi_q",//test_script code('bxtp_ivi_m','bxtp_ivi_o','bxtp_ivi_p','bxtp_ivi_q')
+                "build_type_id": "2",//build_type_id(daily:1,weekly:2)
+                "build_type": "weekly",
+                "build_url": "https://mcg-depot.intel.com/artifactory/cactus-absp-jf/build/eng-builds/master/PSI/weekly/",
+                "build": EB,
+                "slave_id": slave,
+                "case_name": ["full_boot", "Rlbench", "GFX5_openGL_Car_Chase","GFX5_openGL_Car_Chase_offscreen","GFX5_openGL_Manhattan31","GFX5_openGL_Manhattan31_1080_offscreen", "Antutu_6", "Daimler_C217_offscreen","Daimler_C217_onscreen", "Daimler_IC_offscreen", "Daimler_IC_onscreen", "Geekbench3.3", "H264_1080P_60FPS", "H264_2160P_60FPS", "H265_2K_10bit", "H265_2K_8bit", "Resume_time"],
+                "case_loop": ["3","3","3","3","3","3","3","3","3","3","3","3","3","3","3","3","3"],
+                "case_tool": [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
+                "case_weight": ["","","","","","","","","","","","","","","","",""],
+                "config_cmds": "",
+                "config_params": "",
+                "skip_flash": false,
+                "patch": clip,
+                "tag": "bkc",
+                "patch_method": "bap",
+                "display_build": EB.replace("_WW", "_BW"),
+                "test_tag": "",
+                "test_comment": "",
+                "test_target": "gordon_peak"
+                };
+        console.log(data);
+        if (clip!='') {
+            if (EB != '') {
+                $("#EB").attr("disabled", true);
+                $("#BKC .btn").html("Loading......");
+                $.post('/week/{{ project }}/',{'data': JSON.stringify(data)}, function (ret) {
+                    $("#BKC button").html("submit");
+                    alert(ret);
+                    window.location.reload();
+                })
+            }
+            else {
+                alert("Please Select Right Weekly")
+            }
+        }
+        else {
+            alert("Please Select Patches For Bkc")
+        }
+    }
+
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,basicWeek,basicDay'
+            },
+            firstDay: 1,
+            eventLimit: true,
+            height: 900,
+            editable: true,
+            weekNumbers: true,
+            weekends: true,
+            droppable: false, // this allows things to be dropped onto the calendar
+            events: '/calendar_data/{{ project }}/',
+            eventClick: function (calEvent, jsEvent, view) {
+                $('#build_no').html(calEvent.title);
+                $.each($("td[name='tests']"), function () {
+                    $(this).html('');
+                })
+                $.get("/calendar/{{ project }}/", function (data) {
+                    $.each(data, function (i) {
+                        // console.log(data[i].patch);
+                        if (data[i].title == calEvent.title) {
+                            $("#h1").append(data[i].start);
+                            $("#h2").append(data[i].patch);
+                            $("#h3").append(data[i].owner);
+                            $("#h4").append(data[i].status);
+                            $("#h5").append(data[i].track);
+                            $("#h6").append(data[i].cate);
+                        }
+                    })
+
+                    $("#myModal").modal();
+                })
+
+            }
+
+        });
+
+
+    });
+
+    $('#table_summary').footable({ paginate: false });
+    $.ajaxSetup({
+        data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    function discopy(){
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for(var i=0;i<id.length;i++){
+            if(document.getElementById(id[i].text)!=null){
+                if(document.getElementById(id[i].text).checked){
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for(var s=0;s<ids.length;s++){
+            var l = ids[s].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(l == 'MERGED'){
+                if(document.getElementById(ids[s].abbr).checked){
+                    datas.push(ids[s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', { "selects":idlists }, function (ret) {
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function deltips(id) {
+        var open = confirm("confirm deletion?");
+        if (open == true)
+        {
+            $.post('/delete/{{ project }}/',{"data":id});
+            window.location.reload()
+        }
+        
+    }
+
+    function setdisplay(){
+        var status = document.getElementsByName('display');
+        var lst = new Array();
+        for(var i=0;i<status.length;i++){
+            var s = status[i].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(s !== 'MERGED'){
+                lst.push(status[i].abbr);
+            }
+        }
+        for(var f=0;f<status.length;f++) {
+            if(lst[f]!=null){
+                document.getElementById(lst[f]).style.display = 'none'
+            }
+        }
+    };
+
+    function slectsall() {
+        var selects = $("#allselect").prop("checked");
+        var quanx = $(".qx").prop("checked", selects);
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for(var i=0;i<id.length;i++){
+            if(document.getElementById(id[i].text)!=null){
+                if(document.getElementById(id[i].text).checked){
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for(var s=0;s<ids.length;s++){
+            var l = ids[s].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(l == 'MERGED'){
+                if(document.getElementById(ids[s].abbr).checked){
+                    datas.push(ids[s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', { "selects":idlists }, function (ret) {
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function slectsalls() {
+        var selects = $("#allselects").prop("checked");
+        var quanxs = $(".qxs").prop("checked", selects);
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for (var i = 0; i < id.length; i++) {
+            if (document.getElementById(id[i].text) != null) {
+                if (document.getElementById(id[i].text).checked) {
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for (var s = 0; s < ids.length; s++) {
+            var l = ids[s].innerHTML.replace(/[\r\n]/g, "").replace(/\ +/g, "");
+            if (l == 'MERGED') {
+                if (document.getElementById(ids[s].abbr).checked) {
+                    datas.push(ids[{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link href="/static/css/plugins/fullcalendar/fullcalendar.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/github-markdown.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/plugins/footable/footable.core.css" rel="stylesheet" type="text/css">
+    <style>
+        .patch-selector {
+            width: 1380px;
+        }
+
+        .cate-control,
+        .single-line {
+            background-color: #FFFFFF;
+            background-image: none;
+            border: 1px solid #999;
+            border-radius: 1px;
+            color: inherit;
+            display: block;
+            padding: 6px 12px;
+            transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+            width: 100%;
+            font-size: 14px;
+        }
+        #title1{
+            text-transform: uppercase;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5 id="title1">BXTP IVI {{ project }} BKC PATCHES DASHBOARD <span class="badge">{{counts}}</span></h5>
+                <div class="pull-right">
+                    <span class="fa fa-star"></span>&nbsp;Patch Data will refresh after one minute
+                </div>
+            </div>
+            <div class="ibox-content">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th  style="text-align:center;">
+                            <input id="allselects" type="checkbox" onclick="slectsalls()" checked="checked"/>
+                        </th>
+                        <th  style="text-align:center;">
+                            Time
+                        </th>
+                        <th  style="text-align:center;">
+                            Patch
+                        </th>
+                        <th  style="text-align:center;">
+                            Owner
+                        </th>
+                        <th  style="text-align:center;">
+                            Subject
+                        </th>
+                        <th  style="text-align:center;">
+                            Status
+                        </th>
+                        <th  style="text-align:center;">
+                            Tracked_id
+                        </th>
+                        <th  style="text-align:center;">
+                            Category
+                        </th>
+                        <th  style="text-align:center;">
+                            Comments
+                        </th>
+                        <th  style="text-align:center;">
+                            Action
+                        </th>
+                    </tr>
+                    </thead>
+                    {% for i in str %}
+                    <tr>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <input  class="qxs" type="checkbox" id="{{i.shortpatch}}"  checked="checked" onclick="discopy()"/>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.fomartted_date}}
+                        </td>
+                        <td  class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <a href={{i.patch}}  name="alltest" target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.shortpatch}}</a>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.owner}}
+                        </td>
+                        <td class="text-left no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.subject}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.status}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <div class="readonly">
+                                {% ifequal i.track 'None' %} {{i.track}} {% else %}
+                                <a href={{i.track}} target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{i.data}}</a><br>                                                        {% endifequal %}
+                            </div>
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.category}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            {{i.comments}}
+                        </td>
+                        <td class="text-center no-padding" style="font-size: 10px;vertical-align: middle">
+                            <input type="submit" value="Delete" onclick="deltips({{i.id}})" class="btn btn-primary btn-xs" style="font-size: 12px;vertical-align: middle"
+                            />
+                        </td>
+                        {% endfor %}
+                    </tr>
+                </table><br>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <textarea class="form-control" rows="10" id="clipboard"  style="text-align:left;font-size: 13px;width:-webkit-fill-available;background-color: #FFFFFF" readonly="readonly">{{clipboard}}</textarea><br><br>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <input type="button" onClick="copypatch()" value="Copy To Clipboard" class="btn btn-primary block  m-b" style="height:35px;font-size: 13px;"/>
+                            </div>
+                            <div class="col-lg-6">
+                                <button class="btn btn-primary text-center" data-toggle="modal" data-target="#Eblink" style="height:35px;font-size: 13px" onclick="Get_list()">Generate Bkc</button>
+                                <div class="modal fade" id="Eblink" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                                                <h4 class="modal-title" id="myModalLabel">
+                                                    Please Select
+                                                </h4>
+                                            </div>
+                                            <div class="modal-body" style="padding: 10px 10px 10px 10px">
+                                                <select id="slist" class="form-control m-b" rows="2">
+                                                </select>
+                                                <select id="project" class="form-control m-b" rows="2">
+                                                </select>
+                                                <select id="slave" class="form-control m-b" rows="2">
+                                                </select>
+                                            </div>
+                                            <div id="BKC" class="modal-footer">
+                                                <button type="button" onclick="BKC()" class="btn btn-primary">submit</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class=col-lg-6>
+                        <div class="form-group">
+                            <select id="cate" class="form-control m-b">
+                                <option>=== select category ===</option>
+                                <option>s2r</option>
+                                <option>cold boot opt</option>
+                                <option>graphics</option>
+                                <option>wifi</option>
+                                <option>debug only</option>
+                                <option>others</option>
+                            </select>
+                            {% csrf_token %}
+                            <textarea class="form-control"  id="comments" placeholder="comments" rows="1" style="width:-webkit-fill-available;margin-bottom: 18px"></textarea>
+                            <textarea class="form-control" placeholder="Add Patch Here" rows="4" id="pnp" style="width:-webkit-fill-available"></textarea><br><br>
+                                <div id="add" class="bs-example">
+                                    <button type="button" onclick="submit()" class="btn btn-primary " style="height:35px;width:150px;font-size: 13px;" data-loading-text="Loading...">Add Patch</button><br>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>ALL PATCH LIST HISTORY</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div id="calendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal inmodal" id="myModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="width:65%">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <h4 id="build_no" class="modal-title"></h4>
+            </div>
+            <div class="modal-body">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>TIME</td>
+                        <td id="h1" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>PATCH</td>
+                        <td id="h2" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>OWNER</td>
+                        <td id="h3" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>STATUS</td>
+                        <td id="h4" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>TRACKED</td>
+                        <td id="h5" name="tests" width="90%"></td>
+                    </tr>
+                    <tr>
+                        <td>CATEGORY</td>
+                        <td id="h6" name="tests" width="90%"></td>
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+        <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5 id="title1">ALL PATCH LIST OF BXTP_{{ project }} <span class="badge">{{all_counts}}</span></h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <table class="footable table table-stripped toggle-arrow-tiny no-margins collapse in" id="table_summary">
+                        <thead>
+                            <th width="5%"  style="text-align:center"; data-sort-ignore="true">
+                                <input id="allselect" type="checkbox" onclick="slectsall()"/>
+
+                            </th>
+                            <th width="10%" style="text-align:center;">
+                                Time
+                            </th>
+                            <th width="6%" style="text-align:center;">
+                                Patch
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Owner
+                            </th>
+                            <th width="24%" style="text-align:center;">
+                                Subject
+                            </th>
+                            <th  width="8%"style="text-align:center;">
+                                Status
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Tracked_id
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Category
+                            </th>
+                            <th width="8%" style="text-align:center;">
+                                Comments
+                            </th>
+                        </thead>
+                        {% for l in ALL %}
+                        <tr>
+                        <td class="text-center no-padding" style="font-size: 13px;vertical-align: middle">
+                            <input class="qx" type="checkbox" id="{{l.id}}" onclick="discopy()"/>
+                        </td>
+                            <td  class="text-center no-padding" style="font-size: 13px;vertical-align: middle" width="12%">
+                                {{l.fomartted_date}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                <a href={{l.patch}} name="alltests" target="_blank" class="btn btn-link" style="font-size: 13px;vertical-align: middle">{{l.shortpatch}}</a><br>
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.owner}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.subject}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle" name="display" abbr="{{l.id}}">
+                                {{l.status}}
+                            </td>
+                            <td  class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {% ifequal l.track 'None' %}
+                                {{l.track}}
+                                {% else %}
+                                <a href={{l.track}} target="_blank" class="btn btn-link"
+                                   style="font-size: 13px;vertical-align: middle">{{l.data}}</a><br>
+                                {%endifequal %}
+                            </td>
+                            <td class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.category}}
+                            </td>
+                            <td class="text-center no-padding"
+                                style="font-size: 13px;vertical-align: middle">
+                                {{l.comments}}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block js %}
+<!-- Mainly scripts -->
+<script src="/static/js/plugins/footable/footable.all.min.js"></script>
+<script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+<!-- Custom and plugin javascript -->
+<script src="/static/js/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/moment.min.js"></script>
+<script src="/static/js/plugins/fullcalendar/fullcalendar.min.js"></script>
+
+<script>
+    window.onload = setdisplay;
+    var unSelected = "#ff4500";
+    var selected = "#0071C5";
+    $(function () {
+        $("#cate").css("color", unSelected);
+        $("option").css("color", selected);
+        $("select").change(function () {
+            var selItem = $(this).val();
+            if (selItem == $(this).find('option:first').val()) {
+                $(this).css("color", unSelected);
+            } else {
+                $(this).css("color", selected);
+            }
+        });
+    })
+
+    function copypatch() {
+        var patch = document.getElementById("clipboard");
+        patch.select();
+        document.execCommand("Copy");
+        alert("Copy Success");
+    }
+
+    $.ajaxSetup({
+        data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    function submit() {
+        var cate = $("#cate").val();
+        var content = $("#pnp").val();
+        var comments = $("#comments").val();
+        if (cate == "=== select category ===")
+        {
+            $("#add .btn").html("Add Patch");
+            alert("Please Select Category");
+            return false;
+        }
+        $("#add .btn").html("Loading......");
+        $.post('/test/{{ project }}/', { "content": content, "cate": cate, "comments":comments }, function (ret) {
+            $("#add button").html("Add Patch");
+            alert(ret);
+            if (ret=="Please input normal patches"){
+                return false
+            }
+            window.location.reload();
+        })
+    }
+
+    function BKC() {
+        var EB = $("#slist").val();
+        var slave = $("#slave").val();
+        var clip = $("#clipboard").val();
+        var project_id = $("#project").val();
+        var project_name = $("#project option:selected").text();
+        var data = {
+                "project_id": project_id,
+                "project_name": project_name,
+                "slave_project": "bxtp_ivi_q",//test_script code('bxtp_ivi_m','bxtp_ivi_o','bxtp_ivi_p','bxtp_ivi_q')
+                "build_type_id": "2",//build_type_id(daily:1,weekly:2)
+                "build_type": "weekly",
+                "build_url": "https://mcg-depot.intel.com/artifactory/cactus-absp-jf/build/eng-builds/master/PSI/weekly/",
+                "build": EB,
+                "slave_id": slave,
+                "case_name": ["full_boot", "Rlbench", "GFX5_openGL_Car_Chase","GFX5_openGL_Car_Chase_offscreen","GFX5_openGL_Manhattan31","GFX5_openGL_Manhattan31_1080_offscreen", "Antutu_6", "Daimler_C217_offscreen","Daimler_C217_onscreen", "Daimler_IC_offscreen", "Daimler_IC_onscreen", "Geekbench3.3", "H264_1080P_60FPS", "H264_2160P_60FPS", "H265_2K_10bit", "H265_2K_8bit", "Resume_time"],
+                "case_loop": ["3","3","3","3","3","3","3","3","3","3","3","3","3","3","3","3","3"],
+                "case_tool": [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]],
+                "case_weight": ["","","","","","","","","","","","","","","","",""],
+                "config_cmds": "",
+                "config_params": "",
+                "skip_flash": false,
+                "patch": clip,
+                "tag": "bkc",
+                "patch_method": "bap",
+                "display_build": EB.replace("_WW", "_BW"),
+                "test_tag": "",
+                "test_comment": "",
+                "test_target": "gordon_peak"
+                };
+        console.log(data);
+        if (clip!='') {
+            if (EB != '') {
+                $("#EB").attr("disabled", true);
+                $("#BKC .btn").html("Loading......");
+                $.post('/week/{{ project }}/',{'data': JSON.stringify(data)}, function (ret) {
+                    $("#BKC button").html("submit");
+                    alert(ret);
+                    window.location.reload();
+                })
+            }
+            else {
+                alert("Please Select Right Weekly")
+            }
+        }
+        else {
+            alert("Please Select Patches For Bkc")
+        }
+    }
+
+    $(document).ready(function () {
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,basicWeek,basicDay'
+            },
+            firstDay: 1,
+            eventLimit: true,
+            height: 900,
+            editable: true,
+            weekNumbers: true,
+            weekends: true,
+            droppable: false, // this allows things to be dropped onto the calendar
+            events: '/calendar_data/{{ project }}/',
+            eventClick: function (calEvent, jsEvent, view) {
+                $('#build_no').html(calEvent.title);
+                $.each($("td[name='tests']"), function () {
+                    $(this).html('');
+                })
+                $.get("/calendar/{{ project }}/", function (data) {
+                    $.each(data, function (i) {
+                        // console.log(data[i].patch);
+                        if (data[i].title == calEvent.title) {
+                            $("#h1").append(data[i].start);
+                            $("#h2").append(data[i].patch);
+                            $("#h3").append(data[i].owner);
+                            $("#h4").append(data[i].status);
+                            $("#h5").append(data[i].track);
+                            $("#h6").append(data[i].cate);
+                        }
+                    })
+
+                    $("#myModal").modal();
+                })
+
+            }
+
+        });
+
+
+    });
+
+    $('#table_summary').footable({ paginate: false });
+    $.ajaxSetup({
+        data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+    });
+
+    function discopy(){
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for(var i=0;i<id.length;i++){
+            if(document.getElementById(id[i].text)!=null){
+                if(document.getElementById(id[i].text).checked){
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for(var s=0;s<ids.length;s++){
+            var l = ids[s].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(l == 'MERGED'){
+                if(document.getElementById(ids[s].abbr).checked){
+                    datas.push(ids[s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', { "selects":idlists }, function (ret) {
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function deltips(id) {
+        var open = confirm("confirm deletion?");
+        if (open == true)
+        {
+            $.post('/delete/{{ project }}/',{"data":id});
+            window.location.reload()
+        }
+        
+    }
+
+    function setdisplay(){
+        var status = document.getElementsByName('display');
+        var lst = new Array();
+        for(var i=0;i<status.length;i++){
+            var s = status[i].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(s !== 'MERGED'){
+                lst.push(status[i].abbr);
+            }
+        }
+        for(var f=0;f<status.length;f++) {
+            if(lst[f]!=null){
+                document.getElementById(lst[f]).style.display = 'none'
+            }
+        }
+    };
+
+    function slectsall() {
+        var selects = $("#allselect").prop("checked");
+        var quanx = $(".qx").prop("checked", selects);
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for(var i=0;i<id.length;i++){
+            if(document.getElementById(id[i].text)!=null){
+                if(document.getElementById(id[i].text).checked){
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for(var s=0;s<ids.length;s++){
+            var l = ids[s].innerHTML.replace(/[\r\n]/g,"").replace(/\ +/g,"");
+            if(l == 'MERGED'){
+                if(document.getElementById(ids[s].abbr).checked){
+                    datas.push(ids[s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', { "selects":idlists }, function (ret) {
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function slectsalls() {
+        var selects = $("#allselects").prop("checked");
+        var quanxs = $(".qxs").prop("checked", selects);
+        var id = document.getElementsByName('alltest');
+        var ids = document.getElementsByName('display');
+        var datas = new Array();
+        for (var i = 0; i < id.length; i++) {
+            if (document.getElementById(id[i].text) != null) {
+                if (document.getElementById(id[i].text).checked) {
+                    datas.push(id[i].text);
+                }
+            }
+        };
+        for (var s = 0; s < ids.length; s++) {
+            var l = ids[s].innerHTML.replace(/[\r\n]/g, "").replace(/\ +/g, "");
+            if (l == 'MERGED') {
+                if (document.getElementById(ids[s].abbr).checked) {
+                    datas.push(ids[s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', {"selects": idlists}, function (ret) {
+            console.log(ret);
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function Get_list(){
+        $.get('/Get_list/', {"project":"bxtp_{{ project }}"} ,function (ret) {
+            $("#slist").empty();
+            $("#project").empty();
+            $("#slave").empty();
+            $("#slist").html(ret["sli"]);
+            $("#project").html(ret["projects"]);
+            $("#slave").html(ret["slave"])
+        });
+    }
+
+    </script>
+{% endblock %}s].abbr);
+                }
+            }
+        };
+        idlists = datas.join('-');
+        $.post('/select/{{ project }}/', {"selects": idlists}, function (ret) {
+            console.log(ret);
+            $("#clipboard").html(ret)
+        });
+    }
+
+    function Get_list(){
+        $.get('/Get_list/', {"project":"bxtp_{{ project }}"} ,function (ret) {
+            $("#slist").empty();
+            $("#project").empty();
+            $("#slave").empty();
+            $("#slist").html(ret["sli"]);
+            $("#project").html(ret["projects"]);
+            $("#slave").html(ret["slave"])
+        });
+    }
+
+    </script>
+{% endblock %}

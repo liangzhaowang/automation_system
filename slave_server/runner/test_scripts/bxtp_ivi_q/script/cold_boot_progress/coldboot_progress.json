@@ -1,0 +1,63 @@
+{"coldboot": {
+"stage": [
+{"name": "init_1_start", "filter": "init first stage started", "rank": 1},
+{"name": "init_2_start", "filter": "init second stage started", "rank": 1},
+{"name": "android_start", "filter": "boot_progress_start", "rank": 1},
+{"name": "preload_start", "filter": "boot_progress_preload_start", "rank": 1},
+{"name": "preload_end", "filter": "boot_progress_preload_end", "rank": 1},
+{"name": "system_run", "filter": "boot_progress_system_run", "rank": 1},
+{"name": "pms_system_scan_start", "filter": "boot_progress_pms_system_scan_start", "rank": 1},
+{"name": "pms_data_scan_start", "filter": "boot_progress_pms_data_scan_start", "rank": 1},
+{"name": "pms_scan_end", "filter": "boot_progress_pms_scan_end", "rank": 1},
+{"name": "pms_ready", "filter": "boot_progress_pms_ready", "rank": 1},
+{"name": "ams_ready", "filter": "boot_progress_ams_ready", "rank": 1},
+{"name": "enable_screen", "filter": "boot_progress_enable_screen", "rank": 1},
+{"name": "bootanim_exit", "filter": "Service 'bootanim' \\(pid (\\d+)\\) exited with status 0", "rank": 1},
+{"name": "zygote_launched", "filter": "START com.android.internal.os.ZygoteInit", "rank": 2},
+{"name": "init_selinux", "filter": "Initializing SELinux", "rank": 1},
+{"name": ".coldboot_done", "filter": "Waiting for /dev/.coldboot_done took", "rank": 1},
+{"name": "load_default_prop", "filter": "Loading properties from /default.prop took", "rank": 1},
+{"name": "load_system_prop", "filter": "Loading properties from /system/build.prop took", "rank": 1},
+{"name": "load_vendor_prop", "filter": "Loading properties from /vendor/build.prop took", "rank": 1},
+{"name": "load_factory_prop", "filter": "Loading properties from /factory/factory.prop took", "rank": 1},
+{"name": "load_data_local_prop", "filter": "Loading properties from /data/local.prop took", "rank": 1},
+{"name": "finish_mount_system", "filter": "__mount\\(source=([^,]+),target=/system,type=(\\w+)\\)=0", "rank": 1},
+{"name": "finish_mount_cache", "filter": "__mount\\(source=([^,]+),target=/cache,type=(\\w+)\\)=0", "rank": 1},
+{"name": "finish_mount_config", "filter": "__mount\\(source=([^,]+),target=/config,type=(\\w+)\\)=0", "rank": 1},
+{"name": "finish_mount_data", "filter": "__mount\\(source=([^,]+),target=/data,type=(\\w+)\\)=0", "rank": 1},
+{"name": "try_mount_data", "filter": "__mount\\(source=([^,]+),target=/data,type=(\\w+)\\)=-+[\\d]+", "rank": 1},
+{"name": "display_launcher", "filter": "Displayed com.google.android.googlequicksearchbox", "rank": 2},
+{"name": "boot_is_finished", "filter": "Boot is finished", "rank": 1},
+{"name": "driver_igb_avb_inited", "filter": "Using MSI-X interrupts", "rank": 1},
+{"name": "driver_snd_soc_skl_inited", "filter": "ROM loaded, continue FW loading", "rank": 1}
+],
+
+"high_svc": [
+{"svc": "ueventd"},
+{"svc": "zygote"},
+{"svc": "servicemanager"},
+{"svc": "surfaceflinger"},
+{"svc": "rvc"}
+],
+
+"initrc": [
+{"file": "init.rc"},
+{"file": "init.coredump.rc"},
+{"file": "init.crashlogd.rc"},
+{"file": "init.dvc_desc.rc"},
+{"file": "init.environ.rc"},
+{"file": "init.kernel.rc"},
+{"file": "init.log-watch.rc"},
+{"file": "init.logs.rc"},
+{"file": "init.npk.rc"},
+{"file": "init.trace.rc"},
+{"file": "init.usb.configfs.rc"},
+{"file": "init.usb.rc"},
+{"file": "init.zygote32.rc"},
+{"file": "init.zygote64_32.rc"},
+{"file": "init.debug-charging.rc"},
+{"file": "init.diag.rc"},
+{"file": "init.lmdump.rc"},
+{"file": "init.telephony-config.rc"}
+]
+}}

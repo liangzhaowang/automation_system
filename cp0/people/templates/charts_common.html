@@ -1,0 +1,171 @@
+{% extends 'layout.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+    <div class="row">
+        <div class="ibox">
+            <div class="ibox-content">
+                <canvas id="container1" width="400" height="150"></canvas>
+            </div>
+            <div class="ibox-content">
+                <canvas id="container2" width="400" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block js %}
+    <script src="{% static 'js/Chart.js' %}"></script>
+    <script>
+        var mydata = {{ alldata|safe }};
+        var title_names = "{{ title_name }}";
+        if (title_names == "Full Boot View"){
+        var barChartData1 = {
+			labels: ["Stage"].concat(mydata["kernel"]["category"]),
+			datasets: [{
+                label: mydata["kernel"]["stage_name"][0],
+                backgroundColor: '#7cb5ec',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][0]]
+            },
+            {
+                label: mydata["kernel"]["stage_name"][1],
+                backgroundColor: '#90ed7d',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][1]]
+            },
+            {
+                label: mydata["kernel"]["stage_name"][2],
+                backgroundColor: '#f7a35c',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][2]]
+            },
+            {
+                label: mydata["kernel"]["stage_name"][3],
+                backgroundColor: '#696969',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][3]]
+            },
+            {
+                label: mydata["kernel"]["stage_name"][4],
+                backgroundColor: '#8085e9',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][4]]
+            },
+            {
+                label: mydata["kernel"]["stage_name"][5],
+                backgroundColor: '#8085e9',
+                stack: 'data',
+                data: [mydata["kernel"]["stage_data"][5]]
+            },
+            {
+                label: 'start',
+                backgroundColor: '#CCDDFF',
+                stack: 'data',
+                data: [0].concat(mydata["kernel"]["start"])
+            },
+            {
+                    label: 'duration',
+                    backgroundColor: 'rgb(0, 113, 197)',
+                    stack: 'data',
+                    data: [0].concat(mydata["kernel"]["duration"])
+			}]
+		};
+		var barChartData2 = {
+			labels: ["Stage"].concat(mydata["android"]["category"]),
+			datasets: [{
+                label: mydata["android"]["stage_name"][0],
+                backgroundColor: '#7cb5ec',
+                stack: 'data',
+                data: [mydata["android"]["stage_data"][0]]
+            },
+            {
+                label: mydata["android"]["stage_name"][1],
+                backgroundColor: '#f7a35c',
+                stack: 'data',
+                data: [mydata["android"]["stage_data"][1]]
+            },
+            {
+                label: mydata["android"]["stage_name"][2],
+                backgroundColor: '#90ed7d',
+                stack: 'data',
+                data: [mydata["android"]["stage_data"][2]]
+            },
+            {
+                label: mydata["android"]["stage_name"][3],
+                backgroundColor: '#8085e9',
+                stack: 'data',
+                data: [mydata["android"]["stage_data"][3]]
+            },
+            {
+				label: 'start',
+				backgroundColor: '#CCDDFF',
+                stack: 'data',
+				data: [0].concat(mydata["android"]["start"])
+            },
+            {
+				label: 'duration',
+				backgroundColor: 'rgb(0, 113, 197)',
+                stack: 'data',
+				data: [0].concat(mydata["android"]["duration"])
+			}]
+		};
+		window.onload = function() {
+            var ctx1 = document.getElementById('container1').getContext('2d');
+            var ctx2 = document.getElementById('container2').getContext('2d');
+            Chart.defaults.global.defaultFontFamily = "'Helvetica Neue', 'Helvetica', 'Arial', sans-serif";
+            window.myBar = new Chart(ctx1, {
+				type: 'horizontalBar',
+				data: barChartData1,
+				options: {
+					title: {
+						display: true,
+						text: 'Chart for Kernel',
+                        fontSize: 20
+					},
+					tooltips: {
+						mode: 'index',
+						intersect: false
+					},
+					responsive: true,
+					scales: {
+						xAxes: [{
+						    display: false,
+							stacked: true
+						}],
+						yAxes: [{
+							stacked: true
+						}]
+                    }
+				}
+			});
+			window.myBar = new Chart(ctx2, {
+				type: 'horizontalBar',
+				data: barChartData2,
+				options: {
+					title: {
+						display: true,
+						text: 'Chart for Android',
+                        fontSize: 20
+					},
+					tooltips: {
+						mode: 'index',
+						intersect: false
+					},
+					responsive: true,
+					scales: {
+						xAxes: [{
+					        display: false,
+							stacked: true
+						}],
+						yAxes: [{
+							stacked: true
+						}]
+                    }
+				}
+			})
+		}
+        }
+
+    </script>
+{% endblock %}

@@ -1,0 +1,234 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+
+{% block css %}
+<link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet" type="text/css">
+<style>
+    .project-list {
+        table-layout: fixed;
+    }
+
+    .project-list td {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Your projects</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <a class="btn btn-primary btn-sm m-b-md" href="/accounts/workspace/create_project/">Add new project</a>
+                <div class="table-responsive">
+                    <table id="projectTable" class="table table-striped table-bordered table-hover dataTables-example project-list">
+                        <thead>
+                            <tr>
+                                <th width="30px">No</th>
+                                <th>ProjectId</th>
+                                <th>Name</th>
+                                <th>Platform</th>
+                                <th>Patch Service</th>
+                                <th>Compiling Service</th>
+                                <th>Image Hosting Service</th>
+                                <th>Owner</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectTableBody">
+                            {% for project in joined_projects %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ project.name }}</td>
+                                <td>{{ project.production }}</td>
+                                <td><a target="_blank" href="{{ project.services.patch }}">{{ project.services.patch }}<a></td>
+                                <td><a target="_blank" href="{{ project.services.compiling }}">{{ project.services.compiling }}<a></td>
+                                <td><a target="_blank" href="{{ project.services.ihs }}">{{ project.services.ihs }}<a></td>    
+                                <td>{{ project.owner }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <h2 class="m-b-md" id="projectTitle"></h2>
+    </div>
+    <div class="col-lg-6">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Members</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content" style="height: 300px">
+                <div class="full-height-scroll">
+                    <h3>Administrator:</h3>
+                    <p id="ownerName"></p>
+                    <hr>
+                    <h3>Contributors:</h3>
+                    <div id="contributorNames"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Slaves</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content" style="height: 300px">
+                <div class="full-height-scroll">
+                    <table class="table table-hover margin bottom">
+                        <thead>
+                            <tr>
+                                <th style="width: 1%" class="text-center">No.</th>
+                                <th>Name</th>
+                                <th>IP Addr</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for slave in slaves %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td>{{ slave.num }}</td>
+                                <td>{{ slave.ip }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Test Cases</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content table-response">
+                <h4>Public Cases</h4>
+                <table class="table table-hover no-margins">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Owner</th>
+                            <th>View</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in public_cases %}
+                        <tr>
+                            <td style="width: 400px;">{{ case.name }}</td>
+                            <td style="width: 200px;">{{ case.owner }}</td>
+                            <td><button class="btn btn-xs">View</button></td>
+                            <td><button class="btn btn-xs"><i class="fa fa-download"></i> Download</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="ibox-content table-response">
+                <h4>Private Cases</h4>
+                <table class="table table-hover no-margins">
+                    <thead>
+                        <tr>
+                            <th style="width: 400px;">Name</th>
+                            <th style="width: 200px;">Owner</th>
+                            <th>View</th>
+                            <th>Download</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case in private_cases %}
+                        <tr>
+                            <td>{{ case.name }}</td>
+                            <td>{{ case.owner }}</td>
+                            <td><button class="btn btn-xs">Edit</button></td>
+                            <td><button class="btn btn-xs"><i class="fa fa-download"></i> Download</button></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="ibox-footer">
+                <a class="btn btn-primary" href="/accounts/case/">Add test case</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block js %}
+<script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
+<script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+        var table = $('#projectTable').DataTable({
+            columnDefs: [
+            {
+                "targets": [1],
+                "visible": false,
+                "searchable": false
+            }],
+            pageLength: 5,
+            responsive: true,
+            bFilter: false,
+            bLengthChange: false,
+            buttons: [
+                {
+                    customize: function (win) {
+                        $(win.document.body).addClass('white-bg');
+                        $(win.document.body).css('font-size', '10px');
+                        $(win.document.body).find('table')
+                            .addClass('compact')
+                            .css('font-size', 'inherit');
+                    }
+                }
+            ]
+        });
+        $('#projectTable tbody').on('click', 'tr', function () {
+            var project = table.row(this).data()[2];
+            var projectId = table.row(this).data()[1];
+            $("#projectTitle").html(project);
+            $.get("/accounts/get_project_info/" + projectId, function(data) {
+                $("#ownerName").html(data.owner);
+            })
+        });
+        $("#projectTableBody").children(":first").click();
+    });
+
+</script>
+{% endblock js %}

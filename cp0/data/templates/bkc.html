@@ -1,0 +1,177 @@
+{% extends 'layout.html' %}
+{% load staticfiles %}
+{% load chart %}
+
+{% block css %}
+<link href="{% static 'css/plugins/footable/footable.core.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+{% include "navi.html" %}
+<div class="row"> 
+    <div class="col-lg-3">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h3><small>week</small> {{ current_week.1 }} <small>year</small> {{ current_week.0 }}</h3>
+                {{ builds|length }} builds
+            </div>
+            <div class="ibox-content">
+                <ul class="list-group clear-list">
+                    {% for week in weeks %}
+                        <li class="list-group-item {% ifequal forloop.counter0 0 %}fist-item{% endifequal %}">
+                            {% if show_del %}
+                            <button class="btn btn-warning btn-xs" data-toggle="modal" data-target="#remove{{ week.0 }}{{ week.1 }}" onclick="getDBdata('{{ project_name }}','{{ tag }}','{{ week.0 }}','{{ week.1 }}')">
+                                <i class="fa fa-times" style="font-size: 8px"></i>
+                            </button>
+                            {% endif %}
+                            <div class="modal fade" id="remove{{ week.0 }}{{ week.1 }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                <i class="fa fa-info-circle"> please select the data to be deleted</i>
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <select class="form-control" name="account" id="{{ week.0 }}{{ week.1 }}">
+                                            </select>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" onclick="removedata('{{ project_name }}', '{{ tag }}', '{{ week.0 }}{{ week.1 }}')">
+                                                submit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <a class="active" href="/{{ tag }}/{{ project_name }}/{{ week.0 }}/{{ week.1 }}">
+                                Week {{ week.1 }}, {{ week.0 }} {% ifequal current_week week %}<i class="fas fa-arrow-circle-left"></i>
+                                <div class="fc fc-unthemed fc-ltr">
+                                    <div class="fc-toolbar pull-right" style="margin-top: -16px;">
+                                        <div class="fc-right">
+                                        {% if prev_build != none %}
+                                        <a aria-data="{{ project_name }}/{{ prev_build }}///" name="add_cmp" href="#"><i class="fa fa-exchange-alt" style="margin-right:3px;" overflow:hidden title="Weekly"></i></a>
+                                        {% endif %}
+                                        {% if current_build != none %}
+                                        <a aria-data="{{ project_name }}/{{ current_build }}///" name="add_cmp" href="#"><i class="fa fa-exchange-alt" overflow:hidden title="BKC"></i></a>
+                                        {% endif %}
+                                    </div>
+                                    </div>
+                                </div>
+                                {% endifequal %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% include 'pca_raw_tag.html' %}
+    </div>
+    <div class="col-lg-9">
+        <div class="ibox">
+            <div class="ibox-content">
+                <table class="footable table table-stripped toggle-arrow-tiny no-margins" id="table_summary">
+                    <thead>
+                        <tr>
+                            <th>Test Case</th>
+                            <th>Unit</th>
+                            <th>
+                                <small>{{ prev_build }}</small>
+                            </th>
+                            <th>
+                                <small>{{ current_build }}</small>
+                            </th>
+                            <th>Fluctuation</th>
+                            <th>Rate</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for case, value in summary.items %}
+                            <tr>
+                                <td name="trends" style="cursor:pointer;">{{ case }}</td>
+                                <td>{{ value.unit }}</td>
+                                <td>{{ value.prev }}</td>
+                                <td>{{ value.result }}</td>
+                                {% if value.down == False %}
+                                    <td class="text-better">{{ value.fluc }} <i class="fa fa-level-up"></i></td>
+                                    <td class="text-better">{{ value.rate }}% <i class="fa fa-level-up"></i></td>
+                                {% else %}
+                                    <td class="text-worth">{{ value.fluc }} <i class="fa fa-level-down"></i></td>
+                                    <td class="text-worth">{{ value.rate }}% <i class="fa fa-level-down"></i></td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <div>
+    {% include 'raw_2_table.html' %}
+</div>
+{% endblock %}
+
+{% block js %}
+<script src="{% static 'js/plugins/footable/footable.all.min.js' %}"></script>
+<script src="{% static 'js/plugins/highcharts/highcharts.js' %}"></script>
+<script>
+    $("#result_go").click(function() {
+        var url = "/" + $("#view_selector").val() + "/" + $("#project_selector").val() + "/";
+        window.location.href = url;
+    });
+    $("a[name='add_cmp']").on("click", function() {
+        $.post('/api/add_to_compare_list/', {data: $(this).attr("aria-data")}, function (ret) {
+            if (ret == '1')
+            {
+                location.reload();
+            } else if(ret == '-1') {
+                alert('comparison type is mismatching, please clear compare container first.');
+            }
+        })
+    });
+
+    $('#table_summary').footable({ paginate: false });
+
+    $('table[name="table_detail"]').footable({paginate: false});
+
+    $('#table_detail_prev').footable({ paginate: false });
+
+    function view_attachment(id) {
+        var url = $('#' + id).val();
+        window.open('/' + url);
+    }
+
+    function dl_attachment(id) {
+        var url = '/download/' + $('#' + id).val();
+        window.location.href = url;
+    }
+
+    $(document).ready(function () {
+        if('{{project_name}}' == 'bxtp_ivi_o'){
+            $("#pca_bt_container").show();
+        }else{
+            $("#pca_bt_container").hide();
+        }
+
+    });
+    function removedata(project, tag, build) {
+        var build_text = $('#'+build+' option:selected').text();
+        var conf = confirm('Remove data '+build_text+'?');
+        if (conf){
+            $.post('/api/remove_data/',{'project':project, 'tag':tag, 'build':build_text},function (ret) {
+                alert(ret);
+                window.location='/'+tag+'/'+project+'/'
+            })
+        }
+    };
+    function getDBdata(project, tag, weekyear, weeknum) {
+        $.get('/api/get_data/',{'project':project,'tag':tag, 'weekyear':weekyear, 'weeknum':weeknum}, function (ret) {
+            $("#"+weekyear+weeknum).empty();
+            $("#"+weekyear+weeknum).html(ret['selects'])
+        })
+
+    }
+</script>
+{% endblock %}

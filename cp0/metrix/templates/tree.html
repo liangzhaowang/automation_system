@@ -1,0 +1,38 @@
+
+{% load staticfiles %}
+{% block content %}
+
+<div class="chart" id="custom-colored" style="display:none">
+</div>
+
+
+
+{% endblock %}
+{% block js %}
+<script>
+$(document).ready(function(){
+    console.log("+++++++++++++++++++++++");
+    var mid = {{main_id|safe}};
+    console.log(mid);
+     $.get('/total_result/'+mid+'/', function(data) {
+    for (x in {{main_id|safe}})
+    {
+        console.log(x)
+        console.log(mid[x])
+        var m_id = mid[x]
+        $.each(data,function(i,v){
+        if(m_id == i){
+          console.log(i)
+          console.log(v)
+        }
+
+        });
+    }
+    });
+
+
+
+});
+
+</script>
+{% endblock %}
